@@ -1,0 +1,92 @@
+// Copyright 2011 Kevin Cox
+
+/*******************************************************************************
+*                                                                              *
+*  Permission is hereby granted, free of charge, to any person obtaining a     *
+*  copy of this software and associated documentation files (the "Software"),  *
+*  to deal in the Software without restriction, including without limitation   *
+*  the rights to use, copy, modify, merge, publish, distribute, sublicense,    *
+*  and/or sell copies of the Software, and to permit persons to whom the       *
+*  Software is furnished to do so, subject to the following conditions:        *
+*                                                                              *
+*  The above copyright notice and this permission notice shall be included in  *
+*  all copies or substantial portions of the Software.                         *
+*                                                                              *
+*  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  *
+*  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,    *
+*  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL     *
+*  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER  *
+*  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING     *
+*  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER         *
+*  DEALINGS IN THE SOFTWARE.                                                   *
+*                                                                              *
+*******************************************************************************/
+
+#ifndef TARGET_H
+#define TARGET_H
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <locale.h>
+#include <string.h>
+
+#include <iostream>
+#include <set>
+#include <vector>
+
+#include "rapidxml/rapidxml.hpp"
+
+class Generator;
+
+class Target
+{
+public:
+	struct comparator
+	{
+		bool operator ()(Target* t1, Target* t2) const
+		{
+			return strcmp(t1->path, t2->path) < 0;
+		}
+	};
+
+	static Target all; ///< The default target to build
+	static std::set<Target*, Target::comparator> targets; ///< A lsit of all targets created
+
+	static Target *newTarget ( const char *path );
+	static Target *findTarget ( const char *path );
+
+	char *path;  ///< The lcoation of the target.  This is an absolute value.
+	std::set<Target*> depends; ///< The targets that this target depends on
+	Generator *generator; ///< The generator used to create this target.
+private:
+	void init(void);
+public:
+
+	Target(const char *path = NULL );
+	~Target( );
+	void addDependancy(Target*);
+	void addGenerator(std::vector<const char*> cmd);
+
+	static Target *fromXML(const rapidxml::xml_node<> *n);
+	virtual rapidxml::xml_node<> *toXML(rapidxml::xml_document<> &d);
+
+	bool check(void);
+
+	bool operator > (const Target &c) const;
+	bool operator >= (const Target &c) const;
+	bool operator < (const Target &c) const;
+	bool operator <= (const Target &c) const;
+	bool operator == (const Target &c) const;
+	bool operator != (const Target &c) const;
+};
+
+class Generator : public Target
+{
+public:
+	Generator( const std::vector<char*> &cmd );
+	std::vector<char*> cmd;
+	virtual rapidxml::xml_node<> *toXML(rapidxml::xml_document<> &d);
+	static Generator *fromXML(const rapidxml::xml_node<> *n);
+};
+
+#endif

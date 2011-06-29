@@ -1,0 +1,9 @@
+@todo this file
+
+== Release ==
+cmake ${srcdir}
+make install
+
+== Debug ==
+cmake -DCMAKE_BUILD_TYPE=DEBUG ${srcdir}
+make install
