@@ -27,8 +27,7 @@
 
 namespace LuaFunctions
 {
-	int myfunc(lua_State *L);
-	int myfunc(lua_State *L);
+	void clean_up(lua_State *L);
 
 	namespace D
 	{

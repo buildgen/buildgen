@@ -23,7 +23,10 @@
 *******************************************************************************/
 
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include <sysexits.h> // BSD recomended exit stati
+#include <libgen.h>
 
 #include "messages.hpp"
 
@@ -35,12 +38,16 @@
 BuildGenLuaEnv::BuildGenLuaEnv ( const char *root )
 {
 	init();
+
+	char *d = strdup(root);
+	chdir(dirname(d));
+	free(d);
+
 	runFile(root);
 }
 
 BuildGenLuaEnv::~BuildGenLuaEnv ( )
 {
-	LuaFunctions::S::call_shutdown(L);
 	lua_close(L);
 }
 
@@ -58,7 +65,6 @@ void BuildGenLuaEnv::init_lua ( void )
 
 void BuildGenLuaEnv::dmakeify_lua ( void )
 {
-	lua_register(L, "_myfunc", &LuaFunctions::myfunc);
 	lua_register(L, "_d_add_depandancy", &LuaFunctions::D::add_depandancy);
 	lua_register(L, "_d_add_dir", &LuaFunctions::D::add_dir);
 	lua_register(L, "_d_add_generator", &LuaFunctions::D::add_generator);
@@ -72,6 +78,10 @@ void BuildGenLuaEnv::dmakeify_lua ( void )
 
 void BuildGenLuaEnv::runFile ( const char *path )
 {
+	char *d = strdup(path);
+	chdir(dirname(d));
+	free(d);
+
 	//msg::debug("About to run \"%s\" with lua\n", path);
 	int s = luaL_loadfile(L, (char*)path);
 
@@ -87,4 +97,7 @@ void BuildGenLuaEnv::runFile ( const char *path )
 		lua_pop(L, 1); // remove error message
 		exit(EX_DATAERR);
 	}
+
+	LuaFunctions::S::call_shutdown(L);
+	LuaFunctions::clean_up(L);
 }

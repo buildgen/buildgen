@@ -42,18 +42,25 @@
 namespace LuaFunctions
 {
 
-int myfunc(lua_State *L)
+void clean_up (lua_State *L)
 {
-	int argc = lua_gettop(L);
+	lua_settop(L, 0);
 
-	  printf("-- my_function() called with %d arguments.\n", argc);
+	lua_getglobal(L, "_G");
+	lua_pushstring(L, "D");
+	lua_gettable(L, 1);
+	lua_pushstring(L, "P");
+	lua_gettable(L, 1);
 
-	  for ( int n=1; n<=argc; ++n ) {
-		printf("-- argument %d \"%s\"\n", n, lua_tostring(L, n));
-	  }
 
-	  lua_pushnumber(L, 123); // return value
-	  return 1; // number of return values
+
+	/*lua_pushnil( L );
+
+	for ( lua_pushnil(L); lua_next(L, 1); )
+	{
+		lua_pushnil(L);
+		lua_rawset(L, 1);
+	}*/
 }
 
 namespace D

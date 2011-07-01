@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include <locale.h>
 #include <sysexits.h> // BSD recomended exit stati
-#include <libgen.h>
 
 #include <lua.hpp>
 
@@ -47,6 +46,9 @@ int main ( int argc, char **argv )
 
 	std::set<std::string> runfiles;
 
+	chdir(files->project_root);
+	BuildGenLuaEnv lua(files->normalizeFilename(files->rootfilename));
+
 	while (files->infofile.size())
 	{
 		std::pair<std::set<std::string>::iterator,bool> p(
@@ -54,13 +56,6 @@ int main ( int argc, char **argv )
 		);
 		if (p.second) // New file
 		{
-			chdir(files->project_root);
-			BuildGenLuaEnv lua(files->rootfilename);
-
-			char *d = dirname(strdup(files->infofile.front()));
-			chdir(d);
-			free(d);
-
 			lua.runFile(files->infofile.front());
 		}
 
