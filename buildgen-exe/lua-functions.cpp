@@ -27,6 +27,7 @@
 #include <locale.h>
 #include <vector>
 #include <queue>
+#include <sysexits.h>
 
 #include <lua.hpp>
 #include <locale>
@@ -38,29 +39,44 @@
 #include "globals.hpp"
 #include "buildgen-xml/target.hpp"
 #include "lua-init.hpp"
+#include "info.h"
 
 namespace LuaFunctions
 {
-
-void clean_up (lua_State *L)
+bool statesaved = false;
+void save_state(lua_State *L)
 {
-	lua_settop(L, 0);
-
+	msg::debug("1\n");
+	lua_getglobal(L, "P");
 	lua_getglobal(L, "_G");
-	lua_pushstring(L, "D");
-	lua_gettable(L, 1);
-	lua_pushstring(L, "P");
-	lua_gettable(L, 1);
+	lua_setfield(L, 1, "_G");
 
+	statesaved = true;
+	msg::debug("2\n");
+}
 
-
-	/*lua_pushnil( L );
-
-	for ( lua_pushnil(L); lua_next(L, 1); )
+void load_state(lua_State *L)
+{
+	if (statesaved)
 	{
-		lua_pushnil(L);
-		lua_rawset(L, 1);
-	}*/
+		lua_getglobal(L, "P");
+		lua_getfield(L, 1, "_G");
+		lua_setglobal(L, "_G");
+	}
+
+	int s = luaL_loadfile(L, LUALIBS_ROOT"core.lua");
+	if ( s == 0 )
+	{
+		// execute Lua program
+		s = lua_pcall(L, 0, LUA_MULTRET, 0);
+	}
+
+	if (s) // Errors
+	{
+		msg::error("%s\n", lua_tostring(L, -1));
+		lua_pop(L, 1); // remove error message
+		exit(EX_DATAERR);
+	}
 }
 
 namespace D
@@ -179,8 +195,13 @@ void call_shutdown ( lua_State *L )
 	if (!lua_isfunction(L, -1))
 		return;
 
-	lua_call(L, 0, 0);
-	//lua_pcall(L, 0, 0, 0); //@todo check for error
+	if (lua_pcall(L, 0, 0, 0)) // Errors
+	{
+		msg::error("%s\n", lua_tostring(L, -1));
+		lua_pop(L, 1); // remove error message
+		exit(EX_DATAERR);
+	}
+
 	lua_settop(L, 0);
 }
 } // End of S

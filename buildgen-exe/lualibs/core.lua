@@ -36,4 +36,5 @@ D.path = _d_path
 
 -- End of D
 
+if not P then P = {} end
 dofile(_s_lualibs_root.."stdlib.lua")

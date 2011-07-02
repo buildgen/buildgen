@@ -28,8 +28,6 @@ S.imported = true
 
 require "lfs"
 
-if not S.prefix then S.prefix = "/usr/local/" end
-
 local shutdownFunctions = {}
 function S._doShutdownFunctions ( )
 	for k,v in pairs(shutdownFunctions) do v() end

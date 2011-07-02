@@ -25,7 +25,19 @@
 
 --- The Standard library namespace.
 
-S = {}
+S = {} -- Std libraries
+L = {} -- User libraries
+if not P.S then P.S = {} end
+
+S.prefix = P.S.prefix
+if not S.prefix then S.prefix = "/usr/local/" end
+
+function S.setPrefix ( pre )
+	P.S.prefix = pre
+	S.prefix = pre
+end
+
+S.os = _s_os
 S.lualibsRoot = _s_lualibs_root
 S.imported = false
 
@@ -38,5 +50,23 @@ function S.import ( name )
 	if not S[name]
 	then
 		dofile(S.lualibsRoot.."stdlib/"..name..".lua")
+	end
+end
+
+function L.import ( path )
+	print("L.import is not implemented yet")
+
+	local name = path:reverse():find("/", 1, true)
+	if i then
+		name = name:sub(-i+1)
+	end
+
+	if not L[name]
+	then
+		if path:sub(-4) == ".lua"  then
+			dofile(D.path(path))
+		else
+			dofile(S.lualibsRoot.."custom/"..name..".lua")
+		end
 	end
 end

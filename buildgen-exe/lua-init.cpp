@@ -39,11 +39,8 @@ BuildGenLuaEnv::BuildGenLuaEnv ( const char *root )
 {
 	init();
 
-	char *d = strdup(root);
-	chdir(dirname(d));
-	free(d);
-
 	runFile(root);
+	LuaFunctions::save_state(L);
 }
 
 BuildGenLuaEnv::~BuildGenLuaEnv ( )
@@ -72,8 +69,8 @@ void BuildGenLuaEnv::dmakeify_lua ( void )
 
 	lua_pushstring(L, LUALIBS_ROOT);
 	lua_setglobal(L, "_s_lualibs_root");
-
-	runFile(LUALIBS_ROOT"core.lua");
+	lua_pushstring(L, OS_STRING);
+	lua_setglobal(L, "_s_os");
 }
 
 void BuildGenLuaEnv::runFile ( const char *path )
@@ -82,14 +79,14 @@ void BuildGenLuaEnv::runFile ( const char *path )
 	chdir(dirname(d));
 	free(d);
 
-	//msg::debug("About to run \"%s\" with lua\n", path);
-	int s = luaL_loadfile(L, (char*)path);
+	LuaFunctions::load_state(L);
 
-    if ( s == 0 )
-    {
-      // execute Lua program
-      s = lua_pcall(L, 0, LUA_MULTRET, 0);
-    }
+	int s = luaL_loadfile(L, (char*)path);
+	if ( s == 0 )
+	{
+		// execute Lua program
+		s = lua_pcall(L, 0, LUA_MULTRET, 0);
+	}
 
 	if (s) // Errors
 	{
@@ -99,5 +96,5 @@ void BuildGenLuaEnv::runFile ( const char *path )
 	}
 
 	LuaFunctions::S::call_shutdown(L);
-	LuaFunctions::clean_up(L);
+	//LuaFunctions::clean_up(L);
 }

@@ -28,4 +28,12 @@
 #define LUALIBS_ROOT "@lualibs_root@"
 #define DEFALUT_GENERATOR "@default_generator@"
 
+#if defined(__linux__)
+	#define OS_STRING "posix"
+#elif defined(_WIN32)
+	#define OS_STRING "windows"
+#else
+	#define OS_STRING "unknown"
+#endif
+
 #endif
