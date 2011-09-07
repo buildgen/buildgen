@@ -46,13 +46,11 @@ namespace LuaFunctions
 bool statesaved = false;
 void save_state(lua_State *L)
 {
-	msg::debug("1\n");
 	lua_getglobal(L, "P");
 	lua_getglobal(L, "_G");
 	lua_setfield(L, 1, "_G");
 
 	statesaved = true;
-	msg::debug("2\n");
 }
 
 void load_state(lua_State *L)
@@ -73,7 +71,7 @@ void load_state(lua_State *L)
 
 	if (s) // Errors
 	{
-		msg::error("%s\n", lua_tostring(L, -1));
+		msg::error("%s", lua_tostring(L, -1));
 		lua_pop(L, 1); // remove error message
 		exit(EX_DATAERR);
 	}
@@ -197,7 +195,7 @@ void call_shutdown ( lua_State *L )
 
 	if (lua_pcall(L, 0, 0, 0)) // Errors
 	{
-		msg::error("%s\n", lua_tostring(L, -1));
+		msg::error("%s", lua_tostring(L, -1));
 		lua_pop(L, 1); // remove error message
 		exit(EX_DATAERR);
 	}

@@ -23,48 +23,38 @@
 [-----------------------------------------------------------------------------]]
 
 
---- The Standard library namespace.
+S.c = {}
 
-S = {} -- Std libraries
-L = {} -- User libraries
-if not P.S then P.S = {} end
+S.c.flags = ""
+S.c.flag = {}
 
-S.prefix = P.S.prefix
-if not S.prefix then S.prefix = "/usr/local/" end
+S.c.arguments = {}
 
-function S.setPrefix ( pre )
-	P.S.prefix = pre
-	S.prefix = pre
+function S.c.addArg ( arg )
+	if type(arg) ~= "table" then
+		arg = {tostring(arg)}
+	end
+
+	for k, v in pairs(arg) do S.c.arguments[#S.c.arguments+1] = v end
 end
 
-S.os = _s_os
-S.lualibsRoot = _s_lualibs_root
-S.imported = false
-
-function S.import ( name )
-	if not S.imported
-	then
-		dofile(S.lualibsRoot.."stdlib/stdlib.lua")
+function S.c.addInclude ( dir )
+	if type(dir) ~= "table" then
+		dir = {tostring(dir)}
 	end
 
-	if not S[name]
-	then
-		dofile(S.lualibsRoot.."stdlib/"..name..".lua")
-	end
+	for k, v in pairs(dir) do S.c.addArg({"-I", C.path(v)}) end
 end
 
-function L.import ( path )
-	local name = path:reverse():find("/", 1, true)
-	if i then
-		name = name:sub(-i+1)
+function S.c.compile ( out, sources )
+	local cmd = {"*gdmd", "-o", C.path(out) }
+
+	for k, v in pairs(S.c.arguments) do cmd[#cmd+1] = v end
+
+	for k,v in pairs(sources) do
+		sources[k] = C.path(v)
+		cmd[#cmd+1] = sources[k]
 	end
 
-	if not L[name]
-	then
-		if path:find(".") then
-			dofile(C.path(path))
-		else
-			dofile(S.lualibsRoot.."custom/"..name..".lua")
-		end
-	end
+	C.addGenerator({C.path(out)}, sources, cmd)
 end

@@ -22,19 +22,22 @@
 [                                                                              ]
 [-----------------------------------------------------------------------------]]
 
-
 --- The Dependancy namespace.
 --[[[
 	This is where the core build related functions go.
 ]]
-D = {}
+C = {}
 
-D.addDependancy = _d_add_depandancy
-D.addDir = _d_add_dir
-D.addGenerator = _d_add_generator
-D.path = _d_path
+C.addDependancy = _d_add_depandancy
+C.addDir = _d_add_dir
+C.addGenerator = _d_add_generator
+C.path = _d_path
 
 -- End of D
 
 if not P then P = {} end
 dofile(_s_lualibs_root.."stdlib.lua")
+
+if _s_debug then
+	dofile(S.lualibsRoot.."debug.lua")
+end

@@ -47,18 +47,18 @@ function S.c.addInclude ( dir )
 		dir = {tostring(dir)}
 	end
 
-	for k, v in pairs(dir) do S.c.addArg({"-I", D.path(v)}) end
+	for k, v in pairs(dir) do S.c.addArg({"-I", C.path(v)}) end
 end
 
 function S.c.compile ( out, sources )
-	local cmd = {"*gcc", "-o", D.path(out) }
+	local cmd = {"*gcc", "-o", C.path(out) }
 
 	for k, v in pairs(S.c.arguments) do cmd[#cmd+1] = v end
 
 	for k,v in pairs(sources) do
-		sources[k] = D.path(v)
+		sources[k] = C.path(v)
 		cmd[#cmd+1] = sources[k]
 	end
 
-	D.addGenerator({D.path(out)}, sources, cmd)
+	C.addGenerator({C.path(out)}, sources, cmd)
 end

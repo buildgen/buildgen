@@ -30,12 +30,5 @@ namespace msg
 	FILE *err_out = stdout;
 
 	bool useColor;
-
-	/// How much to say
-	/**
-	 * A value less than zero will print everthing.  A value of zero will print
-	 * nothing. (errors will still printerd to \c stderr)  Higher values will
-	 * print more and more.
-	 */
 	int verbosity = 1;
 }

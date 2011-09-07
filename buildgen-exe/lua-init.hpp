@@ -39,6 +39,8 @@ public:
 	BuildGenLuaEnv(const char *root);
 	~BuildGenLuaEnv();
 
+	void define(char *key, char *value);
+
 	void runFile(const char *path);
 };
 

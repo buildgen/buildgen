@@ -58,6 +58,9 @@ void BuildGenLuaEnv::init_lua ( void )
 {
 	L = lua_open();
 	luaL_openlibs(L);
+
+	lua_newtable(L);
+	lua_setglobal(L, "D");
 }
 
 void BuildGenLuaEnv::dmakeify_lua ( void )
@@ -71,6 +74,20 @@ void BuildGenLuaEnv::dmakeify_lua ( void )
 	lua_setglobal(L, "_s_lualibs_root");
 	lua_pushstring(L, OS_STRING);
 	lua_setglobal(L, "_s_os");
+#ifdef DEBUG
+	lua_pushboolean(L, 1);
+	lua_setglobal(L, "_s_debug");
+#endif
+}
+
+void BuildGenLuaEnv::define( char *key, char *value )
+{
+	lua_getglobal(L, "D");
+
+	lua_pushstring(L, value);
+	lua_setfield(L, -2, key);
+
+	lua_pop(L, 1);
 }
 
 void BuildGenLuaEnv::runFile ( const char *path )
@@ -90,7 +107,7 @@ void BuildGenLuaEnv::runFile ( const char *path )
 
 	if (s) // Errors
 	{
-		msg::error("%s\n", lua_tostring(L, -1));
+		msg::error("%s", lua_tostring(L, -1));
 		lua_pop(L, 1); // remove error message
 		exit(EX_DATAERR);
 	}

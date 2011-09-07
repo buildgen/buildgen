@@ -27,6 +27,8 @@
 S.imported = true
 
 require "lfs"
+require "pl"
+stringx.import()
 
 local shutdownFunctions = {}
 function S._doShutdownFunctions ( )
@@ -42,14 +44,14 @@ function S.registerShutdown ( func )
 end
 
 function S.addToDefault ( path )
-	D.addDependancy(">all", path)
+	C.addDependancy(">all", path)
 end
 
 function S.install ( path, to )
 	if string.find(to, "/", 1, true) ~= 1 then
 		to = S.prefix..to
 	end
-	local apath = D.path(path)
+	local apath = C.path(path)
 
 	if lfs.attributes(apath, "mode") == "directory" then
 		for file in lfs.dir(apath) do
@@ -68,13 +70,43 @@ function S.install ( path, to )
 			end
 		end
 	else
-		local apath = D.path(path)
+		local apath = C.path(path)
 		local i = string.find(string.reverse(apath), "/", 1, true)
 		if i then
 			to = to.."/"..string.sub(apath, -i)
 		end
 
-		D.addGenerator({to}, {path}, {"*install", "-D", D.path(path), D.path(to)})
-		D.addDependancy(">install", to)
+		C.addGenerator({to}, {path}, {"*install", "-D", C.path(path), C.path(to)})
+		C.addDependancy(">install", to)
     end
 end
+
+function S.findProgram ( name )
+	for k, v in pairs(S.path) do
+		print("NI")
+	end
+
+	return ""
+end
+
+local function setup ( )
+
+	--- Populate S.path ---
+	S.path = {} -- Will hold folders in the operating systems path.
+
+	local ospath = os.getenv("PATH")
+	local seperator = ""
+
+	if     S.os == "posix"   then
+		seperator = ":"
+	elseif S.os == "windows" then
+		seperator = ";" --@help Is the right?
+	end
+
+	if seperator then
+		S.path = ospath:split(seperator)
+	end
+end
+setup()
+setup = nil
+

@@ -48,6 +48,8 @@ int main ( int argc, char **argv )
 
 	chdir(files->project_root);
 	BuildGenLuaEnv lua(files->normalizeFilename(files->rootfilename));
+	for ( int i = opt::defines.size()-1; i >= 0; i-- )
+		lua.define(opt::defines[i].key, opt::defines[i].value);
 
 	while (files->infofile.size())
 	{

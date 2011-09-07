@@ -35,6 +35,13 @@ namespace msg
 	extern FILE *err_out; ///< Handles error
 
 	extern bool useColor;
+
+	/// How much to say
+	/**
+	 * A value less than zero will print everthing.  A value of zero will print
+	 * nothing. (errors will still printerd to \c stderr)  Higher values will
+	 * print more and more.
+	 */
 	extern int verbosity;
 
 	/// Print an info message
@@ -48,8 +55,12 @@ namespace msg
 		va_list args;
 		va_start(args, msg);
 
-		fputs("Info:  ", msg_out);
-		vfprintf(msg_out, msg, args);
+		if ( msg::verbosity < 0 || msg::verbosity >= 1 )
+		{
+			fputs("Info:  ", msg_out);
+			vfprintf(msg_out, msg, args);
+			fputc('\n', msg_out);
+		}
 
 		va_end(args);
 	}
@@ -69,8 +80,12 @@ namespace msg
 		va_list args;
 		va_start(args, msg);
 
-		fputs("Log:   ", msg_out);
-		vfprintf(msg_out, msg, args);
+		if ( msg::verbosity < 0 || msg::verbosity >= 3 )
+		{
+			fputs("Log:   ", msg_out);
+			vfprintf(msg_out, msg, args);
+			fputc('\n', msg_out);
+		}
 
 		va_end(args);
 	}
@@ -94,6 +109,7 @@ namespace msg
 #ifdef DEBUG //@help Is it safe to comment out the varg macros?
 		fputs("Debug: ", msg_out);
 		vfprintf(msg_out, msg, args);
+		fputc('\n', msg_out);
 		fflush(msg_out);
 #endif
 
@@ -112,9 +128,13 @@ namespace msg
 		va_list args;
 		va_start(args, msg);
 
-		fputs("Error: ", err_out);
-		vfprintf(err_out, msg, args);
-		fflush(err_out);
+		if ( msg::verbosity != 0 )
+		{
+			fputs("Error: ", err_out);
+			vfprintf(err_out, msg, args);
+			fputc('\n', err_out);
+			fflush(err_out);
+		}
 
 		va_end(args);
 	}

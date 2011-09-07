@@ -22,6 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
+#include <vector>
+
 #include <getopt.h>
 #include <sysexits.h>
 
@@ -34,6 +36,8 @@ namespace opt
 {
 	FILE *xml_out = stdout;
 
+	std::vector<Definition> defines;
+
 	char *src_dir;
 
 	void get_options ( int *argc, char ***argv )
@@ -41,16 +45,45 @@ namespace opt
 		char *gen = NULL;
 
 		static struct option longopts[] = {
-			{ "out",       optional_argument, NULL, 'o' },
+			{ "define",    required_argument, NULL, 'D' },
 			{ "generator", optional_argument, NULL, 'g' },
+			{ "out",       optional_argument, NULL, 'o' },
 			{ "verbose",   optional_argument, NULL, 'v' },
 		};
 
 		int i;
-		while ((i = getopt_long(*argc, *argv, "g:o:v::", longopts, NULL)) >= 0 )
+		while ((i = getopt_long(*argc, *argv, "D:g:o:v::", longopts, NULL)) >= 0 )
 		{
 			switch (i)
 			{
+			case 'D': // Define a build property
+				{ // Hide variables
+				char *v = optarg;
+
+				Definition d;
+
+				while ( *v != '\0' )
+				{
+					if ( *v == '=' )
+					{
+						*v = '\0';
+						v++;
+
+						break;
+					}
+
+					v++;
+				}
+
+				d.key   = optarg;
+				d.value = v;
+
+				defines.push_back(d);
+				} // End hide variables
+				break;
+			case 'g': // What generator to use
+				gen = optarg;
+				break;
 			case 'o': // Where to put the xml.  Default is stdout
 				xml_out = fopen(optarg, "w");
 				if (!xml_out)
@@ -58,9 +91,6 @@ namespace opt
 					msg::error("Could not open XML output file.");
 					exit(EX_CANTCREAT);
 				}
-				break;
-			case 'g': // What generator to use
-				gen = optarg;
 				break;
 			case 'v': // Verbosity level
 				if ( optarg )
@@ -73,8 +103,7 @@ namespace opt
 
 					int v = 0;
 					sscanf(optarg, "%d", &v);
-					if ( v <= 0 ) msg::verbosity  = v;
-					else          msg::verbosity += v;
+					msg::verbosity = v;
 				}
 				else msg::verbosity++;
 			}
@@ -91,7 +120,7 @@ namespace opt
 		if ( xml_out == stdout )
 		{
 			if ( gen == NULL ) xml_out = popen(DEFALUT_GENERATOR, "w");
-			else if ( strcmp(gen, "makefile")) popen("gen-makefile", "w");
+			else if (!strcmp(gen, "makefile")) xml_out = popen("gen-makefile", "w");
 		}
 	}
 }

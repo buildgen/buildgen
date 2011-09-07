@@ -54,6 +54,11 @@ void Files::init ( char *srcdir )
 	appendSlash(&out_root);
 
 	DIR *d = opendir(srcdir);
+	if ( d == NULL )
+	{
+		msg::error("Can not switch to the source directory.");
+		exit(EX_USAGE);
+	}
 	fchdir(dirfd(d));
 	project_root = get_current_dir_name(); // As a default.  The value will be copied if needed
 	findProjectRoot();
@@ -68,7 +73,7 @@ void Files::findInfoFile ( void )
 	FILE *conf = fopen(Files::infofilename, "r");
 	if (!conf)
 	{
-		msg::error("Could not open Buildinfo file \"%s\"\n", normalizeFilename(Files::infofilename));
+		msg::error("Could not open Buildinfo file \"%s\"", normalizeFilename(Files::infofilename));
 		exit(EX_NOINPUT);
 	}
 	fclose(conf);
@@ -82,7 +87,7 @@ void Files::addDirectory( const char *path )
 
 	if (chdir(path)) // Returns 0 on success
 	{
-		msg::error("Could not add directory \"%s\".  Reason: \"%s\"\n",
+		msg::error("Could not add directory \"%s\".  Reason: \"%s\"",
 			normalizeFilename(path), strerror(errno));
 	}
 
@@ -97,7 +102,7 @@ void Files::addInfoFile ( const char *path )
 	char *info = normalizeFilename(path);
 	infofile.push(info);
 
-	msg::log("DMakeinfo file added at \"%s\"\n", info);
+	msg::log("DMakeinfo file added at \"%s\"", info);
 }
 
 void Files::appendSlash ( char **inputoutput )
@@ -127,7 +132,7 @@ void Files::findProjectRoot( void )
 			if (!cur[1]) // This is the root directory
 			{
 				free(cur);
-				msg::error("Could not find project root\n");
+				msg::error("Could not find project root");
 				exit(EX_USAGE);
 			}
 			free(cur);
@@ -144,7 +149,7 @@ void Files::findProjectRoot( void )
 	project_root = get_current_dir_name();
 	Files::appendSlash(&project_root);
 
-	msg::log("Project Root at \"%s\"\n", project_root);
+	msg::log("Project Root at \"%s\"", project_root);
 }
 
 char *Files::normalizeFilename( const char *path )

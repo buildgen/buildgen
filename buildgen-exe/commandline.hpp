@@ -26,9 +26,16 @@
 #define COMMANDLINE_HPP
 
 #include <stdio.h>
+#include <vector>
 
 namespace opt
 {
+	struct Definition {
+		char* key;
+		char* value;
+	};
+	extern std::vector<Definition> defines;
+
 	extern FILE *makefile_out;
 	extern FILE *msg_out; // Handles everything but error
 	extern FILE *err_out;
