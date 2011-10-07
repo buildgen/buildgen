@@ -24,40 +24,55 @@
 
 
 S.c = {}
+if not P.S.c then P.S.c = {} end
 
 local function setup () -- So that we can hide our locals.
 
-local compilers = {
-	{ name="gcc", -- Name of the executable
-		flags = {
-			output   = {"-o", "%s"}, -- the option to set the output file name.
-			debug    = "-g",         -- the option to enable debug mode.
-			profile  = "-p",         -- the option to enable profiling.
-			include  = {"-I", "%s"}, -- the option to add an include directory.
-			optimize = {             -- Flags for different levels of optimization.
-				none    = "",
-				quick   = "-O",
-				regular = "-O2",     -- Default optimazation.
-				full    = "-O3",
-				max     = "-O3",     -- Highest possoble (possibly exparemental)
+if not P.S.c.compiler then
+	local compilers = {
+		{ name="gcc", -- Name of the executable
+			flags = {
+				output   = {"-o", "%s"}, -- the option to set the output file name.
+				debug    = "-g",         -- the option to enable debug mode.
+				profile  = "-p",         -- the option to enable profiling.
+				include  = {"-I", "%s"}, -- the option to add an include directory.
+				optimize = {             -- Flags for different levels of optimization.
+					none    = "",
+					quick   = "-O",
+					regular = "-O2",     -- Default optimazation.
+					full    = "-O3",
+					max     = {
+								"-O3",
+								"-fexpensive-optimizations",
+								"-fomit-frame-pointer"
+							  },     -- Highest possoble (possibly exparemental)
+				}
 			}
-		}
-	},
-}
-List(compilers) -- turn tabe into a penlight 'list'
+		},
+	}
+	List(compilers) -- turn tabe into a penlight 'list'
 
-local compiler;
-for c in iter(compilers) do          -- Find the first compiler they have
-	if S.findExecutable(c.name) then -- installed on thier system.
-		compiler = c
-		compiler.name = S.findExecutable(compiler.name)
+	local compiler;
+	for c in iter(compilers) do          -- Find the first compiler they have
+		if S.findExecutable(c.name) then -- installed on thier system.
+			compiler = c
+			compiler.name = S.findExecutable(compiler.name)
 
-		break
+			break
+		end
 	end
+
+	P.S.c.compiler = compiler
 end
 
-S.c.optitization = "regular"
-if D.debug then S.c.optitization = "none" end
+S.c.optimization = "regular"
+if D.debug then S.c.optimization = "none" end
+
+S.c.debug = false
+if D.debug then S.c.debug = true end
+
+S.c.profile = false
+if D.debug then S.c.profile = true end
 
 local arguments = List()
 
@@ -81,6 +96,13 @@ function S.c.addInclude ( dir )
 end
 
 function S.c.compile ( out, sources )
+	local compiler
+	if P.S.c.compiler == nil then
+		error("Error: No C compiler found.", 0)
+	else
+		compiler = P.S.c.compiler
+	end
+
 	out = C.path(out)
 
 	local cmd = List()
@@ -90,12 +112,31 @@ function S.c.compile ( out, sources )
 		cmd:append(i:format(out))           -- the command line.
 	end                                     --
 
-	local o = compiler.flags.optimize[S.c.optitization]
-	if o then
-		cmd:append(o)
+	if S.c.debug then                       -- Add the debug flag.
+		if type(compiler.flags.debug) == "table" then
+			cmd:extend(compiler.flags.debug)
+		else
+			cmd:append(compiler.flags.debug)
+		end
+	end
+	if S.c.profile then                     -- Add the profile flag.
+		if type(compiler.flags.profile) == "table" then
+			cmd:extend(compiler.flags.profile)
+		else
+			cmd:append(compiler.flags.profile)
+		end
 	end
 
-	for a in iter(arguments) do cmd:append(v) end
+	local o = compiler.flags.optimize[S.c.optimization] -- Set the optimization
+	if o then                                           -- level.
+		if type(o) == "table" then                      --
+			cmd:extend(o)                               --
+		else                                            --
+			cmd:append(o)                               --
+		end                                             --
+	end                                                 --
+
+	for v in iter(arguments) do cmd:append(v) end
 
 	for k,v in pairs(sources) do
 		sources[k] = C.path(v)
