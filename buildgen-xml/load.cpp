@@ -40,14 +40,14 @@ using namespace rapidxml;
 
 void die_badFile ( void )
 {
-	msg::error("Input is not a valid BuildGen file.\n");
+	msg::error("Input is not a valid BuildGen file.");
 	exit(EX_DATAERR);
 }
 
 void XML::load ( std::istream &xml,
 	char **buildGenRoot, char **outRoot, char **projectRoot )
 {
-	msg::log("Loading XML\n");
+	msg::log("Loading XML");
 	std::string xmlbuf((std::istreambuf_iterator<char>(xml)), std::istreambuf_iterator<char>());
 
 	xml_document<> doc;

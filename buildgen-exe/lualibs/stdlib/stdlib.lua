@@ -81,12 +81,15 @@ function S.install ( path, to )
     end
 end
 
-function S.findProgram ( name )
+function S.findExecutable ( name )
 	for k, v in pairs(S.path) do
-		print("NI")
+		local p = path.join(v, name);
+		if path.isfile(p) then
+			return p
+		end
 	end
 
-	return ""
+	return false
 end
 
 local function setup ( )

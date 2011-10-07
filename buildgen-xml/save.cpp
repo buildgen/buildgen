@@ -38,7 +38,7 @@ using namespace rapidxml;
 
 std::string XML::create(std::set<Target*, Target::comparator> &targets)
 {
-	msg::log("Linking and Generating XML\n");
+	msg::log("Linking and Generating XML");
 
 	xml_document<> doc;    // character type defaults to char
 

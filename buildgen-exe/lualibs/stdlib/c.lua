@@ -25,21 +25,48 @@
 
 S.c = {}
 
-S.c.flags = ""
-S.c.flag = {}
+local function setup () -- So that we can hide our locals.
 
-S.c.flag.debug = "-g" --@todo Set these when this library is loaded ( or generate this library with the proper flags )
-S.c.flag.profile = "-g"
-S.c.flag.optomize = "-O"
+local compilers = {
+	{ name="gcc", -- Name of the executable
+		flags = {
+			output   = {"-o", "%s"}, -- the option to set the output file name.
+			debug    = "-g",         -- the option to enable debug mode.
+			profile  = "-p",         -- the option to enable profiling.
+			include  = {"-I", "%s"}, -- the option to add an include directory.
+			optimize = {             -- Flags for different levels of optimization.
+				none    = "",
+				quick   = "-O",
+				regular = "-O2",     -- Default optimazation.
+				full    = "-O3",
+				max     = "-O3",     -- Highest possoble (possibly exparemental)
+			}
+		}
+	},
+}
+List(compilers) -- turn tabe into a penlight 'list'
 
-S.c.arguments = {}
+local compiler;
+for c in iter(compilers) do          -- Find the first compiler they have
+	if S.findExecutable(c.name) then -- installed on thier system.
+		compiler = c
+		compiler.name = S.findExecutable(compiler.name)
+
+		break
+	end
+end
+
+S.c.optitization = "regular"
+if D.debug then S.c.optitization = "none" end
+
+local arguments = List()
 
 function S.c.addArg ( arg )
 	if type(arg) ~= "table" then
 		arg = {tostring(arg)}
 	end
 
-	for k, v in pairs(arg) do S.c.arguments[#S.c.arguments+1] = v end
+	for k, v in pairs(arg) do arguments:append(v) end
 end
 
 function S.c.addInclude ( dir )
@@ -47,18 +74,37 @@ function S.c.addInclude ( dir )
 		dir = {tostring(dir)}
 	end
 
-	for k, v in pairs(dir) do S.c.addArg({"-I", C.path(v)}) end
+	for k, v in pairs(dir) do
+		local a =
+		S.c.addArg({"-I", C.path(v)})
+	end
 end
 
 function S.c.compile ( out, sources )
-	local cmd = {"*gcc", "-o", C.path(out) }
+	out = C.path(out)
 
-	for k, v in pairs(S.c.arguments) do cmd[#cmd+1] = v end
+	local cmd = List()
+	cmd:append(compiler.name)
+
+	for i in iter(compiler.flags.output) do -- Add the desired output file to
+		cmd:append(i:format(out))           -- the command line.
+	end                                     --
+
+	local o = compiler.flags.optimize[S.c.optitization]
+	if o then
+		cmd:append(o)
+	end
+
+	for a in iter(arguments) do cmd:append(v) end
 
 	for k,v in pairs(sources) do
 		sources[k] = C.path(v)
-		cmd[#cmd+1] = sources[k]
+		cmd:append(sources[k])
 	end
 
-	C.addGenerator({C.path(out)}, sources, cmd)
+	C.addGenerator({out}, sources, cmd)
 end
+
+end
+setup()
+setup=nil

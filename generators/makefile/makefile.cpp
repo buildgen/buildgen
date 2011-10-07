@@ -26,10 +26,12 @@
 
 #include "makefile.hpp"
 
+#include <algorithm>
+
 Makefile::Makefile ( std::set<Target *, Target::comparator> *targets ):
 	targets(targets),
-    cwd(get_current_dir_name()),
-    cwdlen(strlen(cwd)+1) // The one is to mimic the trailing slash
+	cwd(get_current_dir_name()),
+	cwdlen(strlen(cwd)+1) // The one is to mimic the trailing slash
 {
 
 }
@@ -43,9 +45,12 @@ std::string Makefile::relitiveName(std::string path)
 		if ( s[0] == '\0' )
 			s = '.';
 
+		std::replace(s.begin(), s.end(), ' ', '?');
+
 		return s;
 	}
 
+	std::replace(path.begin(), path.end(), ' ', '?');
 
 	return path;
 }
@@ -56,9 +61,9 @@ std::string Makefile::generate ( void )
 	out += ".DEFAULT_GOAL := all\n\n";
 
 	for ( std::set<Target *, Target::comparator>::iterator ti = targets->begin();
-	      ti != targets->end();
-	      ++ti
-	    )
+		  ti != targets->end();
+		  ++ti
+		)
 	{
 		out += writeTarget(*ti);
 	}
@@ -76,9 +81,9 @@ std::string Makefile::writeTarget(Target *t)
 	out += ": ";
 
 	for ( std::set<Target *, Target::comparator>::iterator di = t->depends.begin();
-	      di != t->depends.end();
-	      ++di
-	    )
+		  di != t->depends.end();
+		  ++di
+		)
 	{
 		Target *d = *di;
 
@@ -87,10 +92,12 @@ std::string Makefile::writeTarget(Target *t)
 	}
 	if (t->generator) out += relitiveName(t->generator->path);
 	out += "\n";
-	std::string dir(dirname(strdup(relitiveName(t->path).c_str())));
+	char *dup = strdup(relitiveName(t->path).c_str());
+	std::string dir(dirname(dup));
+	free(dup);
 	if ( dir != "." )
 	{
-		out += "	mkdir -p \'" + dir + "\'\n";
+		out += "	@mkdir -p \'" + dir + "\'\n";
 	}
 	out += writeGenerator(t->generator);
 	out += '\n'; // Skip a line
@@ -108,7 +115,7 @@ std::string Makefile::writeGenerator(Generator *g)
 		for ( unsigned int i = 0; i < g->cmd.size(); i++ )
 		{
 			out += '\'';
-			out += relitiveName(g->cmd[i]);
+			out += g->cmd[i];
 			out += "\' ";
 		}
 		out += '\n';

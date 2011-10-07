@@ -91,14 +91,14 @@ Target *Target::newTarget ( const char *path )
 
 void Target::addDependancy(Target* d)
 {
-	msg::log("Added dependacy \"%s\" to \"%s\"\n", d->path, path);
+	msg::log("Added dependacy \"%s\" to \"%s\"", d->path, path);
 
 	depends.insert(d);
 }
 
 void Target::addGenerator(std::vector<const char*> cmd)
 {
-	msg::log("Added generator \"%s\" to \"%s\"\n", cmd[0], path);
+	msg::log("Added generator \"%s\" to \"%s\"", cmd[0], path);
 
 	std::vector<char*> dup(cmd.size());
 	for ( int i = cmd.size(); --i; )
@@ -204,7 +204,7 @@ Generator *Generator::fromXML ( const rapidxml::xml_node<> *src )
 	{
 		if (!cmd[i])
 		{
-			msg::error("Generator command missing an argument.\n");
+			msg::error("Generator command missing an argument.");
 			exit(EX_DATAERR);
 		}
 	}
@@ -253,7 +253,7 @@ bool Target::check ( void )
 	}
 
 	msg::info("Target \"%s\" doesn't exist.  You will run into problems "
-		"if you try to build anything that depends on it.\n", path);
+		"if you try to build anything that depends on it.", path);
 	return false;
 }
 

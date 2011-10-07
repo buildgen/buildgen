@@ -47,7 +47,7 @@ function S.import ( name )
 		dofile(S.lualibsRoot.."stdlib/stdlib.lua")
 	end
 
-	if not S[name]
+	if not S[name] and name ~= "stdlib"
 	then
 		dofile(S.lualibsRoot.."stdlib/"..name..".lua")
 	end
