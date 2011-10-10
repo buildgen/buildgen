@@ -30,17 +30,18 @@ S.imported = false
 L = {} -- User libraries
 if not P.S then P.S = {} end
 
-S.lualibsRoot = _s_lualibs_root
+S.lualibsRoot = _s_lualibs_root.."stdlib/"
+L.lualibsRoot = _s_lualibs_root.."custom/"
 
 function S.import ( name )
 	if not S.imported
 	then
-		dofile(S.lualibsRoot.."stdlib/stdlib.lua")
+		dofile(S.lualibsRoot.."stdlib.lua")
 	end
 
 	if not S[name] and name ~= "stdlib"
 	then
-		dofile(S.lualibsRoot.."stdlib/"..name..".lua")
+		dofile(S.lualibsRoot..name..".lua")
 	end
 end
 
@@ -55,7 +56,7 @@ function L.import ( path )
 		if path:find(".") then
 			dofile(C.path(path))
 		else
-			dofile(S.lualibsRoot.."custom/"..name..".lua")
+			dofile(L.lualibsRoot..name..".lua")
 		end
 	end
 end

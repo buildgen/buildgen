@@ -39,5 +39,5 @@ if not P then P = {} end
 dofile(_s_lualibs_root.."stdlib.lua")
 
 if _s_debug then
-	dofile(S.lualibsRoot.."debug.lua")
+	dofile(_s_lualibs_root.."debug.lua")
 end

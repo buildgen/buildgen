@@ -31,7 +31,6 @@ require "pl"
 stringx.import()
 
 S.os = _s_os
-S.lualibsRoot = _s_lualibs_root
 
 if not S.prefix then
 	if S.os == "windows" then
