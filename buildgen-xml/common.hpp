@@ -25,6 +25,8 @@
 #ifndef XML_COMMON_HPP
 #define XML_COMMON_HPP
 
+#include <time.h>
+
 namespace XML
 {
 	/**
@@ -46,7 +48,8 @@ namespace XML
 	extern const char *metaNName;
 	extern const char *meta_projectRootNName;
 	extern const char *meta_outRootNName;
-	extern const char *meta_buildGenRootName;
+	extern const char *meta_buildGenRootNName;
+	extern const char *meta_timeNName;
 	extern const char *targetNName;
 	extern const char *targetsNName;
 	extern const char *target_outNName;
@@ -54,6 +57,14 @@ namespace XML
 	extern const char *target_generatorNName;
 	extern const char *target_generator_argumentNName;
 	extern const char *target_generator_posAName;
+
+	struct Meta {
+		char *buildGenRoot;
+		char *outRoot;
+		char *projectRoot;
+
+		time_t time;
+	};
 }
 
 #endif

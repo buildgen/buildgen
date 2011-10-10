@@ -44,8 +44,7 @@ void die_badFile ( void )
 	exit(EX_DATAERR);
 }
 
-void XML::load ( std::istream &xml,
-	char **buildGenRoot, char **outRoot, char **projectRoot )
+XML::Meta XML::load ( std::istream &xml )
 {
 	msg::log("Loading XML");
 	std::string xmlbuf((std::istreambuf_iterator<char>(xml)), std::istreambuf_iterator<char>());
@@ -56,41 +55,37 @@ void XML::load ( std::istream &xml,
 	xml_node<> *root = doc.first_node(XML::rootNName);
 	if (!root) die_badFile();
 
-	if ( projectRoot || outRoot || buildGenRoot )
-	{
-		xml_node<> *meta = root->first_node(XML::metaNName);
-		if (!meta) die_badFile();
+	xml_node<> *meta = root->first_node(XML::metaNName);
+	if (!meta) die_badFile();
 
-		if (buildGenRoot)
-		{
-			xml_node<> *n = meta->first_node(XML::meta_buildGenRootName);
-			if (!n) die_badFile();
+	Meta metaObj;
 
-			*buildGenRoot = (char*)realloc(buildGenRoot, n->value_size());
-			strcpy(n->value(), *buildGenRoot);
-		}
-		if (outRoot)
-		{
-			xml_node<> *n = meta->first_node(XML::meta_outRootNName);
-			if (!n) die_badFile();
+	xml_node<> *n = meta->first_node(XML::meta_buildGenRootNName);
+	if (!n) die_badFile();
 
-			*outRoot = (char*)realloc(outRoot, n->value_size());
-			strcpy(n->value(), *outRoot);
-		}
-		if (projectRoot)
-		{
-			xml_node<> *n = meta->first_node(XML::meta_projectRootNName);
-			if (!n) die_badFile();
+	metaObj.buildGenRoot = (char*)malloc(n->value_size());
+	strcpy(n->value(), metaObj.buildGenRoot);
 
-			*projectRoot = (char*)realloc(projectRoot, n->value_size());
-			strcpy(n->value(), *projectRoot);
-		}
-	}
+	n = meta->first_node(XML::meta_outRootNName);
+	if (!n) die_badFile();
+
+	metaObj.outRoot = (char*)malloc(n->value_size());
+	strcpy(n->value(), metaObj.outRoot);
+
+	n = meta->first_node(XML::meta_projectRootNName);
+	if (!n) die_badFile();
+
+	metaObj.projectRoot = (char*)malloc(n->value_size());
+	strcpy(n->value(), metaObj.projectRoot);
+
+	n = meta->first_node(XML::meta_timeNName);
+	if (!n) die_badFile();
+	sscanf(n->value(), "%d", &metaObj.time);
 
 	xml_node<> *targ = root->first_node(XML::targetsNName);
 	if (!targ) die_badFile();
 
-	if ( xml_node<> *n = targ->first_node(XML::targetNName) )
+	if ( n = targ->first_node(XML::targetNName) )
 	{
 		do {
 			Target::fromXML(n);

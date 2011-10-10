@@ -39,7 +39,7 @@ int main ( int argc, char **argv )
 {
 	opt::get_options(&argc, &argv);
 
-	XML::load(opt::xml_in);
+	XML::Meta meta = XML::load(opt::xml_in);
 
 	Makefile m(&Target::targets);
 	opt::makefile_out << m.generate();

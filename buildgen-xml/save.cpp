@@ -26,6 +26,7 @@
 #include "buildgen-xml/common.hpp"
 
 #include <stdlib.h>
+#include <time.h>
 #include "rapidxml/rapidxml.hpp"
 #include "rapidxml/rapidxml_print.hpp"
 
@@ -39,6 +40,9 @@ using namespace rapidxml;
 std::string XML::create(std::set<Target*, Target::comparator> &targets)
 {
 	msg::log("Linking and Generating XML");
+
+	char *timestamp = (char*)malloc(11*sizeof(char));
+	sprintf(timestamp, "%d", time(NULL));
 
 	xml_document<> doc;    // character type defaults to char
 
@@ -58,7 +62,8 @@ std::string XML::create(std::set<Target*, Target::comparator> &targets)
 
 	meta->append_node(doc.allocate_node(node_element, XML::meta_projectRootNName, files->project_root));
 	meta->append_node(doc.allocate_node(node_element, XML::meta_outRootNName, files->out_root));
-	meta->append_node(doc.allocate_node(node_element, XML::meta_buildGenRootName, files->buildgen_root));
+	meta->append_node(doc.allocate_node(node_element, XML::meta_buildGenRootNName, files->buildgen_root));
+	meta->append_node(doc.allocate_node(node_element, XML::meta_timeNName, timestamp));
 
 	xml_node<> *targ = doc.allocate_node(node_element, XML::targetsNName);
 	root->append_node(targ);

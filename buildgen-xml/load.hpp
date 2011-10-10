@@ -28,12 +28,12 @@
 #include <iostream>
 #include <set>
 
+#include "buildgen-xml/common.hpp"
 #include "buildgen-xml/target.hpp"
 
 namespace XML
 {
-	void load ( std::istream &xml, char **buildGenRoot = (char**)NULL,
-		char **outRoot = (char**)NULL, char **projectRoot = (char**)NULL );
+	XML::Meta load ( std::istream &xml );
 };
 
 #endif
