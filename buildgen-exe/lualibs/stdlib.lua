@@ -26,20 +26,11 @@
 --- The Standard library namespace.
 
 S = {} -- Std libraries
+S.imported = false
 L = {} -- User libraries
 if not P.S then P.S = {} end
 
-S.prefix = P.S.prefix
-if not S.prefix then S.prefix = "/usr/local/" end
-
-function S.setPrefix ( pre )
-	P.S.prefix = pre
-	S.prefix = pre
-end
-
-S.os = _s_os
 S.lualibsRoot = _s_lualibs_root
-S.imported = false
 
 function S.import ( name )
 	if not S.imported

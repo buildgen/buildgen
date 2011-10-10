@@ -35,12 +35,12 @@
 
 #include "info.h"
 
-BuildGenLuaEnv::BuildGenLuaEnv ( const char *root )
+BuildGenLuaEnv::BuildGenLuaEnv ( const char *root ):
+	root_file(NULL)
 {
 	init();
 
-	runFile(root);
-	LuaFunctions::save_state(L);
+	root_file = strdup(root);
 }
 
 BuildGenLuaEnv::~BuildGenLuaEnv ( )
@@ -65,10 +65,10 @@ void BuildGenLuaEnv::init_lua ( void )
 
 void BuildGenLuaEnv::dmakeify_lua ( void )
 {
-	lua_register(L, "_d_add_depandancy", &LuaFunctions::D::add_depandancy);
-	lua_register(L, "_d_add_dir", &LuaFunctions::D::add_dir);
-	lua_register(L, "_d_add_generator", &LuaFunctions::D::add_generator);
-	lua_register(L, "_d_path", &LuaFunctions::D::path);
+	lua_register(L, "_c_add_depandancy", &LuaFunctions::C::add_depandancy);
+	lua_register(L, "_c_add_dir", &LuaFunctions::C::add_dir);
+	lua_register(L, "_c_add_generator", &LuaFunctions::C::add_generator);
+	lua_register(L, "_c_path", &LuaFunctions::C::path);
 
 	lua_pushstring(L, LUALIBS_ROOT);
 	lua_setglobal(L, "_s_lualibs_root");
@@ -84,19 +84,19 @@ void BuildGenLuaEnv::define( char *key, char *value )
 {
 	lua_getglobal(L, "D");
 
-	lua_pushstring(L, value);
+	if ( value == NULL ) lua_pushboolean(L, 1);
+	else                 lua_pushstring(L, value);
+
 	lua_setfield(L, -2, key);
 
 	lua_pop(L, 1);
 }
 
-void BuildGenLuaEnv::runFile ( const char *path )
+void BuildGenLuaEnv::doRunFile ( const char *path )
 {
 	char *d = strdup(path);
 	chdir(dirname(d));
 	free(d);
-
-	LuaFunctions::load_state(L);
 
 	int s = luaL_loadfile(L, (char*)path);
 	if ( s == 0 )
@@ -111,6 +111,18 @@ void BuildGenLuaEnv::runFile ( const char *path )
 		lua_pop(L, 1); // remove error message
 		exit(EX_DATAERR);
 	}
+
+	//LuaFunctions::clean_up(L);
+}
+
+void BuildGenLuaEnv::runFile ( const char *path )
+{
+	doRunFile(LUALIBS_ROOT"core.lua");
+
+	if ( root_file != NULL ) // Run the root file.
+		doRunFile(root_file);
+
+	doRunFile(path);
 
 	LuaFunctions::S::call_shutdown(L);
 	//LuaFunctions::clean_up(L);

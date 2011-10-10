@@ -47,7 +47,10 @@ int main ( int argc, char **argv )
 	std::set<std::string> runfiles;
 
 	chdir(files->project_root);
-	BuildGenLuaEnv lua(files->normalizeFilename(files->rootfilename));
+	char *rootFileName = files->normalizeFilename(files->rootfilename);
+	BuildGenLuaEnv lua(rootFileName);
+	free(rootFileName);
+
 	for ( int i = opt::defines.size()-1; i >= 0; i-- )
 		lua.define(opt::defines[i].key, opt::defines[i].value);
 

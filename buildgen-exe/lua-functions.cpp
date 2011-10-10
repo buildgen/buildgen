@@ -46,21 +46,21 @@ namespace LuaFunctions
 bool statesaved = false;
 void save_state(lua_State *L)
 {
-	lua_getglobal(L, "P");
+	/*lua_getglobal(L, "P");
 	lua_getglobal(L, "_G");
 	lua_setfield(L, 1, "_G");
 
-	statesaved = true;
+	statesaved = true;*/
 }
 
 void load_state(lua_State *L)
 {
-	if (statesaved)
+	/*if (statesaved)
 	{
 		lua_getglobal(L, "P");
 		lua_getfield(L, 1, "_G");
 		lua_setglobal(L, "_G");
-	}
+	}*/
 
 	int s = luaL_loadfile(L, LUALIBS_ROOT"core.lua");
 	if ( s == 0 )
@@ -77,15 +77,15 @@ void load_state(lua_State *L)
 	}
 }
 
-namespace D
+namespace C
 {
 
 int add_depandancy (lua_State *L)
 {
 	if (!lua_isstring(L, 1))
-		luaL_error(L, "D.addDependancy was given an argument that is not a path. Arg 1");
+		luaL_error(L, "C.addDependancy was given an argument that is not a path. Arg 1");
 	if (!lua_isstring(L, 2))
-		luaL_error(L, "D.addDependancy was given an argument that is not a path. Arg 2");
+		luaL_error(L, "C.addDependancy was given an argument that is not a path. Arg 2");
 
 	char *targ = files->normalizeFilename(lua_tostring(L, 1));
 	char *dep = files->normalizeFilename(lua_tostring(L, 2));
@@ -102,7 +102,7 @@ int add_depandancy (lua_State *L)
 int add_dir (lua_State *L)
 {
 	if (!lua_isstring(L, 1))
-		luaL_error(L, "D.addDir was given an argument that is not a path.");
+		luaL_error(L, "C.addDir was given an argument that is not a path.");
 
 	files->addDirectory(lua_tostring(L, 1));
 
@@ -119,28 +119,38 @@ int add_generator (lua_State *L)
 	lua_getstack(L, 1, &ar);
 	lua_getinfo(L, "l", &ar);
 
-	std::vector<const char*> gen(luaL_getn(L, 3));
-	for ( unsigned int i = luaL_getn(L, 3); i >= 1; i-- )
+	char *generatorCmd = NULL;
+
+	/*** Get Command ***/
+	std::vector<const char*> gen(lua_objlen(L, 3));
+	for ( unsigned int i = lua_objlen(L, 3); i >= 1; i-- )
 	{
 		lua_pushnumber(L, i);
 		lua_gettable(L, 3);
 		if (!lua_isstring(L, -1))
-			luaL_error(L, "D.addGenerator was given a generator command this is not a string.");
+			luaL_error(L, "C.addGenerator was given a generator command this is not a string.");
 
 		gen[i-1] = lua_tostring(L, -1);
 		lua_pop(L, 1);
 	}
-	if (luaL_getn(L, 3)) gen[0] = files->normalizeFilename(gen[0]);
+	if (lua_objlen(L, 3))
+	{
+		generatorCmd = files->normalizeFilename(gen[0]);
+		gen[0]       = generatorCmd;
+	}
 
 	std::vector<Target*> in(luaL_getn(L, 2));
 
-	for ( unsigned int i = luaL_getn(L, 2); i >= 1; i-- ) // For each input
+	/*** Get Inputs ***/
+	for ( unsigned int i = lua_objlen(L, 2); i >= 1; i-- ) // For each input
 	{
 		/*** Get the current filename ***/
 		lua_pushnumber(L, i);
 		lua_gettable(L, 2);
 		if (!lua_isstring(L, -1))
-			luaL_error(L, "D.addGenerator was given a source file this is not a string.");
+			luaL_error(L, "C.addGenerator was given a source file that is"
+						  "not a string."
+					   );
 
 		char *t = files->normalizeFilename(lua_tostring(L, -1));
 		in[i-1] = Target::newTarget(t);
@@ -148,23 +158,26 @@ int add_generator (lua_State *L)
 		lua_pop(L, 1);
 	}
 
-	for ( unsigned int i = luaL_getn(L, 1); i >= 1; i-- ) // For each output
+	/*** Get Outputs ***/
+	for ( unsigned int i = lua_objlen(L, 1); i >= 1; i-- ) // For each output
 	{
 		/*** Get the current filename ***/
 		lua_pushnumber(L, i);
 		lua_gettable(L, 1);
 		if (!lua_isstring(L, -1))
-			luaL_error(L, "D.addGenerator was given an output file this is not a string.");
+			luaL_error(L, "C.addGenerator was given an output file this is not a string.");
 
 		char *tpath = files->normalizeFilename(lua_tostring(L, -1));
 		Target *t = Target::newTarget(tpath);
 		free(tpath);
 		lua_pop(L, 1);
 
-		if (luaL_getn(L, 3)) t->addGenerator(gen);
+		if (lua_objlen(L, 3)) t->addGenerator(gen);
 		for ( unsigned int i = in.size(); i--; )
 			t->addDependancy(in[i]);
 	}
+
+	free(generatorCmd);
 
 	return 0;
 }
@@ -175,8 +188,7 @@ int path (lua_State *L)
 		luaL_error(L, "path was asked to convert a path that is not a string");
 
 	char *p = files->normalizeFilename(lua_tostring(L, 1));
-	lua_settop(L, 0);
-	lua_pushstring(L, p);
+	lua_pushstring(L, p); // Push our result.
 	free(p);
 
 	return 1;

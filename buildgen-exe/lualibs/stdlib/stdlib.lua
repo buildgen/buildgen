@@ -30,6 +30,17 @@ require "lfs"
 require "pl"
 stringx.import()
 
+S.os = _s_os
+S.lualibsRoot = _s_lualibs_root
+
+if not S.prefix then
+	if S.os == "windows" then
+		S.prefix = "C:/Program Files/"
+	else
+		S.prefix = "/usr/local/"
+	end
+end
+
 local shutdownFunctions = {}
 function S._doShutdownFunctions ( )
 	for k,v in pairs(shutdownFunctions) do v() end
@@ -70,13 +81,12 @@ function S.install ( path, to )
 			end
 		end
 	else
-		local apath = C.path(path)
 		local i = string.find(string.reverse(apath), "/", 1, true)
 		if i then
 			to = to.."/"..string.sub(apath, -i)
 		end
 
-		C.addGenerator({to}, {path}, {"*install", "-D", C.path(path), C.path(to)})
+		C.addGenerator({to}, {path}, {"*install", "-D", apath, C.path(to)})
 		C.addDependancy(">install", to)
     end
 end

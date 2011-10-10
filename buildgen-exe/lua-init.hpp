@@ -30,11 +30,14 @@
 class BuildGenLuaEnv
 {
 	lua_State* L;
+	char *root_file;
 
 	void init(void);
 	void init_lua(void);
 	void dmakeify_lua(void);
 	void report_errors(lua_State *L, int status);
+
+	void doRunFile ( const char *path );
 public:
 	BuildGenLuaEnv(const char *root);
 	~BuildGenLuaEnv();

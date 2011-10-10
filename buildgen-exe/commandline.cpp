@@ -61,6 +61,7 @@ namespace opt
 				char *v = optarg;
 
 				Definition d;
+				d.value = NULL;
 
 				while ( *v != '\0' )
 				{
@@ -69,14 +70,15 @@ namespace opt
 						*v = '\0';
 						v++;
 
+						d.value = v;
+
 						break;
 					}
 
 					v++;
 				}
 
-				d.key   = optarg;
-				d.value = v;
+				d.key = optarg;
 
 				defines.push_back(d);
 				} // End hide variables

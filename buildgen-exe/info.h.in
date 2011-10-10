@@ -25,6 +25,8 @@
 #ifndef LUALIBS_H___GENERATED_INFO_FILE
 #define LUALIBS_H___GENERATED_INFO_FILE
 
+#define VERSION "0.1"
+
 #define LUALIBS_ROOT "@lualibs_root@"
 #define DEFALUT_GENERATOR "@default_generator@"
 

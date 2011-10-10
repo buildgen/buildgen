@@ -53,7 +53,46 @@ public:
 
 	void findProjectRoot(void);
 
+	/** Makes a BuildGen filename absolute.
+//	  *
+	  * Takes a path and finds the absolute meathod of expressing it.  This
+	  * function performs the following translations:
+	  * 	>dir/file
+	  * 		Turns into the file "file" inside the directory "dir" inside
+	  * 		the build directory.
+	  * 	<dir/file
+	  * 		Turns into the file "file" inside the directory "dir" inside
+	  * 		the source directory.
+	  *		*file
+	  *			returns the "matching" filename in the build directory.  For
+	  *			example, if this is called in "/src/mylib" it will return
+	  *			"/build/mylib/file" (assumeing "/build" is your build directory).
+	  *
+	  * 	*prog
+	  * 		Finds the file "prog" in the installed programs. (on posix
+	  * 	systems finds the file in your $PATH)
+	  *
+	  * 		rel/file
+	  * 	Relitive pathnames are turned into absolute pathnames.
+	  * 	/this/file
+	  * 		Absolute pathnames are left as is.
+	  *
+	  * \arg path The path to normalize.
+	  * \returns A newly malloc'ed path.
+	  */
 	char *normalizeFilename(const char *path);
+
+	/** Dumb fixing of pathnames inplace.
+	  *
+	  * Removes unessary components from a path.
+	  *
+	  * Example:
+	  *		/dir/dir2/dir3/../dir4/.././../file
+	  *		becomes: /dir/file
+	  *
+	  * \arg path An absolute path to be prettified in place.
+	  * \return path (the same value you put in)
+	  */
 	char *prettyPath(char *path);
 };
 

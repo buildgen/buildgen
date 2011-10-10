@@ -28,10 +28,10 @@
 ]]
 C = {}
 
-C.addDependancy = _d_add_depandancy
-C.addDir = _d_add_dir
-C.addGenerator = _d_add_generator
-C.path = _d_path
+C.addDependancy = _c_add_depandancy
+C.addDir = _c_add_dir
+C.addGenerator = _c_add_generator
+C.path = _c_path
 
 -- End of D
 

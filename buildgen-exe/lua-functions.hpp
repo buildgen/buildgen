@@ -30,7 +30,7 @@ namespace LuaFunctions
 	void save_state(lua_State *L);
 	void load_state(lua_State *L);
 
-	namespace D
+	namespace C
 	{
 		int add_depandancy(lua_State *L);
 		int add_dir(lua_State *L);

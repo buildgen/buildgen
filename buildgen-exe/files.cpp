@@ -154,39 +154,44 @@ void Files::findProjectRoot( void )
 
 char *Files::normalizeFilename( const char *path )
 {
-	char *n, *r;
 	switch (path[0])
 	{
 	case '<': // Input
-		if ( path[1] == '<' )
 		{
-			path++;
-			break;
+			char *n = (char*)malloc((strlen(project_root)+strlen(path))*sizeof(char));
+			strcpy(n, project_root);
+			strcat(n, path+1);
+			return prettyPath(n);
 		}
-
-		n = (char*)malloc((strlen(project_root)+strlen(path))*sizeof(char));
-		strcpy(n, project_root);
-		strcat(n, path+1);
-		return prettyPath(n);
 	case '>': // Output
-		if ( path[1] == '>' )
 		{
-			path++;
-			break;
+			char *n = (char*)malloc((strlen(out_root)+strlen(path))*sizeof(char));
+			strcpy(n, out_root);
+			strcat(n, path+1);
+			return prettyPath(n);
 		}
+	case '@': // Auto path
+		{
+			char *p = strdup(path);
+			p[0] = '!';
+			char *b = normalizeFilename(p);
+			free(p);
+			char *n = (char*)malloc((strlen(b)
+							   - strlen(project_root)
+							   + strlen(out_root)
+							   + 1
+							  )*sizeof(char));
+			strcpy(n, out_root);
+			strcat(n, b+strlen(project_root)); // -1 is to include the slash.
 
-		n = (char*)malloc((strlen(out_root)+strlen(path))*sizeof(char));
-		strcpy(n, out_root);
-		strcat(n, path+1);
-		return prettyPath(n);
-	case '*': // System path
-		if ( path[1] == '*' )
-		{
-			path++;
-			break;
+			free(b);
+
+			return prettyPath(n);
 		}
-		else  // If we don't use an else we get errors because of case jumps
-		{     // and uniniltized vars.  This limits the scope.
+	case '*': // System path
+		{
+			path = strdup(path);
+
 			DIR *cwd  = opendir(".");
 
 			char *pathdir = strdup(getenv("PATH"));
@@ -211,7 +216,7 @@ char *Files::normalizeFilename( const char *path )
 				{
 					unsigned int dlen = strlen(pathdir);
 					unsigned int flen = strlen(exename);
-					n = (char*)malloc((dlen+flen+1)*sizeof(char));
+					char *n = (char*)malloc((dlen+flen+2)*sizeof(char));
 					strcpy(n, pathdir);
 					n[dlen] = '/';
 					strcpy(n+dlen+1, exename);
@@ -234,7 +239,10 @@ char *Files::normalizeFilename( const char *path )
 
 	// Regular relative path
 
-	n = get_current_dir_name();
+	if ( *path == '!' ) path++; // We didn't want the first character
+	                            // to be looked at.
+
+	char *n = get_current_dir_name();
 	int cwdlen = strlen(n);
 
 	n = (char*)realloc(n, (cwdlen+2+strlen(path))*sizeof(char));
@@ -263,11 +271,13 @@ char *Files::prettyPath ( char *path )
 		else if ( i[1] == '.' )
 		{
 			if ( i[1] == '/' || i[1] == '\0' ) // . current directory
-			{
-				i += 2;
+			{ /* /dir/./file */
+			  /*     ^^^     */
+				i += 2; // skip it, it doesn't tell us anything
 			}
 			else if ( i[2] == '.' && ( i[3] == '/' || i[3] == '\0' ) ) // .. go up
-			{
+			{ /* /dir/otherdir/../file */
+			/*                ^^^^     */
 				i += 3;
 				while ( o != path+1 && *o != '/' ) // The +1 is to keep the
 					o--;                           // leading slash

@@ -44,7 +44,7 @@ namespace opt
 		{
 			switch (i)
 			{
-				case 'o': // Where to put the xml.  Default is stdout
+				case 'o': // Where to put the makefile.  Default is Makefile
 					std::ofstream *makefile = new std::ofstream(optarg, std::ios::out | std::ios::binary);
 					if (!*makefile)
 					{
