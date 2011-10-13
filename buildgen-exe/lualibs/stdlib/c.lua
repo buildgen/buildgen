@@ -26,18 +26,22 @@
 S.c = {}
 if not P.S.c then P.S.c = {} end
 
+S.import "ld"
+
 local function setup () -- So that we can hide our locals.
 
 if not P.S.c.compiler then
 	local compilers = {
-		{ name="gcc", -- Name of the executable
+		{	name = "gcc", -- Name of the executable
 			flags = {
+				compile  = "-c",
 				output   = {"-o", "%s"}, -- the option to set the output file name.
 				debug    = "-g",         -- the option to enable debug mode.
 				profile  = "-p",         -- the option to enable profiling.
+				link     = {"-l", "%s"}, -- the option to link a library.
 				include  = {"-I", "%s"}, -- the option to add an include directory.
 				optimize = {             -- Flags for different levels of optimization.
-					none    = "",
+					none    = {},
 					quick   = "-O",
 					regular = "-O2",     -- Default optimazation.
 					full    = "-O3",
@@ -62,7 +66,11 @@ if not P.S.c.compiler then
 		end
 	end
 
-	P.S.c.compiler = compiler
+	if compiler == nil then
+		error("Error: No C compiler found.", 0)
+	else
+		P.S.c.compiler = compiler
+	end
 end
 
 S.c.optimization = "regular"
@@ -90,60 +98,73 @@ function S.c.addInclude ( dir )
 	end
 
 	for k, v in pairs(dir) do
-		local a =
 		S.c.addArg({"-I", C.path(v)})
 	end
 end
 
+S.c.addLib = S.ld.addLib
+
 function S.c.compile ( out, sources )
-	local compiler
-	if P.S.c.compiler == nil then
-		error("Error: No C compiler found.", 0)
-	else
-		compiler = P.S.c.compiler
-	end
+	sources = List(sources)
+	local compiler = P.S.c.compiler
 
 	out = C.path(out)
 
-	local cmd = List()
-	cmd:append(compiler.name)
+	local toLink = List()
 
-	for i in iter(compiler.flags.output) do -- Add the desired output file to
-		cmd:append(i:format(out))           -- the command line.
-	end                                     --
+	for source in iter(sources) do
+		source = C.path(source)
 
-	if S.c.debug then                       -- Add the debug flag.
-		if type(compiler.flags.debug) == "table" then
-			cmd:extend(compiler.flags.debug)
-		else
-			cmd:append(compiler.flags.debug)
+		if stringx.endswith(source, ".c") or stringx.endswith(source, ".C") then
+			-- Get path to put object file.
+			local object = C.path("@"..source:sub(#lfs.currentdir()+2, -3)..".o")
+
+			local cmd = List()
+			cmd:append(compiler.name)
+
+			if type(compiler.flags.compile) == "table" then
+				cmd:extend(compiler.flags.compile)
+			else
+				cmd:append(compiler.flags.compile)
+			end
+
+			for i in iter(compiler.flags.output) do -- Add the desired output file to
+				cmd:append(i:format(object))           -- the command line.
+			end                                     --
+
+			if S.c.debug then                       -- Add the debug flag.
+				if type(compiler.flags.debug) == "table" then
+					cmd:extend(compiler.flags.debug)
+				else
+					cmd:append(compiler.flags.debug)
+				end
+			end
+			if S.c.profile then                     -- Add the profile flag.
+				if type(compiler.flags.profile) == "table" then
+					cmd:extend(compiler.flags.profile)
+				else
+					cmd:append(compiler.flags.profile)
+				end
+			end
+
+			local o = compiler.flags.optimize[S.c.optimization] -- Set the optimization
+			if o then                                           -- level.
+				if type(o) == "table" then                      --
+					cmd:extend(o)                               --
+				else                                            --
+					cmd:append(o)                               --
+				end                                             --
+			end                                                 --
+
+			cmd:extend(arguments)
+			cmd:append(source)
+
+			C.addGenerator({object}, {source}, cmd)
+			toLink:append(object)
 		end
 	end
-	if S.c.profile then                     -- Add the profile flag.
-		if type(compiler.flags.profile) == "table" then
-			cmd:extend(compiler.flags.profile)
-		else
-			cmd:append(compiler.flags.profile)
-		end
-	end
 
-	local o = compiler.flags.optimize[S.c.optimization] -- Set the optimization
-	if o then                                           -- level.
-		if type(o) == "table" then                      --
-			cmd:extend(o)                               --
-		else                                            --
-			cmd:append(o)                               --
-		end                                             --
-	end                                                 --
-
-	for v in iter(arguments) do cmd:append(v) end
-
-	for k,v in pairs(sources) do
-		sources[k] = C.path(v)
-		cmd:append(sources[k])
-	end
-
-	C.addGenerator({out}, sources, cmd)
+	S.ld.link(out, toLink)
 end
 
 function S.c.generateHeader ( name, definitions )
