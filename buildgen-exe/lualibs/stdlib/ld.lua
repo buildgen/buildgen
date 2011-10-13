@@ -73,7 +73,7 @@ function S.ld.addLib ( dir )
 
 	local args = List()
 	for k, v in pairs(dir) do
-		for l, w in pairs(P.S.c.compiler.flags.lib) do
+		for l, w in pairs(P.S.ld.linker.flags.lib) do
 			args:append(w:format(v))
 		end
 	end
