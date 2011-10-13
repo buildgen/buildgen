@@ -159,7 +159,7 @@ function S.c.compile ( out, sources )
 			cmd:extend(arguments)
 			cmd:append(source)
 
-			C.addGenerator({object}, {source}, cmd)
+			C.addGenerator({object}, sources, cmd)
 			toLink:append(object)
 		end
 	end
