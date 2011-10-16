@@ -279,7 +279,8 @@ char *Files::prettyPath ( char *path )
 			{ /* /dir/otherdir/../file */
 			/*                ^^^^     */
 				i += 3;
-				while ( o != path+1 && *o != '/' ) // The +1 is to keep the
+				o--;
+				while ( o > path && *o != '/' )
 					o--;                           // leading slash
 			}
 			else // Just a file starting with a '.'.
