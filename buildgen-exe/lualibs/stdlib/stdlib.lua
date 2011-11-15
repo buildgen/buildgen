@@ -30,6 +30,7 @@ require "lfs"
 require "pl"
 stringx.import()
 
+S.version = _s_version
 S.os = _s_os
 
 if not S.prefix then
