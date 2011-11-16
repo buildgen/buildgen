@@ -73,11 +73,11 @@ if not P.S.c.compiler then
 	end
 end
 
-S.c.optimization = "regular"
-if D.debug then S.c.optimization = "none" end
-
 S.c.debug = false
 if D.debug then S.c.debug = true end
+
+S.c.optimization = "regular"
+if D.debug then S.c.optimization = "none" end
 
 S.c.profile = false
 if D.debug then S.c.profile = true end

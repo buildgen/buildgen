@@ -66,13 +66,13 @@ function S.ld.addArg ( arg )
 	arguments:extend(arg)
 end
 
-function S.ld.addLib ( dir )
-	if type(dir) ~= "table" then
-		dir = {tostring(dir)}
+function S.ld.addLib ( lib )
+	if type(lib) ~= "table" then
+		dir = {tostring(lib)}
 	end
 
 	local args = List()
-	for k, v in pairs(dir) do
+	for k, v in pairs(lib) do
 		for l, w in pairs(P.S.ld.linker.flags.lib) do
 			args:append(w:format(v))
 		end
