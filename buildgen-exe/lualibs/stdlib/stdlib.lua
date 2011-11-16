@@ -59,6 +59,17 @@ function S.addToDefault ( path )
 	C.addDependancy(">all", path)
 end
 
+function S.findExecutable ( name )
+	for k, v in pairs(S.path) do
+		local p = path.join(v, name);
+		if path.isfile(p) then
+			return p
+		end
+	end
+
+	return false
+end
+
 function S.install ( path, to )
 	if string.find(to, "/", 1, true) ~= 1 then
 		to = S.prefix..to
@@ -90,17 +101,6 @@ function S.install ( path, to )
 		C.addGenerator({to}, {path}, {"*install", "-D", apath, C.path(to)})
 		C.addDependancy(">install", to)
     end
-end
-
-function S.findExecutable ( name )
-	for k, v in pairs(S.path) do
-		local p = path.join(v, name);
-		if path.isfile(p) then
-			return p
-		end
-	end
-
-	return false
 end
 
 local function setup ( )
