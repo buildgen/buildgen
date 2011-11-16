@@ -50,6 +50,7 @@ end
 
 function S.registerShutdown ( func )
 	assert(type(func) == "function", "S.registerShutdown expects a function.")
+	print "S.shutdown is depreciated."
 
 	shutdownFunctions[#shutdownFunctions+1] = func
 end
