@@ -42,7 +42,7 @@ std::string XML::create(std::set<Target*, Target::comparator> &targets)
 	msg::log("Linking and Generating XML");
 
 	char *timestamp = (char*)malloc(11*sizeof(char));
-	sprintf(timestamp, "%d", time(NULL));
+	sprintf(timestamp, "%ld", time(NULL));
 
 	xml_document<> doc;    // character type defaults to char
 

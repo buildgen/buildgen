@@ -91,7 +91,7 @@ namespace opt
 			{ "out",       optional_argument, NULL, 'o' },
 			{ "verbose",   optional_argument, NULL, 'v' },
 			{ "version",         no_argument, &flag, 1  },
-			{ NULL,                     NULL, NULL,  0  },
+			{ NULL,                        0, NULL,  0  },
 		};
 
 		int i;

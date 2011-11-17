@@ -80,7 +80,7 @@ XML::Meta XML::load ( std::istream &xml )
 
 	n = meta->first_node(XML::meta_timeNName);
 	if (!n) die_badFile();
-	sscanf(n->value(), "%d", &metaObj.time);
+	sscanf(n->value(), "%ld", &metaObj.time);
 
 	xml_node<> *targ = root->first_node(XML::targetsNName);
 	if (!targ) die_badFile();
@@ -91,4 +91,6 @@ XML::Meta XML::load ( std::istream &xml )
 			Target::fromXML(n);
 		} while ( n = n->next_sibling(XML::targetNName) );
 	}
+
+	return metaObj;
 }

@@ -29,9 +29,9 @@
 #include <algorithm>
 
 Makefile::Makefile ( std::set<Target *, Target::comparator> *targets ):
-	targets(targets),
 	cwd(get_current_dir_name()),
-	cwdlen(strlen(cwd)+1) // The one is to mimic the trailing slash
+	cwdlen(strlen(cwd)+1), // The one is to mimic the trailing slash
+	targets(targets)
 {
 
 }
