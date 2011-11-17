@@ -148,10 +148,15 @@ Target *Target::fromXML ( const rapidxml::xml_node<> *src )
 	return t;
 }
 
-Generator::Generator( const std::vector<char*> &cmd ):
-	Target(cmd[0]),
-	cmd(cmd)
+Generator::Generator( void ):
+	Target()
 {
+}
+
+Generator::Generator( const std::vector<char*> &cmd ):
+	Target(cmd[0])
+{
+	this->cmds.push_back(cmd);
 }
 
 rapidxml::xml_node<> *Generator::toXML(rapidxml::xml_document<> &d)
@@ -159,21 +164,28 @@ rapidxml::xml_node<> *Generator::toXML(rapidxml::xml_document<> &d)
 	using namespace rapidxml;
 	xml_node<> *g = d.allocate_node(node_element, XML::target_generatorNName);
 
-	for ( unsigned int i = 0; i < cmd.size(); ++i )
+	for ( unsigned int i = 0; i < cmds.size(); ++i )
 	{
-		xml_node<> *n = d.allocate_node(node_element,
-		                                  XML::target_generator_argumentNName,
-		                                  cmd[i]
-		                               );
+		xml_node<> *c = d.allocate_node(node_element, XML::target_generator_commandNName);
 
-		char *pos;
-		if (i) pos = d.allocate_string(NULL, (ceil(log(i)/log(10))+1)*sizeof(char));
-		else   pos = d.allocate_string(NULL, 1*sizeof(char));
-		sprintf(pos, "%d", i);
+		for ( unsigned int j = 0; j < cmds[i].size(); ++j )
+		{
+			xml_node<> *n = d.allocate_node(node_element,
+			                                 XML::target_generator_command_argumentNName,
+			                                 cmds[i][j]
+			                               );
 
-		n->append_attribute(d.allocate_attribute(XML::target_generator_posAName, pos));
+			char *pos;
+			if (j) pos = d.allocate_string(NULL, (ceil(log(j)/log(10))+1)*sizeof(char));
+			else   pos = d.allocate_string(NULL, 1*sizeof(char));
+			sprintf(pos, "%d", j);
 
-		g->append_node(n);
+			n->append_attribute(d.allocate_attribute(XML::target_generator_command_argument_posAName, pos));
+
+			c->append_node(n);
+		}
+
+		g->append_node(c);
 	}
 
 	return g;
@@ -184,20 +196,33 @@ Generator *Generator::fromXML ( const rapidxml::xml_node<> *src )
 	using namespace rapidxml;
 	std::vector<char*> cmd;
 
-	if (src->first_node(XML::target_generator_argumentNName))
+	Generator *g = new Generator();
+
+	if (src->first_node(XML::target_generator_commandNName))
 	{
-		xml_node<> *n = src->last_node(XML::target_generator_argumentNName);
-		// We are going backwords in hope of minimising vector resizes.
+		cmd.empty();
+
+		xml_node<> *n = src->first_node(XML::target_generator_commandNName);
 		do
 		{
-			unsigned int pos;
-			sscanf(n->last_attribute(XML::target_generator_posAName)->value(), "%u", &pos);
+			if (n->first_node(XML::target_generator_commandNName))
+			{
+				xml_node<> *o = n->last_node(XML::target_generator_command_argumentNName);
+				// We are going backwords in hope of minimising vector resizes.
+				do
+				{
+					unsigned int pos;
+					sscanf(o->last_attribute(XML::target_generator_command_argument_posAName)->value(), "%u", &pos);
 
-			if ( pos >= cmd.size() )
-				cmd.resize(pos+1, NULL);
+					if ( pos >= cmd.size() )
+						cmd.resize(pos+1, NULL);
 
-			cmd[pos] = strdup(n->value());
-		} while ( n = n->previous_sibling(XML::target_generator_argumentNName) );
+					cmd[pos] = strdup(o->value());
+				} while ( o = o->previous_sibling(XML::target_generator_command_argumentNName) );
+			}
+
+			g->addCommand(cmd);
+		} while ( n = n->next_sibling(XML::target_generator_commandNName) );
 	}
 
 	for ( unsigned int i = cmd.size(); i--; )
@@ -212,49 +237,12 @@ Generator *Generator::fromXML ( const rapidxml::xml_node<> *src )
 	return new Generator(cmd);
 }
 
-bool Target::check ( void )
+void Generator::addCommand ( const std::vector<char *> &cmd )
 {
-	if ( path[0] == '*' && path[1] != '*' ) // System path
-	{
-		char *pathdir = strdup(getenv("PATH"));
-		char *nt = pathdir; // NULL-terminator
+	if ( cmds.size() == 0 )
+		path = cmd[0];
 
-		bool moredirs = true;
-
-		char *exename = path + 1;
-		while ( moredirs )
-		{
-			/*** NULL-terminate the end of the next dir ***/
-			pathdir = nt;
-			while ( *nt != '\0' && *nt != ':' )
-				nt++;
-			if (!*nt)
-				moredirs = false;
-			*(nt++) = '\0';
-
-			/*** Check for executable ***/
-			chdir(pathdir);
-			FILE *e = fopen(exename, "r");
-			if (e) // Found it.
-			{
-				fclose(e);
-				return true;
-			}
-		}
-	}
-	else
-	{
-		FILE *e = fopen(path, "r");
-		if (e) // Found it.
-		{
-			fclose(e);
-			return true;
-		}
-	}
-
-	msg::info("Target \"%s\" doesn't exist.  You will run into problems "
-		"if you try to build anything that depends on it.", path);
-	return false;
+	cmds.push_back(cmd);
 }
 
 bool Target::operator > (const Target &c) const

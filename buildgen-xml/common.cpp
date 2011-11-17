@@ -24,18 +24,19 @@
 
 namespace XML
 {
-	const char *rootNName =                      "BuildGen";
-	const char *versionAName =                   "version";
-	const char *metaNName =                      "meta";
-	const char *meta_projectRootNName =          "projectroot";
-	const char *meta_outRootNName =              "outroot";
-	const char *meta_buildGenRootNName =         "buildgenroot";
-	const char *meta_timeNName =                 "time";
-	const char *targetsNName =                   "targets";
-	const char *targetNName =                    "target";
-	const char *target_outNName =                "out";
-	const char *target_dependsNName =            "depends";
-	const char *target_generatorNName =          "generator";
-	const char *target_generator_argumentNName = "arg";
-	const char *target_generator_posAName =      "pos";
+	const char *rootNName =                                  "BuildGen";
+	const char *versionAName =                               "version";
+	const char *metaNName =                                  "meta";
+	const char *meta_projectRootNName =                      "projectroot";
+	const char *meta_outRootNName =                          "outroot";
+	const char *meta_buildGenRootNName =                     "buildgenroot";
+	const char *meta_timeNName =                             "time";
+	const char *targetsNName =                               "targets";
+	const char *targetNName =                                "target";
+	const char *target_outNName =                            "out";
+	const char *target_dependsNName =                        "depends";
+	const char *target_generatorNName =                      "generator";
+	const char *target_generator_commandNName =              "command";
+	const char *target_generator_command_argumentNName =     "arg";
+	const char *target_generator_command_argument_posAName = "pos";
 }

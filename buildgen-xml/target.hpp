@@ -70,8 +70,6 @@ public:
 	static Target *fromXML(const rapidxml::xml_node<> *n);
 	virtual rapidxml::xml_node<> *toXML(rapidxml::xml_document<> &d);
 
-	bool check(void);
-
 	bool operator > (const Target &c) const;
 	bool operator >= (const Target &c) const;
 	bool operator < (const Target &c) const;
@@ -83,8 +81,10 @@ public:
 class Generator : public Target
 {
 public:
-	Generator( const std::vector<char*> &cmd );
-	std::vector<char*> cmd;
+	Generator( void );
+	Generator( const std::vector<char*> &cmds );
+	std::vector< std::vector<char*> > cmds;
+	void addCommand ( const std::vector<char*> &cmd );
 	virtual rapidxml::xml_node<> *toXML(rapidxml::xml_document<> &d);
 	static Generator *fromXML(const rapidxml::xml_node<> *n);
 };

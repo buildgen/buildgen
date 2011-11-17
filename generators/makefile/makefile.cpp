@@ -113,14 +113,17 @@ std::string Makefile::writeGenerator(Generator *g)
 
 	if (g)
 	{
-		out += '	';
-		for ( unsigned int i = 0; i < g->cmd.size(); i++ )
+		for ( unsigned int i = 0; i < g->cmds.size(); i++ )
 		{
-			out += '\'';
-			out += g->cmd[i];
-			out += "\' ";
+			out += '	';
+			for ( unsigned int j = 0; j < g->cmds[i].size(); j++ )
+			{
+				out += '\'';
+				out += g->cmds[i][j];
+				out += "\' ";
+			}
+			out += '\n';
 		}
-		out += '\n';
 	}
 
 	return out;
