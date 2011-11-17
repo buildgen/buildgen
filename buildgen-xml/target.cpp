@@ -96,18 +96,23 @@ void Target::addDependancy(Target* d)
 	depends.insert(d);
 }
 
-void Target::addGenerator(std::vector<const char*> cmd)
+void Target::addGenerator( Generator *gen )
 {
-	msg::log("Added generator \"%s\" to \"%s\"", cmd[0], path);
+	msg::log("Added generator \"%s\" to \"%s\"", gen->cmds[0][0], path);
 
-	std::vector<char*> dup(cmd.size());
+	generator = gen;
+}
+
+void Target::addGenerator(std::vector<char*> cmd)
+{
+	std::vector<const char*> dup(cmd.size());
 	for ( int i = cmd.size(); --i; )
 	{
 		dup[i] = strdup(cmd[i]);
 	}
 	dup[0] = strdup(cmd[0]);
 
-	generator = new Generator(dup);
+	addGenerator(new Generator(dup));
 }
 
 rapidxml::xml_node<> *Target::toXML ( rapidxml::xml_document<> &d )
@@ -153,10 +158,10 @@ Generator::Generator( void ):
 {
 }
 
-Generator::Generator( const std::vector<char*> &cmd ):
+Generator::Generator( const std::vector<const char*> &cmd ):
 	Target(cmd[0])
 {
-	this->cmds.push_back(cmd);
+	addCommand(cmd);
 }
 
 rapidxml::xml_node<> *Generator::toXML(rapidxml::xml_document<> &d)
@@ -194,7 +199,7 @@ rapidxml::xml_node<> *Generator::toXML(rapidxml::xml_document<> &d)
 Generator *Generator::fromXML ( const rapidxml::xml_node<> *src )
 {
 	using namespace rapidxml;
-	std::vector<char*> cmd;
+	std::vector<const char*> cmd;
 
 	Generator *g = new Generator();
 
@@ -237,12 +242,17 @@ Generator *Generator::fromXML ( const rapidxml::xml_node<> *src )
 	return new Generator(cmd);
 }
 
-void Generator::addCommand ( const std::vector<char *> &cmd )
+void Generator::addCommand ( const std::vector<const char *> &cmd )
 {
-	if ( cmds.size() == 0 )
-		path = cmd[0];
+	std::vector<char*> n(cmd.size());
 
-	cmds.push_back(cmd);
+	for ( unsigned int i = cmd.size()-1; i--; )
+		n[i] = strdup(cmd[i]);
+
+	if ( cmds.size() == 0 )
+		path = n[0];
+
+	cmds.push_back(n);
 }
 
 bool Target::operator > (const Target &c) const

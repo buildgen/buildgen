@@ -65,7 +65,8 @@ public:
 	Target(const char *path = NULL );
 	~Target( );
 	void addDependancy(Target*);
-	void addGenerator(std::vector<const char*> cmd);
+	void addGenerator( Generator *gen );
+	void addGenerator(std::vector<char*> cmd);
 
 	static Target *fromXML(const rapidxml::xml_node<> *n);
 	virtual rapidxml::xml_node<> *toXML(rapidxml::xml_document<> &d);
@@ -82,9 +83,9 @@ class Generator : public Target
 {
 public:
 	Generator( void );
-	Generator( const std::vector<char*> &cmds );
+	Generator( const std::vector<const char*> &cmds );
 	std::vector< std::vector<char*> > cmds;
-	void addCommand ( const std::vector<char*> &cmd );
+	void addCommand ( const std::vector<const char*> &cmd );
 	virtual rapidxml::xml_node<> *toXML(rapidxml::xml_document<> &d);
 	static Generator *fromXML(const rapidxml::xml_node<> *n);
 };

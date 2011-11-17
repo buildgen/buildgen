@@ -119,24 +119,38 @@ int add_generator (lua_State *L)
 	lua_getstack(L, 1, &ar);
 	lua_getinfo(L, "l", &ar);
 
+	Generator *gen = new Generator();
+
 	char *generatorCmd = NULL;
 
 	/*** Get Command ***/
-	std::vector<const char*> gen(lua_objlen(L, 3));
+	std::vector<const char*> cmd;
 	for ( unsigned int i = lua_objlen(L, 3); i >= 1; i-- )
 	{
 		lua_pushnumber(L, i);
 		lua_gettable(L, 3);
-		if (!lua_isstring(L, -1))
-			luaL_error(L, "C.addGenerator was given a generator command this is not a string.");
 
-		gen[i-1] = lua_tostring(L, -1);
+		int curcmd = lua_gettop(L);
+
+		cmd.resize(lua_objlen(L, curcmd));
+		for ( unsigned int j = lua_objlen(L, curcmd); j >= 1; j-- )
+		{
+			lua_pushnumber(L, j);
+			lua_gettable(L, curcmd);
+			if (!lua_isstring(L, -1))
+				luaL_error(L, "C.addGenerator was given a generator command that is not a string.");
+
+			cmd[j-1] = lua_tostring(L, -1);
+			lua_pop(L, 1);
+		}
+		if (lua_objlen(L, curcmd))
+		{
+			generatorCmd = files->normalizeFilename(cmd[0]);
+			cmd[0]       = generatorCmd;
+		}
+
+		gen->addCommand(cmd);
 		lua_pop(L, 1);
-	}
-	if (lua_objlen(L, 3))
-	{
-		generatorCmd = files->normalizeFilename(gen[0]);
-		gen[0]       = generatorCmd;
 	}
 
 	std::vector<Target*> in(luaL_getn(L, 2));

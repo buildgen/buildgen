@@ -28,9 +28,15 @@
 ]]
 C = {}
 
+function C.addGenerator ( outputs, sources, commands )
+	if type(commands[1]) ~= "table" then -- If they gave us one command wrap
+		commands = {commands}            -- it in a table.
+	end
+
+	return _c_add_generator(outputs, sources, commands)
+end
 C.addDependancy = _c_add_depandancy
 C.addDir = _c_add_dir
-C.addGenerator = _c_add_generator
 C.path = _c_path
 
 -- End of D

@@ -68,7 +68,7 @@ end
 
 function S.ld.addLib ( lib )
 	if type(lib) ~= "table" then
-		dir = {tostring(lib)}
+		lib = {tostring(lib)}
 	end
 
 	local args = List()
