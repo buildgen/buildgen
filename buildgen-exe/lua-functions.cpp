@@ -113,7 +113,24 @@ int add_generator (lua_State *L)
 {
 	luaL_checktype(L, 1, LUA_TTABLE); // Outputs
 	luaL_checktype(L, 2, LUA_TTABLE); // Inputs
+
 	luaL_checktype(L, 3, LUA_TTABLE); // Command line
+	lua_pushinteger(L, 1);
+	if (lua_isstring(L, -1)) // Check the first element of the table.
+	{
+		lua_createtable(L, 1, 0); // Create the wrapper table.
+		lua_insert(L, 3);         // Put it at the proper index
+		lua_pushinteger(L, 1);    // Push a 1 for the index of the settable()
+		lua_pushvalue(L, 4);      // Copy the old table.
+		lua_remove(L, 4);         // Delete the original old table.
+		lua_settable(L, 3);       // wrapper[1] = oldtable
+	}
+	lua_pop(L, 1); // Pop the result of the test.
+
+	if (lua_isnone(L, 4)) msg::debug("No option table");
+	if (lua_isnone(L, 4))
+		lua_newtable(L);
+	luaL_checktype(L, 4, LUA_TTABLE); // Options
 
 	lua_Debug ar;
 	lua_getstack(L, 1, &ar);
@@ -122,6 +139,15 @@ int add_generator (lua_State *L)
 	Generator *gen = new Generator();
 
 	char *generatorCmd = NULL;
+	const char *desc = NULL;
+
+	lua_pushstring(L, "description");
+	lua_gettable(L, 4);
+	if (lua_isstring(L, -1))
+		desc = lua_tostring(L, -1);
+	lua_pop(L, 1);
+
+	msg::debug("%s", desc);
 
 	/*** Get Command ***/
 	std::vector<const char*> cmd;

@@ -159,7 +159,9 @@ function S.c.compile ( out, sources )
 			cmd:extend(arguments)
 			cmd:append(source)
 
-			C.addGenerator({object}, sources, cmd)
+			C.addGenerator({object}, sources, cmd, {
+				description = "Generating "..object
+			})
 			toLink:append(object)
 		end
 	end
@@ -179,7 +181,9 @@ function S.c.generateHeader ( name, definitions )
 		cmd:append(k.."="..v)
 	end
 
-	C.addGenerator({name}, {}, cmd)
+	C.addGenerator({name}, {}, cmd, {
+		description = "Generating '"..name.."'..."
+	})
 end
 
 end

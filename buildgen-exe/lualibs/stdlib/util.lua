@@ -71,7 +71,9 @@ function S.util.cp ( src, dest )
 	cmd:append(C.path(src))
 	cmd:append(C.path(dest))
 
-	C.addGenerator({dest}, {src}, cmd)
+	C.addGenerator({dest}, {src}, cmd, {
+		description = "Coppying "..src.." to "..dest
+	})
 end
 
 end

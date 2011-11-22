@@ -106,7 +106,9 @@ function S.install ( path, to )
 			to = to.."/"..string.sub(apath, -i)
 		end
 
-		C.addGenerator({to}, {path}, {"*install", "-D", apath, C.path(to)})
+		C.addGenerator({to}, {path}, {"*install", "-D", apath, C.path(to)}, {
+			description = "Installing "..to
+		})
 		C.addDependancy(">install", to)
     end
 end
