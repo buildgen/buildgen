@@ -60,6 +60,14 @@ function S.addToDefault ( path )
 end
 
 function S.findExecutable ( name )
+	if name:find("/", 1, true) == 1 then
+		if path.isfile(name) then
+			return name
+		end
+
+		return false
+	end
+
 	for k, v in pairs(S.path) do
 		local p = path.join(v, name);
 		if path.isfile(p) then

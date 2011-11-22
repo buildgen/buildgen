@@ -1,3 +1,5 @@
+#! /usr/bin/env lua
+
 -- Copyright 2011 Kevin Cox
 
 --[[---------------------------------------------------------------------------]
@@ -22,41 +24,34 @@
 [                                                                              ]
 [-----------------------------------------------------------------------------]]
 
+require "lfs"
+require "pl"
+stringx.import()
 
---- The Standard library namespace.
+flags = {
+	r = false, -- Do recursion.
+	n = false, -- Don't overwrite.
+	v = false, -- be verbose.
+}
 
-S = {} -- Std libraries
-S.imported = false
-L = {} -- User libraries
-if not P.S then P.S = {} end
-
-S.lualibsRoot = _s_lualibs_root.."stdlib/"
-L.lualibsRoot = _s_lualibs_root.."custom/"
-
-function S.import ( name )
-	if not S.imported
-	then
-		dofile(S.lualibsRoot.."stdlib.lua")
+local i = 1; -- Even though lua indicies start at 1 the script name is still 0.
+while i <= #arg do
+	if arg[i]:find("-", 1, true) == 1 then
+		flags[arg[i]:sub(2)] = true
+	else
+		break
 	end
 
-	if not S[name] and name ~= "stdlib"
-	then
-		dofile(S.lualibsRoot..name..".lua")
-	end
+	i = i+1
 end
 
-function L.import ( path )
-	local name = path:reverse():find("/", 1, true)
-	if i then
-		name = name:sub(-i+1)
+while i < #arg do
+	if not flags.r then
+		if flags.v then print("Copying "..arg[i].."...") end
+		dir.copyfile(arg[i], arg[#arg]);
+	else
+		dir.clonetree(arg[i], arg[#arg], nil, flags.v);
 	end
 
-	if not L[name]
-	then
-		if path:find(".") then
-			dofile(C.path(path))
-		else
-			dofile(L.lualibsRoot..name..".lua")
-		end
-	end
+	i = i+1
 end

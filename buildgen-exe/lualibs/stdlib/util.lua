@@ -23,40 +23,57 @@
 [-----------------------------------------------------------------------------]]
 
 
---- The Standard library namespace.
+S.util = {}
+P.S.util = P.S.util or {}
+P.S.util.cmd = P.S.util.cmd or {}
 
-S = {} -- Std libraries
-S.imported = false
-L = {} -- User libraries
-if not P.S then P.S = {} end
+local function setup () -- So that we can hide our locals.
 
-S.lualibsRoot = _s_lualibs_root.."stdlib/"
-L.lualibsRoot = _s_lualibs_root.."custom/"
+if not P.S.util.cmd.cp then
+	local cps = {
+		{	name = S.lualibsRoot.."util/cp.lua", -- Name of the executable
+			flags = {
+				noover  = "-n",
+				recurse = "-r",
+				verbose = "-v",
+			}
+		},
+		--[[{	name = "cp", -- Name of the executable
+			flags = {
+				noover  = "-n",
+				recurse = "-r",
+				verbose = "-v",
+			}
+		},]]
+	}
+	List(cps) -- turn tabe into a penlight 'list'
 
-function S.import ( name )
-	if not S.imported
-	then
-		dofile(S.lualibsRoot.."stdlib.lua")
-	end
+	local cp;
+	for c in iter(cps) do          -- Find the first compiler they have
+		if S.findExecutable(c.name) then -- installed on thier system.
+			cp = c
+			cp.name = S.findExecutable(cp.name)
 
-	if not S[name] and name ~= "stdlib"
-	then
-		dofile(S.lualibsRoot..name..".lua")
-	end
-end
-
-function L.import ( path )
-	local name = path:reverse():find("/", 1, true)
-	if i then
-		name = name:sub(-i+1)
-	end
-
-	if not L[name]
-	then
-		if path:find(".") then
-			dofile(C.path(path))
-		else
-			dofile(L.lualibsRoot..name..".lua")
+			break
 		end
 	end
+
+	if cp == nil then
+		error("Error: No copy command found.", 0)
+	else
+		P.S.util.cmd.cp = cp
+	end
 end
+
+function S.util.cp ( src, dest )
+	cmd = List()
+	cmd:append(P.S.util.cmd.cp.name)
+	cmd:append(C.path(src))
+	cmd:append(C.path(dest))
+
+	C.addGenerator({dest}, {src}, cmd)
+end
+
+end
+setup()
+setup=nil

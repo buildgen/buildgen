@@ -210,7 +210,7 @@ Generator *Generator::fromXML ( const rapidxml::xml_node<> *src )
 		xml_node<> *n = src->first_node(XML::target_generator_commandNName);
 		do
 		{
-			if (n->first_node(XML::target_generator_commandNName))
+			if (n->first_node(XML::target_generator_command_argumentNName))
 			{
 				xml_node<> *o = n->last_node(XML::target_generator_command_argumentNName);
 				// We are going backwords in hope of minimising vector resizes.
@@ -246,7 +246,7 @@ void Generator::addCommand ( const std::vector<const char *> &cmd )
 {
 	std::vector<char*> n(cmd.size());
 
-	for ( unsigned int i = cmd.size()-1; i--; )
+	for ( unsigned int i = cmd.size(); i--; )
 		n[i] = strdup(cmd[i]);
 
 	if ( cmds.size() == 0 )
