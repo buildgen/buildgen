@@ -154,20 +154,32 @@ Target *Target::fromXML ( const rapidxml::xml_node<> *src )
 }
 
 Generator::Generator( void ):
-	Target()
+	Target(),
+	desc(NULL)
 {
 }
 
 Generator::Generator( const std::vector<const char*> &cmd ):
-	Target(cmd[0])
+	Target(cmd[0]),
+	desc(NULL)
 {
 	addCommand(cmd);
+}
+
+void Generator::addDescription ( const char *d )
+{
+	desc = strdup(d);
 }
 
 rapidxml::xml_node<> *Generator::toXML(rapidxml::xml_document<> &d)
 {
 	using namespace rapidxml;
 	xml_node<> *g = d.allocate_node(node_element, XML::target_generatorNName);
+
+	g->append_node(d.allocate_node(node_element,
+	                XML::target_generator_descriptionNName,
+	                desc
+	));
 
 	for ( unsigned int i = 0; i < cmds.size(); ++i )
 	{

@@ -66,10 +66,13 @@ if not P.S.util.cmd.cp then
 end
 
 function S.util.cp ( src, dest )
+	src  = C.path(src)
+	dest = C.path(dest)
+
 	cmd = List()
 	cmd:append(P.S.util.cmd.cp.name)
-	cmd:append(C.path(src))
-	cmd:append(C.path(dest))
+	cmd:append(src)
+	cmd:append(dest)
 
 	C.addGenerator({dest}, {src}, cmd, {
 		description = "Coppying "..src.." to "..dest

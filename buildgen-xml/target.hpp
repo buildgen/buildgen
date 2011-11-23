@@ -84,6 +84,8 @@ class Generator : public Target
 public:
 	Generator( void );
 	Generator( const std::vector<const char*> &cmds );
+	char *desc;
+	void addDescription ( const char *d );
 	std::vector< std::vector<char*> > cmds;
 	void addCommand ( const std::vector<const char*> &cmd );
 	virtual rapidxml::xml_node<> *toXML(rapidxml::xml_document<> &d);

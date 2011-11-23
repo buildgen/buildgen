@@ -147,7 +147,7 @@ int add_generator (lua_State *L)
 		desc = lua_tostring(L, -1);
 	lua_pop(L, 1);
 
-	msg::debug("%s", desc);
+	if ( desc != NULL ) gen->addDescription(desc);
 
 	/*** Get Command ***/
 	std::vector<const char*> cmd;

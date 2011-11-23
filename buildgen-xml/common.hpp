@@ -58,6 +58,7 @@ namespace XML
 	extern const char *target_generator_commandNName;
 	extern const char *target_generator_command_argumentNName;
 	extern const char *target_generator_command_argument_posAName;
+	extern const char *target_generator_descriptionNName;
 
 	struct Meta {
 		char *buildGenRoot;

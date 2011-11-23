@@ -39,4 +39,5 @@ namespace XML
 	const char *target_generator_commandNName =              "command";
 	const char *target_generator_command_argumentNName =     "arg";
 	const char *target_generator_command_argument_posAName = "pos";
+	const char *target_generator_descriptionNName =          "description";
 }
