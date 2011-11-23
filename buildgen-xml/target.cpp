@@ -215,11 +215,18 @@ Generator *Generator::fromXML ( const rapidxml::xml_node<> *src )
 
 	Generator *g = new Generator();
 
+	xml_node<> *n = NULL;
+
+	if ( n = src->first_node(XML::target_generator_descriptionNName))
+	{
+		g->addDescription(n->value());
+	}
+
 	if (src->first_node(XML::target_generator_commandNName))
 	{
 		cmd.empty();
 
-		xml_node<> *n = src->first_node(XML::target_generator_commandNName);
+		n = src->first_node(XML::target_generator_commandNName);
 		do
 		{
 			if (n->first_node(XML::target_generator_command_argumentNName))
@@ -242,16 +249,7 @@ Generator *Generator::fromXML ( const rapidxml::xml_node<> *src )
 		} while ( n = n->next_sibling(XML::target_generator_commandNName) );
 	}
 
-	for ( unsigned int i = cmd.size(); i--; )
-	{
-		if (!cmd[i])
-		{
-			msg::error("Generator command missing an argument.");
-			exit(EX_DATAERR);
-		}
-	}
-
-	return new Generator(cmd);
+	return g;
 }
 
 void Generator::addCommand ( const std::vector<const char *> &cmd )

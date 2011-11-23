@@ -113,6 +113,9 @@ std::string Makefile::writeGenerator(Generator *g)
 
 	if (g)
 	{
+		if ( g->desc != NULL ) out += "	echo -e '\\e[1m"
+		                              +std::string(g->desc)
+		                              +"\\e[0m'\n";
 		for ( unsigned int i = 0; i < g->cmds.size(); i++ )
 		{
 			out += '	';
