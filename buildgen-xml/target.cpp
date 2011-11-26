@@ -146,7 +146,11 @@ rapidxml::xml_node<> *Target::toXML ( rapidxml::xml_document<> &d )
 Target *Target::fromXML ( const rapidxml::xml_node<> *src )
 {
 	using namespace rapidxml;
-	Target *t = Target::newTarget(src->first_node(XML::target_outNName)->value());
+	xml_node<> *p = src->first_node(XML::target_outNName);
+	Target *t = Target::newTarget(p->value());
+
+	xml_attribute<> *magic = p->first_attribute(XML::target_out_magicAName);
+	if (magic && !strcmp(magic->value(), "true")) t->magic = 1;
 
 	if ( xml_node<> *n = src->first_node(XML::target_dependsNName) )
 	{
