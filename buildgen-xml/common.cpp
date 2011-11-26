@@ -34,6 +34,7 @@ namespace XML
 	const char *targetsNName =                               "targets";
 	const char *targetNName =                                "target";
 	const char *target_outNName =                            "out";
+	const char *target_out_magicAName =                      "magic";
 	const char *target_dependsNName =                        "depends";
 	const char *target_generatorNName =                      "generator";
 	const char *target_generator_commandNName =              "command";

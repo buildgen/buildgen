@@ -86,12 +86,35 @@ int add_depandancy (lua_State *L)
 		luaL_error(L, "C.addDependancy was given an argument that is not a path. Arg 1");
 	if (!lua_isstring(L, 2))
 		luaL_error(L, "C.addDependancy was given an argument that is not a path. Arg 2");
+	if (lua_isnone(L, 3))
+		lua_newtable(L);
+	luaL_checktype(L, 3, LUA_TTABLE); // Options
 
-	char *targ = files->normalizeFilename(lua_tostring(L, 1));
-	char *dep = files->normalizeFilename(lua_tostring(L, 2));
+	int magic = 0; // Check to see if this is a magic path.
+	lua_pushstring(L, "magic"); // If the path to add to is magic.
+	lua_gettable(L, 3);
+	if ( lua_isboolean(L, -1) && lua_toboolean(L, -1))
+		magic = 1;
+	lua_pop(L, 1);
+
+	lua_pushstring(L, "magicsrc"); // If the path being added is magic.
+	lua_gettable(L, 3);
+	if ( lua_isboolean(L, -1) && lua_toboolean(L, -1))
+		magic &= 0b10;
+	lua_pop(L, 1);
+
+	char *targ = NULL;
+	char *dep = NULL;
+	if (!(magic & 0b01)) targ = files->normalizeFilename(lua_tostring(L, 1));
+	else                 targ = strdup(lua_tostring(L, 1));
+	if (!(magic & 0b10)) dep = files->normalizeFilename(lua_tostring(L, 2));
+	else                 dep = strdup(lua_tostring(L, 2));
 
 	Target *t = Target::newTarget(targ);
-	t->addDependancy(Target::newTarget(dep));
+	Target *d = Target::newTarget(dep);
+	if ( magic & 0b01 ) t->magic = 1;
+	if ( magic & 0b10 ) t->magic = 1;
+	t->addDependancy(d);
 
 	free(targ);
 	free(dep);

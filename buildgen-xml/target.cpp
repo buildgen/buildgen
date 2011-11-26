@@ -53,6 +53,7 @@ Target::~Target ( )
 void Target::init()
 {
 	generator = NULL;
+	magic = 0;
 }
 
 /// Find a target
@@ -122,8 +123,15 @@ rapidxml::xml_node<> *Target::toXML ( rapidxml::xml_document<> &d )
 	using namespace rapidxml;
 
 	xml_node<> *t = d.allocate_node(node_element, XML::targetNName);
+	xml_node<> *p = d.allocate_node(node_element, XML::target_outNName, path);
+	if (magic)
+	{
+		xml_attribute<> *m = NULL;
+		m = d.allocate_attribute(XML::target_out_magicAName, "true");
+		p->append_attribute(m);
+	}
 
-	t->append_node(d.allocate_node(node_element, XML::target_outNName, path));
+	t->append_node(p);
 
 	if (generator)
 		t->append_node(generator->toXML(d));

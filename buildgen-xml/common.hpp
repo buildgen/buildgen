@@ -53,6 +53,7 @@ namespace XML
 	extern const char *targetNName;
 	extern const char *targetsNName;
 	extern const char *target_outNName;
+	extern const char *target_out_magicAName;
 	extern const char *target_dependsNName;
 	extern const char *target_generatorNName;
 	extern const char *target_generator_commandNName;

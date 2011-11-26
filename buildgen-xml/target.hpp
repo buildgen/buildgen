@@ -56,6 +56,7 @@ public:
 	static Target *findTarget ( const char *path );
 
 	char *path;  ///< The lcoation of the target.  This is an absolute value.
+	short int magic; ///< If the target is a magic target.
 	std::set<Target*> depends; ///< The targets that this target depends on
 	Generator *generator; ///< The generator used to create this target.
 private:

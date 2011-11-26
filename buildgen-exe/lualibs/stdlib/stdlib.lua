@@ -109,7 +109,7 @@ function S.install ( path, to )
 		C.addGenerator({to}, {path}, {"*install", "-D", apath, C.path(to)}, {
 			description = "Installing "..to
 		})
-		C.addDependancy(">install", to)
+		C.addDependancy("install", to, { magic = true })
     end
 end
 
