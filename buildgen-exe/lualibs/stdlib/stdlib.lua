@@ -56,7 +56,7 @@ function S.registerShutdown ( func )
 end
 
 function S.addToDefault ( path )
-	C.addDependancy(">all", path)
+	C.addDependancy("all", path, { magic = true })
 end
 
 function S.findExecutable ( name )
