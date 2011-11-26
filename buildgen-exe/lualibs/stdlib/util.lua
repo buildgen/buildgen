@@ -31,6 +31,13 @@ local function setup () -- So that we can hide our locals.
 
 if not P.S.util.cmd.cp then
 	local cps = {
+		{	name = "cp", -- Name of the executable
+			flags = {
+				noover  = "-n",
+				recurse = "-r",
+				verbose = "-v",
+			}
+		},
 		{	name = S.lualibsRoot.."util/cp.lua", -- Name of the executable
 			flags = {
 				noover  = "-n",
@@ -38,13 +45,6 @@ if not P.S.util.cmd.cp then
 				verbose = "-v",
 			}
 		},
-		--[[{	name = "cp", -- Name of the executable
-			flags = {
-				noover  = "-n",
-				recurse = "-r",
-				verbose = "-v",
-			}
-		},]]
 	}
 	List(cps) -- turn tabe into a penlight 'list'
 
@@ -65,6 +65,78 @@ if not P.S.util.cmd.cp then
 	end
 end
 
+if not P.S.util.cmd.mv then
+	local mvs = {
+		{	name = "mv", -- Name of the executable
+			flags = {
+				over    = {},
+				noover  = {},
+				recurse = {},
+				verbose = "-v",
+			}
+		},
+		{	name = S.lualibsRoot.."util/mv.lua", -- Name of the executable
+			flags = {
+				over    = {},
+				noover  = {},
+				recurse = {},
+				verbose = "-v",
+			}
+		},
+	}
+	List(mvs) -- turn tabe into a penlight 'list'
+
+	local mv;
+	for c in iter(mvs) do          -- Find the first compiler they have
+		if S.findExecutable(c.name) then -- installed on thier system.
+			mv = c
+			mv.name = S.findExecutable(mv.name)
+
+			break
+		end
+	end
+
+	if mv == nil then
+		error("Error: No move command found.", 0)
+	else
+		P.S.util.cmd.mv = mv
+	end
+end
+
+if not P.S.util.cmd.rm then
+	local rms = {
+		{	name = "rm", -- Name of the executable
+			flags = {
+				recurse = {"-r"},
+				verbose = "-v",
+			}
+		},
+		{	name = S.lualibsRoot.."util/rm.lua", -- Name of the executable
+			flags = {
+				recurse = {"-r"},
+				verbose = "-v",
+			}
+		},
+	}
+	List(rms) -- turn tabe into a penlight 'list'
+
+	local rm;
+	for c in iter(rms) do          -- Find the first compiler they have
+		if S.findExecutable(c.name) then -- installed on thier system.
+			rm = c
+			rm.name = S.findExecutable(rm.name)
+
+			break
+		end
+	end
+
+	if rm == nil then
+		error("Error: No remove command found.", 0)
+	else
+		P.S.util.cmd.rm = rm
+	end
+end
+
 function S.util.cp ( src, dest )
 	src  = C.path(src)
 	dest = C.path(dest)
@@ -76,6 +148,32 @@ function S.util.cp ( src, dest )
 
 	C.addGenerator({dest}, {src}, cmd, {
 		description = "Coppying "..src.." to "..dest
+	})
+end
+
+function S.util.mv ( src, dest )
+	src  = C.path(src)
+	dest = C.path(dest)
+
+	cmd = List()
+	cmd:append(P.S.util.cmd.mv.name)
+	cmd:append(src)
+	cmd:append(dest)
+
+	C.addGenerator({dest}, {src}, cmd, {
+		description = "Moving "..src.." to "..dest
+	})
+end
+
+function S.util.rm ( file )
+	file  = C.path(file)
+
+	cmd = List()
+	cmd:append(P.S.util.cmd.rm.name)
+	cmd:append(file)
+
+	C.addGenerator({}, {file}, cmd, {
+		description = "Deleting "..file
 	})
 end
 

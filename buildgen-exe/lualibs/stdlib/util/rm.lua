@@ -1,3 +1,5 @@
+#! /usr/bin/env lua
+
 -- Copyright 2011 Kevin Cox
 
 --[[---------------------------------------------------------------------------]
@@ -22,39 +24,33 @@
 [                                                                              ]
 [-----------------------------------------------------------------------------]]
 
+require "lfs"
+require "pl"
+stringx.import()
 
-S.c = {}
+flags = {
+	r = false, -- Do recursion.
+	v = false, -- be verbose.
+}
 
-S.c.flags = ""
-S.c.flag = {}
-
-S.c.arguments = {}
-
-function S.c.addArg ( arg )
-	if type(arg) ~= "table" then
-		arg = {tostring(arg)}
+local i = 1; -- Even though lua indicies start at 1 the script name is still 0.
+while i <= #arg do
+	if arg[i]:find("-", 1, true) == 1 then
+		flags[arg[i]:sub(2)] = true
+	else
+		break
 	end
 
-	for k, v in pairs(arg) do S.c.arguments[#S.c.arguments+1] = v end
+	i = i+1
 end
 
-function S.c.addInclude ( dir )
-	if type(dir) ~= "table" then
-		dir = {tostring(dir)}
+while i < #arg do
+	if not flags.r then
+		if flags.v then print("Deleting "..arg[i].."...") end
+		dir.rmfile(arg[i], arg[#arg]);
+	else
+		dir.rmtree(arg[i], arg[#arg], nil, flags.v);
 	end
 
-	for k, v in pairs(dir) do S.c.addArg({"-I", C.path(v)}) end
-end
-
-function S.c.compile ( out, sources )
-	local cmd = {"*gdmd", "-o", C.path(out) }
-
-	for k, v in pairs(S.c.arguments) do cmd[#cmd+1] = v end
-
-	for k,v in pairs(sources) do
-		sources[k] = C.path(v)
-		cmd[#cmd+1] = sources[k]
-	end
-
-	C.addGenerator({C.path(out)}, sources, cmd)
+	i = i+1
 end
