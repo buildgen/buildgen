@@ -44,12 +44,8 @@ while i <= #arg do
 end
 
 while i < #arg do
-	if not flags.r then
-		if flags.v then print("Moving "..arg[i].."...") end
-		dir.movefile(arg[i], arg[#arg]);
-	else
-		dir.movetree(arg[i], arg[#arg], nil, flags.v);
-	end
+	if flags.v then print("Moving "..arg[i].."...") end
+	dir.movefile(arg[i], arg[#arg]);
 
 	i = i+1
 end

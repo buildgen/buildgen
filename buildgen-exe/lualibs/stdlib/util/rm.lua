@@ -44,12 +44,12 @@ while i <= #arg do
 	i = i+1
 end
 
-while i < #arg do
+while i <= #arg do
+	if flags.v then print("Deleting "..arg[i].."...") end
 	if not flags.r then
-		if flags.v then print("Deleting "..arg[i].."...") end
-		dir.rmfile(arg[i], arg[#arg]);
+		file.delete(arg[i]);
 	else
-		dir.rmtree(arg[i], arg[#arg], nil, flags.v);
+		dir.rmtree(arg[i]);
 	end
 
 	i = i+1
