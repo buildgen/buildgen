@@ -37,8 +37,7 @@
 
 using namespace rapidxml;
 
-std::string XML::create(std::set<Target*, Target::comparator> &targets,
-                        std::set<std::string> infofiles)
+std::string XML::create(std::set<Target*, Target::comparator> &targets)
 {
 	msg::log("Linking and Generating XML");
 
