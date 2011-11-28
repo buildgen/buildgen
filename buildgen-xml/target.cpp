@@ -33,16 +33,14 @@
 
 #include "buildgen-xml/common.hpp"
 
-Target Target::all;
-
 std::set<Target*, Target::comparator> Target::targets; // All of the targets
 
-Target::Target ( const char *path )
+Target::Target ( const char *path, bool autodepend )
 {
 	if (!path) this->path = NULL;
 	else       this->path = strdup(path);
 
-	init();
+	init(autodepend);
 }
 
 Target::~Target ( )
@@ -50,10 +48,18 @@ Target::~Target ( )
 	free(path);
 }
 
-void Target::init()
+
+Target *regen = NULL;
+void Target::init( bool autodepend )
 {
 	generator = NULL;
 	magic = 0;
+
+	if ( regen == NULL && autodepend )
+		regen = Target::newTarget("regen", false); // All targets depend on this.
+
+	if (autodepend)
+		addDependancy(regen); // All targets depend on this
 }
 
 /// Find a target
@@ -76,9 +82,9 @@ Target *Target::findTarget ( const char *path )
  *
  * \param path the loacation of the target.  This must be an absolute path.
  */
-Target *Target::newTarget ( const char *path )
+Target *Target::newTarget ( const char *path, bool autodepend )
 {
-	Target *t = new Target(path);
+	Target *t = new Target(path, autodepend);
 
 	std::pair<std::set<Target*>::iterator,bool> r(targets.insert(t)); // Crashes if we assign right away
 
@@ -147,7 +153,7 @@ Target *Target::fromXML ( const rapidxml::xml_node<> *src )
 {
 	using namespace rapidxml;
 	xml_node<> *p = src->first_node(XML::target_outNName);
-	Target *t = Target::newTarget(p->value());
+	Target *t = Target::newTarget(p->value(), false);
 
 	xml_attribute<> *magic = p->first_attribute(XML::target_out_magicAName);
 	if (magic && !strcmp(magic->value(), "true")) t->magic = 1;
@@ -155,7 +161,7 @@ Target *Target::fromXML ( const rapidxml::xml_node<> *src )
 	if ( xml_node<> *n = src->first_node(XML::target_dependsNName) )
 	{
 		do {
-			t->addDependancy(Target::newTarget(n->value()));
+			t->addDependancy(Target::newTarget(n->value(), false));
 		} while ( n = n->next_sibling(XML::target_dependsNName) );
 	}
 

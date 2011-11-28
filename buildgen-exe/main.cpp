@@ -36,9 +36,25 @@
 #include "files.hpp"
 #include "buildgen-xml/save.hpp"
 
+char *findOurPath ( char *a ) // Turn argv[0] into a BuildGen path
+{
+	for ( char *b = a; *b != '\0'; b++ )
+		if ( *b == '/' ) // Relitive or absolute.
+			return a;
+
+	char *b = (char*)malloc((strlen(a)+2)*sizeof(char));
+	b[0] = '*'; // System path
+	strcpy(b+1, a);
+
+	return b;
+}
+
 int main ( int argc, char **argv )
 {
-	//setlocale(LC_CTYPE, "en_ca.UTF-8");
+	std::vector<char*> cmd(argc); // Grab command line before we mess with it.
+	for (int i = argc; --i; ) // Note that 0 doesn't get hit
+		cmd[i] = argv[i];
+	cmd[0] = findOurPath(argv[0]); // We will process this after files is inited.
 
 	opt::get_options(&argc, &argv);
 
@@ -51,6 +67,13 @@ int main ( int argc, char **argv )
 	BuildGenLuaEnv lua(rootFileName);
 	free(rootFileName);
 
+	Target *regen = Target::newTarget("regen");
+	regen->magic = 1;
+
+	cmd[0] = files->normalizeFilename(cmd[0]);
+	regen->addGenerator(cmd);
+	regen->generator->addDescription("Regenerating build information");
+
 	for ( int i = opt::defines.size()-1; i >= 0; i-- )
 		lua.define(opt::defines[i].key, opt::defines[i].value);
 
@@ -61,6 +84,9 @@ int main ( int argc, char **argv )
 		);
 		if (p.second) // New file
 		{
+			Target *t = Target::newTarget(files->infofile.front(), false);
+			regen->addDependancy(t);
+
 			lua.runFile(files->infofile.front());
 		}
 
