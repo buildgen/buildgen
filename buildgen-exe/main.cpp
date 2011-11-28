@@ -95,5 +95,6 @@ int main ( int argc, char **argv )
 
 	fputs(XML::create(Target::targets).c_str(), opt::xml_out);
 
+	opt::close_xml_out();
 	return 0;
 }

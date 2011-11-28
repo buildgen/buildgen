@@ -41,6 +41,7 @@ namespace opt
 	extern FILE *err_out;
 
 	extern FILE *xml_out;
+	extern void close_xml_out(void);
 
 	extern char *src_dir;
 

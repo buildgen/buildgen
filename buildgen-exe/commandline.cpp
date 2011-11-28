@@ -73,6 +73,7 @@ void version ( void )
 
 namespace opt
 {
+	bool xml_out_isProcess = false;
 	FILE *xml_out = stdout;
 
 	std::vector<Definition> defines;
@@ -173,8 +174,20 @@ namespace opt
 
 		if ( xml_out == stdout )
 		{
-			if ( gen == NULL ) xml_out = popen(DEFALUT_GENERATOR, "w");
+			if ( gen == NULL )
+			{
+				xml_out = popen(DEFALUT_GENERATOR, "w");
+				xml_out_isProcess = true;
+			}
 			else if (!strcmp(gen, "makefile")) xml_out = popen("gen-makefile", "w");
 		}
+	}
+
+	void close_xml_out ( void )
+	{
+		if (xml_out_isProcess) pclose(xml_out);
+		else                   fclose(xml_out);
+
+		xml_out = NULL;
 	}
 }
