@@ -50,6 +50,9 @@ namespace XML
 	extern const char *meta_outRootNName;
 	extern const char *meta_buildGenRootNName;
 	extern const char *meta_timeNName;
+	extern const char *filesNName;
+	extern const char *files_rootNName;
+	extern const char *files_infoNName;
 	extern const char *targetNName;
 	extern const char *targetsNName;
 	extern const char *target_outNName;

@@ -37,7 +37,8 @@
 
 using namespace rapidxml;
 
-std::string XML::create(std::set<Target*, Target::comparator> &targets)
+std::string XML::create(std::set<Target*, Target::comparator> &targets,
+                        std::set<std::string> infofiles)
 {
 	msg::log("Linking and Generating XML");
 
@@ -65,6 +66,33 @@ std::string XML::create(std::set<Target*, Target::comparator> &targets)
 	meta->append_node(doc.allocate_node(node_element, XML::meta_buildGenRootNName, files->buildgen_root));
 	meta->append_node(doc.allocate_node(node_element, XML::meta_timeNName, timestamp));
 
+	/*** Build Info Files ***/
+	xml_node<> *filen = doc.allocate_node(node_element, XML::filesNName);
+	root->append_node(filen);
+
+	char *rootfile = (char*)malloc((strlen(files->project_root)+10*sizeof(char)));
+	strcpy(rootfile, files->project_root);
+	strcat(rootfile, "Buildroot");
+	filen->append_node(doc.allocate_node(node_element,
+	                                      XML::files_rootNName,
+	                                      rootfile
+	                                    )
+	                   );
+	//free(rootfile);
+
+	for ( std::set<std::string>::iterator i = infofiles.begin();
+	      i != infofiles.end();
+	      i++
+	    )
+	{
+		filen->append_node(doc.allocate_node(node_element,
+		                                      XML::files_infoNName,
+		                                      i->c_str()
+		                                    )
+		                  );
+	}
+
+	/*** Targets ***/
 	xml_node<> *targ = doc.allocate_node(node_element, XML::targetsNName);
 	root->append_node(targ);
 

@@ -31,6 +31,9 @@ namespace XML
 	const char *meta_outRootNName =                          "outroot";
 	const char *meta_buildGenRootNName =                     "buildgenroot";
 	const char *meta_timeNName =                             "time";
+	const char *filesNName =                                 "infofiles";
+	const char *files_rootNName =                            "root";
+	const char *files_infoNName =                            "info";
 	const char *targetsNName =                               "targets";
 	const char *targetNName =                                "target";
 	const char *target_outNName =                            "out";

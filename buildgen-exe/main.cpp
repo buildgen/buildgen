@@ -67,7 +67,7 @@ int main ( int argc, char **argv )
 		files->infofile.pop();
 	}
 
-	fputs(XML::create(Target::targets).c_str(), opt::xml_out);
+	fputs(XML::create(Target::targets, runfiles).c_str(), opt::xml_out);
 
 	return 0;
 }

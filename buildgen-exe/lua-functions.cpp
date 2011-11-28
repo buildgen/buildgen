@@ -251,6 +251,7 @@ int path (lua_State *L)
 		luaL_error(L, "path was asked to convert a path that is not a string");
 
 	char *p = files->normalizeFilename(lua_tostring(L, 1));
+	files->prettyPath(p);
 	lua_pushstring(L, p); // Push our result.
 	free(p);
 

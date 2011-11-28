@@ -33,5 +33,6 @@ using namespace rapidxml;
 
 namespace XML
 {
-	std::string create(std::set<Target*, Target::comparator> &targets);
+	std::string create(std::set<Target*, Target::comparator> &targets,
+	                   std::set<std::string> infofiles);
 }

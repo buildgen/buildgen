@@ -79,6 +79,7 @@ function S.findExecutable ( name )
 end
 
 function S.install ( path, to )
+	S.import "util"
 	if string.find(to, "/", 1, true) ~= 1 then
 		to = S.prefix..to
 	end
@@ -106,9 +107,7 @@ function S.install ( path, to )
 			to = to.."/"..string.sub(apath, -i)
 		end
 
-		C.addGenerator({to}, {path}, {"*install", "-D", apath, C.path(to)}, {
-			description = "Installing "..to
-		})
+		S.util.install(path, to)
 		C.addDependancy("install", to, { magic = true })
     end
 end
