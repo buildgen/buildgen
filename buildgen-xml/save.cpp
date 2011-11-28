@@ -65,6 +65,8 @@ std::string XML::create(std::set<Target*, Target::comparator> &targets)
 	meta->append_node(doc.allocate_node(node_element, XML::meta_buildGenRootNName, files->buildgen_root));
 	meta->append_node(doc.allocate_node(node_element, XML::meta_timeNName, timestamp));
 
+	/*** Targets ***/
+
 	xml_node<> *targ = doc.allocate_node(node_element, XML::targetsNName);
 	root->append_node(targ);
 
