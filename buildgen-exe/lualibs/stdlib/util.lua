@@ -137,6 +137,40 @@ if not P.S.util.cmd.rm then
 	end
 end
 
+if not P.S.util.cmd.install then
+	local installs = {
+		{	name = "install", -- Name of the executable
+			flags = {
+				preargs = {"-D"},
+				verbose = "-v",
+			}
+		},
+		{	name = S.lualibsRoot.."util/cp.lua", -- Name of the executable
+			flags = {
+				preargs = {},
+				verbose = "-v",
+			}
+		},
+	}
+	List(installs) -- turn tabe into a penlight 'list'
+
+	local install;
+	for c in iter(installs) do          -- Find the first compiler they have
+		if S.findExecutable(c.name) then -- installed on thier system.
+			install = c
+			install.name = S.findExecutable(install.name)
+
+			break
+		end
+	end
+
+	if install == nil then
+		error("Error: No install command found.", 0)
+	else
+		P.S.util.cmd.install = install
+	end
+end
+
 function S.util.cp ( src, dest )
 	src  = C.path(src)
 	dest = C.path(dest)
@@ -166,7 +200,7 @@ function S.util.mv ( src, dest )
 end
 
 function S.util.rm ( file )
-	file  = C.path(file)
+	file = C.path(file)
 
 	cmd = List()
 	cmd:append(P.S.util.cmd.rm.name)
@@ -174,6 +208,21 @@ function S.util.rm ( file )
 
 	C.addGenerator({}, {file}, cmd, {
 		description = "Deleting "..file
+	})
+end
+
+function S.util.install ( src, dest )
+	src  = C.path(src)
+	dest = C.path(dest)
+
+	cmd = List()
+	cmd:append(P.S.util.cmd.install.name)
+	cmd:append(P.S.util.cmd.cp.flags.preargs)
+	cmd:append(src)
+	cmd:append(dest)
+
+	C.addGenerator({dest}, {src}, cmd, {
+		description = "Installing "..src.." to "..dest
 	})
 end
 
