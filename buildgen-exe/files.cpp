@@ -149,6 +149,9 @@ void Files::findProjectRoot( void )
 	project_root = get_current_dir_name();
 	Files::appendSlash(&project_root);
 
+	Target *t = Target::newTarget(normalizeFilename(rootfilename), false);
+	Target::newTarget("regen")->addDependancy(t);
+
 	msg::log("Project Root at \"%s\"", project_root);
 }
 

@@ -49,10 +49,9 @@ public:
 		}
 	};
 
-	static Target all; ///< The default target to build
 	static std::set<Target*, Target::comparator> targets; ///< A lsit of all targets created
 
-	static Target *newTarget ( const char *path );
+	static Target *newTarget ( const char *path, bool autodepend = true );
 	static Target *findTarget ( const char *path );
 
 	char *path;  ///< The lcoation of the target.  This is an absolute value.
@@ -60,10 +59,10 @@ public:
 	std::set<Target*> depends; ///< The targets that this target depends on
 	Generator *generator; ///< The generator used to create this target.
 private:
-	void init(void);
+	void init(bool autodepend);
 public:
 
-	Target(const char *path = NULL );
+	Target(const char *path = NULL, bool autodepend = true  );
 	~Target( );
 	void addDependancy(Target*);
 	void addGenerator( Generator *gen );
