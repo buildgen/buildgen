@@ -79,6 +79,13 @@ std::string Makefile::writeTarget(Target *t)
 
 	if ( !t->generator && !t->depends.size()) return out; // This is an existing file
 
+	if (t->magic)
+	{
+		out += ".PHONY: ";
+		out += std::string(t->path);
+		out += "\n\n";
+	}
+
 	out += relitiveName(t->path);
 	out += ": ";
 
