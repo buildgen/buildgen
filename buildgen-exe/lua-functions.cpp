@@ -150,7 +150,6 @@ int add_generator (lua_State *L)
 	}
 	lua_pop(L, 1); // Pop the result of the test.
 
-	if (lua_isnone(L, 4)) msg::debug("No option table");
 	if (lua_isnone(L, 4))
 		lua_newtable(L);
 	luaL_checktype(L, 4, LUA_TTABLE); // Options
