@@ -41,6 +41,7 @@ S.cpp.compile("@gen-makefile", {
 	"<buildgen-xml/target.hpp",
 
 	"<buildgen-exe/messages.hpp",
+	"<buildgen-exe/messages.cpp",
 })
 
 S.addToDefault "@gen-makefile"
