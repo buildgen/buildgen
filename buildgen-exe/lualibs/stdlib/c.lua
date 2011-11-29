@@ -160,7 +160,7 @@ function S.c.compile ( out, sources )
 			cmd:append(source)
 
 			C.addGenerator({object}, sources, cmd, {
-				description = "Generating "..object
+				description = "Compiling "..object
 			})
 			toLink:append(object)
 		end
