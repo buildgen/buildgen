@@ -169,20 +169,24 @@ function S.c.compile ( out, sources )
 	S.ld.link(out, toLink)
 end
 
-function S.c.generateHeader ( name, definitions )
+function S.c.generateHeader ( head, src, definitions )
 	local generatorScript = S.lualibsRoot .. "c/generateHeader.lua"
+
+	head = C.path(head)
+	src  = C.path(src)
 
 	cmd = List()
 	cmd:append "*lua"
 	cmd:append(generatorScript)
-	cmd:append(C.path(name))
+	cmd:append(head)
+	cmd:append(src)
 
 	for k,v in pairs(definitions) do
 		cmd:append(k.."="..v)
 	end
 
-	C.addGenerator({name}, {}, cmd, {
-		description = "Generating '"..name.."'..."
+	C.addGenerator({head, src}, {}, cmd, {
+		description = "Generating '"..head.."'..."
 	})
 end
 

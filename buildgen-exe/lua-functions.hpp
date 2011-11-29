@@ -27,9 +27,6 @@
 
 namespace LuaFunctions
 {
-	void save_state(lua_State *L);
-	void load_state(lua_State *L);
-
 	namespace C
 	{
 		int add_depandancy(lua_State *L);

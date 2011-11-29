@@ -57,6 +57,7 @@ SET(xml_headers
 SET(lualibs_root "${CMAKE_INSTALL_PREFIX}/lib/buildgen/lualibs/")
 SET(default_generator "gen-makefile")
 CONFIGURE_FILE("info.h.in" "${CMAKE_CURRENT_BINARY_DIR}/info.h") # Makes info.h which has some marcos in it.
+CONFIGURE_FILE("info.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/info.cpp") # Makes info.h which has some marcos in it.
 INSTALL(DIRECTORY "lualibs/" DESTINATION "${lualibs_root}"
 	FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
 	                 GROUP_READ GROUP_WRITE GROUP_EXECUTE
@@ -71,6 +72,7 @@ ADD_EXECUTABLE(gen
 	${headers}
 	${xml_sources}
 	${xml_headers}
+	"${CMAKE_CURRENT_BINARY_DIR}/info.cpp"
 	"info.h"
 )
 

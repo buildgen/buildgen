@@ -52,6 +52,11 @@ void BuildGenLuaEnv::init ( void )
 {
 	init_lua();
 	dmakeify_lua();
+
+	const char *cf = "core.lua";
+	corefile = (char*)malloc((strlen(LUALIBS_ROOT)+strlen(cf)+1)*sizeof(char));
+	strcpy(corefile, LUALIBS_ROOT);
+	strcat(corefile, cf);
 }
 
 void BuildGenLuaEnv::init_lua ( void )
@@ -117,7 +122,7 @@ void BuildGenLuaEnv::doRunFile ( const char *path )
 
 void BuildGenLuaEnv::runFile ( const char *path )
 {
-	doRunFile(LUALIBS_ROOT"core.lua");
+	doRunFile(corefile);
 
 	if ( root_file != NULL ) // Run the root file.
 		doRunFile(root_file);

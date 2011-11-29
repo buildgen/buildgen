@@ -43,39 +43,6 @@
 
 namespace LuaFunctions
 {
-bool statesaved = false;
-void save_state(lua_State *L)
-{
-	/*lua_getglobal(L, "P");
-	lua_getglobal(L, "_G");
-	lua_setfield(L, 1, "_G");
-
-	statesaved = true;*/
-}
-
-void load_state(lua_State *L)
-{
-	/*if (statesaved)
-	{
-		lua_getglobal(L, "P");
-		lua_getfield(L, 1, "_G");
-		lua_setglobal(L, "_G");
-	}*/
-
-	int s = luaL_loadfile(L, LUALIBS_ROOT"core.lua");
-	if ( s == 0 )
-	{
-		// execute Lua program
-		s = lua_pcall(L, 0, LUA_MULTRET, 0);
-	}
-
-	if (s) // Errors
-	{
-		msg::error("%s", lua_tostring(L, -1));
-		lua_pop(L, 1); // remove error message
-		exit(EX_DATAERR);
-	}
-}
 
 namespace C
 {

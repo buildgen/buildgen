@@ -98,11 +98,12 @@ function S.cpp.addInclude ( dir )
 	end
 
 	for k, v in pairs(dir) do
-		S.c.addArg({"-I", C.path(v)})
+		S.cpp.addArg({"-I", C.path(v)})
 	end
 end
 
 S.cpp.addLib = S.ld.addLib
+S.ld.addLib "stdc++"
 
 function S.cpp.compile ( out, sources )
 	sources = List(sources)
@@ -115,7 +116,12 @@ function S.cpp.compile ( out, sources )
 	for source in iter(sources) do
 		source = C.path(source)
 
-		if stringx.endswith(source, ".c") or stringx.endswith(source, ".C") then
+		if stringx.endswith(source, ".cpp") or
+		   stringx.endswith(source, ".CPP") or
+		   stringx.endswith(source, ".c++") or
+		   stringx.endswith(source, ".CC") or
+		   stringx.endswith(source, ".cxx") or
+		   stringx.endswith(source, ".CXX")  then
 			-- Get path to put object file.
 			local object = C.path("@"..source:sub(#lfs.currentdir()+2, -3)..".o")
 

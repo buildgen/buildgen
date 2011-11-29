@@ -25,17 +25,17 @@
 #ifndef LUALIBS_H___GENERATED_INFO_FILE
 #define LUALIBS_H___GENERATED_INFO_FILE
 
-#define VERSION "0.1.0"
+extern const char *VERSION;
 
-#define LUALIBS_ROOT "@lualibs_root@"
-#define DEFALUT_GENERATOR "@default_generator@"
+extern const char *LUALIBS_ROOT;
+extern const char *DEFALUT_GENERATOR;
 
 #if defined(__linux__)
-	#define OS_STRING "posix"
+	extern const char *OS_STRING;
 #elif defined(_WIN32)
-	#define OS_STRING "windows"
+	extern const char *OS_STRING;
 #else
-	#define OS_STRING "unknown"
+	extern const char *OS_STRING;
 #endif
 
 #endif

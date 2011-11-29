@@ -22,31 +22,20 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef LUA_HPP
-#define LUA_HPP
+#ifndef LUALIBS_H___GENERATED_INFO_FILE
+#define LUALIBS_H___GENERATED_INFO_FILE
 
-#include <lua.hpp>
+const char *VERSION = "0.1.0";
 
-class BuildGenLuaEnv
-{
-	lua_State* L;
-	char *root_file;
+const char *LUALIBS_ROOT = "@lualibs_root@";
+const char *DEFALUT_GENERATOR = "@default_generator@";
 
-	char *corefile;
-
-	void init(void);
-	void init_lua(void);
-	void dmakeify_lua(void);
-	void report_errors(lua_State *L, int status);
-
-	void doRunFile ( const char *path );
-public:
-	BuildGenLuaEnv(const char *root);
-	~BuildGenLuaEnv();
-
-	void define(char *key, char *value);
-
-	void runFile(const char *path);
-};
+#if defined(__linux__)
+	const char *OS_STRING = "posix";
+#elif defined(_WIN32)
+	const char *OS_STRING = "windows";
+#else
+	#const char *OS_STRING = "unknown";
+#endif
 
 #endif

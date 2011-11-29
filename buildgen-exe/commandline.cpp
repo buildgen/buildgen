@@ -176,7 +176,7 @@ namespace opt
 		{
 			if ( gen == NULL )
 			{
-				xml_out = popen(DEFALUT_GENERATOR, "w");
+				xml_out = popen(DEFAULT_GENERATOR, "w");
 				xml_out_isProcess = true;
 			}
 			else if (!strcmp(gen, "makefile")) xml_out = popen("gen-makefile", "w");

@@ -22,41 +22,50 @@
 [                                                                              ]
 [-----------------------------------------------------------------------------]]
 
+S.import "c"
+S.import "cpp"
 
---- The Standard library namespace.
+S.c.generateHeader("@info.h", "@info.cpp", {
+	VERSION = version,
+	LUALIBS_ROOT = C.path(S.prefix.."/lib/buildgen/lualibs/"),
+	DEFAULT_GENERATOR = "gen-makefile",
+	OS_STRING = S.os,
+})
+S.cpp.addInclude "@"
 
-S = {} -- Std libraries
-S.imported = false
-L = {} -- User libraries
-if not P.S then P.S = {} end
+S.cpp.addLib{"m", "lua"}
+S.cpp.addInclude "<"
 
-S.lualibsRoot = _s_lualibs_root.."stdlib/"
-L.lualibsRoot = _s_lualibs_root.."custom/"
+S.cpp.compile("@gen", {
+	"commandline.hpp",
+	"commandline.cpp",
+	"files.hpp",
+	"files.cpp",
+	"globals.hpp",
+	"globals.cpp",
+	"lua-functions.hpp",
+	"lua-functions.cpp",
+	"lua-init.hpp",
+	"lua-init.cpp",
+	"main.hpp",
+	"main.cpp",
+	"messages.hpp",
+	"messages.cpp",
 
-function S.import ( name )
-	if not S.imported
-	then
-		dofile(S.lualibsRoot.."stdlib.lua")
-	end
+	"@info.h",
+	"@info.cpp",
 
-	if not S[name] and name ~= "stdlib"
-	then
-		dofile(S.lualibsRoot..name..".lua")
-	end
-end
+	"<buildgen-xml/common.cpp",
+	"<buildgen-xml/common.hpp",
+	"<buildgen-xml/load.cpp",
+	"<buildgen-xml/load.hpp",
+	"<buildgen-xml/save.cpp",
+	"<buildgen-xml/save.hpp",
+	"<buildgen-xml/target.cpp",
+	"<buildgen-xml/target.hpp",
+})
 
-function L.import ( path )
-	local name = path:reverse():find("/", 1, true)
-	if i then
-		name = name:sub(-i+1)
-	end
+S.addToDefault "@gen"
 
-	if not L[name]
-	then
-		if path:find(".") then
-			dofile(C.path(path))
-		else
-			dofile(L.lualibsRoot..name..".lua")
-		end
-	end
-end
+S.install("@gen", "bin/")
+S.install("lualibs/", "lib/")

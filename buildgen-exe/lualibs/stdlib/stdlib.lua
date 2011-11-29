@@ -34,7 +34,9 @@ S.version = _s_version
 S.os = _s_os
 
 if not S.prefix then
-	if S.os == "windows" then
+	if D.prefix then
+		S.prefix = D.prefix
+	elseif S.os == "windows" then
 		S.prefix = "C:/Program Files/"
 	else
 		S.prefix = "/usr/local/"
