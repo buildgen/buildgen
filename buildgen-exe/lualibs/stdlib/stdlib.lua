@@ -83,7 +83,7 @@ end
 function S.install ( path, to )
 	S.import "util"
 	if string.find(to, "/", 1, true) ~= 1 then
-		to = S.prefix..to
+		to = S.prefix..to.."/"
 	end
 	local apath = C.path(path)
 
@@ -95,7 +95,7 @@ function S.install ( path, to )
 
 		for root, dirs, files in dir.walk(apath) do
 			for f in iter(files) do
-				t = to..string.sub(root, #apath).."/"..dirname..f
+				t = to..dirname..string.sub(root, #apath).."/"..f
 
 				S.util.install(root.."/"..f, t)
 				C.addDependancy("install", t, { magic = true })
