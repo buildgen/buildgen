@@ -25,9 +25,11 @@
 S.import "c"
 S.import "cpp"
 
+lualibsdir = "lib/buildgen/lualibs/"
+
 S.c.generateHeader("@info.h", "@info.cpp", {
 	VERSION = version,
-	LUALIBS_ROOT = "lib/buildgen/lualibs/",
+	LUALIBS_ROOT = lualibsdir,
 	DEFAULT_GENERATOR = "gen-makefile",
 	OS_STRING = S.os,
 })
@@ -68,4 +70,4 @@ S.cpp.compile("@gen", {
 S.addToDefault "@gen"
 
 S.install("@gen", "bin/")
-S.install("lualibs/", "lib/")
+S.install("lualibs/", lualibsdir)
