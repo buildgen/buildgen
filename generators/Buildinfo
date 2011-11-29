@@ -22,5 +22,4 @@
 [                                                                              ]
 [-----------------------------------------------------------------------------]]
 
-C.addDir "buildgen-exe"
-C.addDir "generators"
+C.addDir "makefile"

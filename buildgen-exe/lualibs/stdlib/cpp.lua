@@ -138,14 +138,14 @@ function S.cpp.compile ( out, sources )
 				cmd:append(i:format(object))           -- the command line.
 			end                                     --
 
-			if S.c.debug then                       -- Add the debug flag.
+			if S.cpp.debug then                       -- Add the debug flag.
 				if type(compiler.flags.debug) == "table" then
 					cmd:extend(compiler.flags.debug)
 				else
 					cmd:append(compiler.flags.debug)
 				end
 			end
-			if S.c.profile then                     -- Add the profile flag.
+			if S.cpp.profile then                     -- Add the profile flag.
 				if type(compiler.flags.profile) == "table" then
 					cmd:extend(compiler.flags.profile)
 				else
@@ -153,14 +153,14 @@ function S.cpp.compile ( out, sources )
 				end
 			end
 
-			local o = compiler.flags.optimize[S.c.optimization] -- Set the optimization
-			if o then                                           -- level.
-				if type(o) == "table" then                      --
-					cmd:extend(o)                               --
-				else                                            --
-					cmd:append(o)                               --
-				end                                             --
-			end                                                 --
+			local o = compiler.flags.optimize[S.cpp.optimization] -- Set the optimization
+			if o then                                             -- level.
+				if type(o) == "table" then                        --
+					cmd:extend(o)                                 --
+				else                                              --
+					cmd:append(o)                                 --
+				end                                               --
+			end                                                   --
 
 			cmd:extend(arguments)
 			cmd:append(source)
