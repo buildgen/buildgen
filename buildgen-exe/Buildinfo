@@ -27,7 +27,7 @@ S.import "cpp"
 
 S.c.generateHeader("@info.h", "@info.cpp", {
 	VERSION = version,
-	LUALIBS_ROOT = C.path(S.prefix.."/lib/buildgen/lualibs/"),
+	LUALIBS_ROOT = C.path("../buildgen/lualibs/"),
 	DEFAULT_GENERATOR = "gen-makefile",
 	OS_STRING = S.os,
 })

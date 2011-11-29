@@ -32,7 +32,6 @@
 #include <lua.hpp>
 #include <locale>
 #include <math.h>
-//#include <luabind/luabind.hpp>
 
 #include "messages.hpp"
 #include "lua-functions.hpp"

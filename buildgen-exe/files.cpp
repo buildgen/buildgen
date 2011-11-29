@@ -34,24 +34,36 @@
 #include "messages.hpp"
 #include "files.hpp"
 #include "buildgen-xml/target.hpp"
+#include "info.h"
 
-Files::Files ( char *srcdir ):
+Files::Files ( char *srcdir, char *buildgen_root ):
 	project_root(NULL),
 	out_root(NULL),
 
 	infofilename("Buildinfo"),
 	rootfilename("Buildroot"),
 	config_file_system("/etc/buildgen/buildgen"),
-	config_file_user("~/.config/BuildGen"),
-	buildgen_root("/usr/lib/buildgen")
+	config_file_user("~/.config/BuildGen")
 {
-	init(srcdir);
+	init(srcdir, buildgen_root);
 }
 
-void Files::init ( char *srcdir )
+void Files::init ( char *srcdir, char *buildgen_root )
 {
 	out_root = get_current_dir_name();
 	appendSlash(&out_root);
+
+	char *br = normalizeFilename(buildgen_root);
+
+	unsigned int ls = strlen(br);
+	while ( br[ls] != '/' ) ls--;
+	ls--;
+	while ( br[ls] != '/' ) ls--;
+	br[ls+1] = '\0';
+
+	this->buildgen_root = normalizeFilename(br);
+
+	free(br);
 
 	DIR *d = opendir(srcdir);
 	if ( d == NULL )

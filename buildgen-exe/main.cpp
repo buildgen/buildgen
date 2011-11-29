@@ -58,7 +58,7 @@ int main ( int argc, char **argv )
 
 	opt::get_options(&argc, &argv);
 
-	files = new Files(opt::src_dir);
+	files = new Files(opt::src_dir, cmd[0]);
 
 	std::set<std::string> runfiles;
 
@@ -71,6 +71,7 @@ int main ( int argc, char **argv )
 	regen->magic = 1;
 
 	cmd[0] = files->normalizeFilename(cmd[0]);
+
 	regen->addGenerator(cmd);
 	regen->generator->addDescription("Regenerating build information");
 

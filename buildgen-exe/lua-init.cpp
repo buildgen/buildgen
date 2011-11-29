@@ -34,13 +34,14 @@
 #include "lua-functions.hpp"
 
 #include "info.h"
+#include "globals.hpp"
 
 BuildGenLuaEnv::BuildGenLuaEnv ( const char *root ):
 	root_file(NULL)
 {
-	init();
-
 	root_file = strdup(root);
+
+	init();
 }
 
 BuildGenLuaEnv::~BuildGenLuaEnv ( )
@@ -50,13 +51,20 @@ BuildGenLuaEnv::~BuildGenLuaEnv ( )
 
 void BuildGenLuaEnv::init ( void )
 {
-	init_lua();
-	dmakeify_lua();
+	unsigned int bgl = strlen(files->buildgen_root);
+	unsigned int llrl = strlen(LUALIBS_ROOT);
+
+	libroot = (char*)malloc((bgl+llrl+1)*sizeof(char));
+	strcpy(libroot, files->buildgen_root);
+	strcpy(libroot+bgl, LUALIBS_ROOT);
 
 	const char *cf = "core.lua";
-	corefile = (char*)malloc((strlen(LUALIBS_ROOT)+strlen(cf)+1)*sizeof(char));
-	strcpy(corefile, LUALIBS_ROOT);
+	corefile = (char*)malloc((bgl+llrl+strlen(cf)+1)*sizeof(char));
+	strcpy(corefile, libroot);
 	strcat(corefile, cf);
+
+	init_lua();
+	dmakeify_lua();
 }
 
 void BuildGenLuaEnv::init_lua ( void )
@@ -75,7 +83,7 @@ void BuildGenLuaEnv::dmakeify_lua ( void )
 	lua_register(L, "_c_add_generator", &LuaFunctions::C::add_generator);
 	lua_register(L, "_c_path", &LuaFunctions::C::path);
 
-	lua_pushstring(L, LUALIBS_ROOT);
+	lua_pushstring(L, libroot);
 	lua_setglobal(L, "_s_lualibs_root");
 	lua_pushstring(L, OS_STRING);
 	lua_setglobal(L, "_s_os");

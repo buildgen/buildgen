@@ -60,13 +60,7 @@ XML::Meta XML::load ( std::istream &xml )
 
 	Meta metaObj;
 
-	xml_node<> *n = meta->first_node(XML::meta_buildGenRootNName);
-	if (!n) die_badFile();
-
-	metaObj.buildGenRoot = (char*)malloc(n->value_size());
-	strcpy(n->value(), metaObj.buildGenRoot);
-
-	n = meta->first_node(XML::meta_outRootNName);
+	xml_node<> *n = meta->first_node(XML::meta_outRootNName);
 	if (!n) die_badFile();
 
 	metaObj.outRoot = (char*)malloc(n->value_size());

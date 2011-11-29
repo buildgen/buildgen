@@ -65,7 +65,6 @@ namespace XML
 	extern const char *target_generator_descriptionNName;
 
 	struct Meta {
-		char *buildGenRoot;
 		char *outRoot;
 		char *projectRoot;
 
