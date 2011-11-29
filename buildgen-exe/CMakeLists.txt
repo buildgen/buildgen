@@ -54,7 +54,7 @@ SET(xml_headers
 #	ADD_DEFINITIONS(-UDEBUG)
 #endif ()
 
-SET(lualibs_root "../lib/buildgen/lualibs/")
+SET(lualibs_root "lib/buildgen/lualibs/")
 SET(default_generator "gen-makefile")
 CONFIGURE_FILE("info.h.in" "${CMAKE_CURRENT_BINARY_DIR}/info.h") # Makes info.h which has some marcos in it.
 CONFIGURE_FILE("info.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/info.cpp") # Makes info.h which has some marcos in it.
