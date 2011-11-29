@@ -23,16 +23,16 @@
 [-----------------------------------------------------------------------------]]
 
 
-S.c = {}
-if not P.S.c then P.S.c = {} end
+S.cpp = {}
+if not P.S.cpp then P.S.cpp = {} end
 
 S.import "ld"
 
 local function setup () -- So that we can hide our locals.
 
-if not P.S.c.compiler then
+if not P.S.cpp.compiler then
 	local compilers = {
-		{	name = "gcc", -- Name of the executable
+		{	name = "g++", -- Name of the executable
 			flags = {
 				compile  = "-c",
 				output   = {"-o", "%s"}, -- the option to set the output file name.
@@ -67,24 +67,24 @@ if not P.S.c.compiler then
 	end
 
 	if compiler == nil then
-		error("Error: No C compiler found.", 0)
+		error("Error: No C++ compiler found.", 0)
 	else
-		P.S.c.compiler = compiler
+		P.S.cpp.compiler = compiler
 	end
 end
 
-S.c.debug = false
-if D.debug then S.c.debug = true end
+S.cpp.debug = false
+if D.debug then S.cpp.debug = true end
 
-S.c.optimization = "regular"
-if D.debug then S.c.optimization = "none" end
+S.cpp.optimization = "regular"
+if D.debug then S.cpp.optimization = "none" end
 
-S.c.profile = false
-if D.debug then S.c.profile = true end
+S.cpp.profile = false
+if D.debug then S.cpp.profile = true end
 
 local arguments = List()
 
-function S.c.addArg ( arg )
+function S.cpp.addArg ( arg )
 	if type(arg) ~= "table" then
 		arg = {tostring(arg)}
 	end
@@ -92,7 +92,7 @@ function S.c.addArg ( arg )
 	for k, v in pairs(arg) do arguments:append(v) end
 end
 
-function S.c.addInclude ( dir )
+function S.cpp.addInclude ( dir )
 	if type(dir) ~= "table" then
 		dir = {tostring(dir)}
 	end
@@ -102,11 +102,11 @@ function S.c.addInclude ( dir )
 	end
 end
 
-S.c.addLib = S.ld.addLib
+S.cpp.addLib = S.ld.addLib
 
-function S.c.compile ( out, sources )
+function S.cpp.compile ( out, sources )
 	sources = List(sources)
-	local compiler = P.S.c.compiler
+	local compiler = P.S.cpp.compiler
 
 	out = C.path(out)
 
@@ -160,30 +160,13 @@ function S.c.compile ( out, sources )
 			cmd:append(source)
 
 			C.addGenerator({object}, sources, cmd, {
-				description = "Generating "..object
+				description = "Compiling "..object
 			})
 			toLink:append(object)
 		end
 	end
 
 	S.ld.link(out, toLink)
-end
-
-function S.c.generateHeader ( name, definitions )
-	local generatorScript = S.lualibsRoot .. "c/generateHeader.lua"
-
-	cmd = List()
-	cmd:append "*lua"
-	cmd:append(generatorScript)
-	cmd:append(C.path(name))
-
-	for k,v in pairs(definitions) do
-		cmd:append(k.."="..v)
-	end
-
-	C.addGenerator({name}, {}, cmd, {
-		description = "Generating '"..name.."'..."
-	})
 end
 
 end
