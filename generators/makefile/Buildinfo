@@ -37,10 +37,10 @@ S.cpp.compile("@gen-makefile", {
 	"<buildgen-xml/common.hpp",
 	"<buildgen-xml/load.cpp",
 	"<buildgen-xml/load.hpp",
-	"<buildgen-xml/save.cpp",
-	"<buildgen-xml/save.hpp",
 	"<buildgen-xml/target.cpp",
 	"<buildgen-xml/target.hpp",
+
+	"<buildgen-exe/messages.hpp",
 })
 
 S.addToDefault "@gen-makefile"

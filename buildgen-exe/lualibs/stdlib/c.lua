@@ -117,7 +117,7 @@ function S.c.compile ( out, sources )
 
 		if stringx.endswith(source, ".c") or stringx.endswith(source, ".C") then
 			-- Get path to put object file.
-			local object = C.path("@"..source:sub(#lfs.currentdir()+2, -3)..".o")
+			local object = C.path("@"..source:sub(#C.path("<"))..".o")
 
 			local cmd = List()
 			cmd:append(compiler.name)
