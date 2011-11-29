@@ -35,7 +35,7 @@ S.os = _s_os
 
 if not S.prefix then
 	if D.prefix then
-		S.prefix = D.prefix
+		S.prefix = C.path(D.prefix)
 	elseif S.os == "windows" then
 		S.prefix = "C:/Program Files/"
 	else
@@ -88,19 +88,17 @@ function S.install ( path, to )
 	local apath = C.path(path)
 
 	if lfs.attributes(apath, "mode") == "directory" then
-		for file in lfs.dir(apath) do
-			if file ~= "." and file ~= ".." then
-				local dirname = apath
-				local i = string.find(string.reverse(dirname), "/", 1, true)
-				if i == #dirname then -- Trailing slash
-					dirname = string.sub(dirname, 1, -i+1)
-					i = string.find(string.reverse(dirname), "/", 1, true)
-				end
-				if i then
-					dirname = string.sub(dirname, -i+1)
-				end
+		local i = string.find(string.sub(string.reverse(apath), 2), "/", 1, true)
+		if i then
+			dirname = string.sub(apath, -i)
+		end
 
-				S.install(path..'/'..file, to.."/"..dirname.."/")
+		for root, dirs, files in dir.walk(apath) do
+			for f in iter(files) do
+				t = to..string.sub(root, #apath).."/"..dirname..f
+
+				S.util.install(root.."/"..f, t)
+				C.addDependancy("install", t, { magic = true })
 			end
 		end
 	else

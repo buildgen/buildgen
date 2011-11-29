@@ -28,7 +28,7 @@
 extern const char *VERSION;
 
 extern const char *LUALIBS_ROOT;
-extern const char *DEFALUT_GENERATOR;
+extern const char *DEFAULT_GENERATOR;
 
 #if defined(__linux__)
 	extern const char *OS_STRING;
