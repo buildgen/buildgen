@@ -34,13 +34,13 @@ S.version = _s_version
 S.os = _s_os
 
 if not S.prefix then
-	if D.prefix then
-		S.prefix = C.path(D.prefix)
-	elseif S.os == "windows" then
-		S.prefix = "C:/Program Files/"
+	if S.os == "windows" then
+		D.resolvePath("prefix", "C:/Program Files/")
 	else
-		S.prefix = "/usr/local/"
+		D.resolvePath("prefix", "/usr/local/")
 	end
+
+	S.prefix = D.prefix
 end
 
 local shutdownFunctions = {}
