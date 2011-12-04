@@ -108,6 +108,9 @@ function S.c.compile ( out, sources )
 	sources = List(sources)
 	local compiler = P.S.c.compiler
 
+	local projectRoot = C.path("<") -- Cache this.
+	local outRoot     = C.path(">") --
+
 	out = C.path(out)
 
 	local toLink = List()
@@ -117,7 +120,16 @@ function S.c.compile ( out, sources )
 
 		if stringx.endswith(source, ".c") or stringx.endswith(source, ".C") then
 			-- Get path to put object file.
-			local object = C.path("@"..source:sub(#C.path("<"))..".o")
+			local object = nil;
+
+			if source:sub(0, #projectRoot) == projectRoot then
+				object = C.path(">"..source:sub(#projectRoot)..".o")
+			elseif source:sub(0, #outRoot) == outRoot then
+				object = C.path(source..".o") -- Already in the out dir.
+			else
+				object = C.path("@"..source:sub(#projectRoot)..".o") -- Put inside
+				                                                     -- the build
+			end                                                      -- dir.
 
 			local cmd = List()
 			cmd:append(compiler.name)

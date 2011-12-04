@@ -111,6 +111,9 @@ function S.cpp.compile ( out, sources )
 
 	out = C.path(out)
 
+	local projectRoot = C.path("<") -- Cache this.
+	local outRoot     = C.path(">") --
+
 	local toLink = List()
 
 	for source in iter(sources) do
@@ -123,7 +126,17 @@ function S.cpp.compile ( out, sources )
 		   stringx.endswith(source, ".cxx") or
 		   stringx.endswith(source, ".CXX")  then
 			-- Get path to put object file.
-			local object = C.path("@"..source:sub(#C.path("<"))..".o")
+
+			local object = nil;
+
+			if source:sub(0, #projectRoot) == projectRoot then
+				object = C.path(">"..source:sub(#projectRoot)..".o")
+			elseif source:sub(0, #outRoot) == outRoot then
+				object = C.path(source..".o") -- Already in the out dir.
+			else
+				object = C.path("@"..source:sub(#projectRoot)..".o") -- Put inside
+				                                                     -- the build
+			end                                                      -- dir.
 
 			local cmd = List()
 			cmd:append(compiler.name)
