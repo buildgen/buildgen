@@ -33,6 +33,18 @@ C.addDependancy = _c_add_depandancy
 C.addDir = _c_add_dir
 C.path = _c_path
 
+function D.resolvePath ( path , default )
+	if not D[path] then
+		D[path] = default
+	end
+
+	if not D[path] then return end -- If the default was nil.
+
+	if D[path]:find("/", 1, true) > 1 then -- Doesn't start with a slash.
+		D[path] = C.path(">"..D[path])
+	end
+end
+
 -- End of D
 
 if not P then P = {} end
