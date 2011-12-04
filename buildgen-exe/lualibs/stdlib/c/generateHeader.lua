@@ -48,7 +48,7 @@ while #arg > i do
 	                          ["\n"] = "\\n"
 	                        })
 
-	header:write   ("extern const char *"..key..';\n')
+	header:write("extern const char *"..key..';\n')
 	src:write("const char *"..key..' = "'..value..'";\n')
 end
 
