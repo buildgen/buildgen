@@ -22,7 +22,7 @@
 [                                                                              ]
 [-----------------------------------------------------------------------------]]
 
---- The Dependancy namespace.
+--- The Core namespace.
 --[[[
 	This is where the core build related functions go.
 ]]
