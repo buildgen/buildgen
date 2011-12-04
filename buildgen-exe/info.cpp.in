@@ -35,7 +35,7 @@ const char *DEFAULT_GENERATOR = "@default_generator@";
 #elif defined(_WIN32)
 	const char *OS_STRING = "windows";
 #else
-	#const char *OS_STRING = "unknown";
+	const char *OS_STRING = "unknown";
 #endif
 
 #endif
