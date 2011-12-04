@@ -66,7 +66,8 @@ INSTALL(DIRECTORY "lualibs/" DESTINATION "${lualibs_root}"
 
 ##### Build
 IF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
-   INCLUDE_DIRECTORIES("/usr/local/include/lua51/")
+	LINK_DIRECTORIES("/usr/local/lib/lua51/")
+	INCLUDE_DIRECTORIES("/usr/local/include/lua51/")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
 
 INCLUDE_DIRECTORIES(..)
