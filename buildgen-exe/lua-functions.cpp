@@ -66,20 +66,20 @@ int add_depandancy (lua_State *L)
 	lua_pushstring(L, "magicsrc"); // If the path being added is magic.
 	lua_gettable(L, 3);
 	if ( lua_isboolean(L, -1) && lua_toboolean(L, -1))
-		magic &= 0b10;
+		magic &= 0x02;
 	lua_pop(L, 1);
 
 	char *targ = NULL;
 	char *dep = NULL;
-	if (!(magic & 0b01)) targ = files->normalizeFilename(lua_tostring(L, 1));
+	if (!(magic & 0x01)) targ = files->normalizeFilename(lua_tostring(L, 1));
 	else                 targ = strdup(lua_tostring(L, 1));
-	if (!(magic & 0b10)) dep = files->normalizeFilename(lua_tostring(L, 2));
+	if (!(magic & 0x02)) dep = files->normalizeFilename(lua_tostring(L, 2));
 	else                 dep = strdup(lua_tostring(L, 2));
 
 	Target *t = Target::newTarget(targ);
 	Target *d = Target::newTarget(dep);
-	if ( magic & 0b01 ) t->magic = 1;
-	if ( magic & 0b10 ) t->magic = 1;
+	if ( magic & 0x01 ) t->magic = 1;
+	if ( magic & 0x02 ) t->magic = 1;
 	t->addDependancy(d);
 
 	free(targ);
