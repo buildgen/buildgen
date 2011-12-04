@@ -24,6 +24,8 @@
 
 S.import "cpp"
 
+pname   = "BuildGen"
+name    = "buildgen"
 version = "0.1.0"
 
 if D.debug then
