@@ -102,8 +102,13 @@ function S.c.addInclude ( dir )
 	end
 end
 
-function S.c.addLib ( name )
-	S.ld.addLib(name)
+local linker = S.ld.newState()
+function S.c.addLib ( lib )
+	local ln = S.ld.swapState(linker)
+
+	S.ld.addLib(lib)
+
+	linker = S.ld.swapState(ln)
 end
 
 function S.c.stashState ( )
@@ -113,7 +118,7 @@ end
 function S.c.newState ( )
 	data = {
 		args = {},
-		link = nil,
+		link = S.ld.newState(),
 	}
 
 	data.debug = false
@@ -131,34 +136,29 @@ end
 function S.c.swapState ( new )
 	old = {
 		args = arguments,
-		link = nil,
+		link = linker,
 
 		debug        = S.c.debug,
 		optimization = S.c.optimization,
 		profile      = S.c.profile,
 	}
 
-	S.c.load(new)
+	S.c.loadState(new)
 
 	return old
 end
 
 function S.c.loadState ( data )
-	arguments = data.args
-	old = {
-		args = arguments,
-		link = nil,
-
-		debug        = S.c.debug,
-		optimization = S.c.optimization,
-		profile      = S.c.profile,
-	}
+	arguments        = data.args
+	linker           = data.link
 	S.c.debug        = data.debug
 	S.c.optimization = data.optimization
 	S.c.profile      = data.profile
 end
 
 function S.c.compile ( out, sources )
+	local ln = S.ld.swapState(linker) -- Use our linker.
+
 	sources = List(sources)
 	local compiler = P.S.c.compiler
 
@@ -233,6 +233,8 @@ function S.c.compile ( out, sources )
 	end
 
 	S.ld.link(out, toLink)
+
+	linker = S.ld.swapState(ln) -- Put thier linker back.
 end
 
 function S.c.generateHeader ( head, src, definitions )
