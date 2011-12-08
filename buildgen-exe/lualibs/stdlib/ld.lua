@@ -113,14 +113,14 @@ function S.ld.swapState ( new )
 		args = arguments,
 	}
 
-	S.ld.load(new)
+	S.ld.loadState(new)
 
 	return old
 end
 
 function S.ld.newState ( )
 	data = {
-		args = {},
+		args = List(),
 	}
 
 	return data
