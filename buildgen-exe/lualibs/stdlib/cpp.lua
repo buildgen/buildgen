@@ -133,8 +133,6 @@ function S.cpp.addInclude ( dir )
 	end
 end
 
-local linker = S.ld.newState()
-
 function S.cpp.addLib ( lib )
 	local ln = S.ld.swapState(state.linker)
 
@@ -143,6 +141,22 @@ function S.cpp.addLib ( lib )
 	state.linker = S.ld.swapState(ln)
 end
 S.cpp.addLib "stdc++"
+
+
+function S.cpp.define ( map )
+	if type(map) ~= "table" then
+		dir = {tostring(map)}
+	end
+
+	for k, v in pairs(map) do
+		if type(v) ~= "string" then
+			v = ""
+		else
+			v = "="..v
+		end
+		S.cpp.addArg("-D"..k..v)
+	end
+end
 
 function S.cpp.compile ( out, sources )
 	local ln = S.ld.swapState(state.linker) -- Use our linker

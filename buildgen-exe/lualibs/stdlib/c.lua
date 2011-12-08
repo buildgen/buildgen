@@ -133,6 +133,21 @@ function S.c.addInclude ( dir )
 	end
 end
 
+function S.c.define ( map )
+	if type(map) ~= "table" then
+		dir = {tostring(map)}
+	end
+
+	for k, v in pairs(map) do
+		if type(value) ~= "string" then
+			value = ""
+		else
+			value = "="..value
+		end
+		S.c.addArg("-D"..k..v)
+	end
+end
+
 function S.c.addLib ( lib )
 	local ln = S.ld.swapState(state.linker)
 
