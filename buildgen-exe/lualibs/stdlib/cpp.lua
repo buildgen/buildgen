@@ -29,6 +29,48 @@ if not P.S.cpp then P.S.cpp = {} end
 S.import "ld"
 
 local function setup () -- So that we can hide our locals.
+function S.cpp.newState ( )
+	local data = {
+		arguments = List(),
+		linker    = S.ld.newState(),
+	}
+
+	data.debug = false
+	if D.debug then data.debug = true end
+
+	data.optimization = "regular"
+	if D.debug then data.optimization = "none" end
+
+	data.profile = false
+	if D.debug then data.profile = true end
+
+	return data
+end
+local state = S.cpp.newState()
+
+function S.cpp.stashState ( )
+	return S.cpp.swapState(S.cpp.newState())
+end
+
+function S.cpp.swapState ( new )
+	local old = state
+
+	old.debug        = S.cpp.debug
+	old.optimization = S.cpp.optimization
+	old.profile      = S.cpp.profile
+
+	S.cpp.loadState(new)
+
+	return old
+end
+
+function S.cpp.loadState ( data )
+	state = data
+
+	S.cpp.debug        = data.debug
+	S.cpp.optimization = data.optimization
+	S.cpp.profile      = data.profile
+end
 
 if not P.S.cpp.compiler then
 	local compilers = {
@@ -73,23 +115,12 @@ if not P.S.cpp.compiler then
 	end
 end
 
-S.cpp.debug = false
-if D.debug then S.cpp.debug = true end
-
-S.cpp.optimization = "regular"
-if D.debug then S.cpp.optimization = "none" end
-
-S.cpp.profile = false
-if D.debug then S.cpp.profile = true end
-
-local arguments = List()
-
 function S.cpp.addArg ( arg )
 	if type(arg) ~= "table" then
 		arg = {tostring(arg)}
 	end
 
-	for k, v in pairs(arg) do arguments:append(v) end
+	for k, v in pairs(arg) do state.arguments:append(v) end
 end
 
 function S.cpp.addInclude ( dir )
@@ -158,17 +189,17 @@ function S.cpp.compile ( out, sources )
 			end
 
 			for i in iter(compiler.flags.output) do -- Add the desired output file to
-				cmd:append(i:format(object))           -- the command line.
+				cmd:append(i:format(object))        -- the command line.
 			end                                     --
 
-			if S.cpp.debug then                       -- Add the debug flag.
+			if state.debug then                     -- Add the debug flag.
 				if type(compiler.flags.debug) == "table" then
 					cmd:extend(compiler.flags.debug)
 				else
 					cmd:append(compiler.flags.debug)
 				end
 			end
-			if S.cpp.profile then                     -- Add the profile flag.
+			if state.profile then                     -- Add the profile flag.
 				if type(compiler.flags.profile) == "table" then
 					cmd:extend(compiler.flags.profile)
 				else
@@ -176,7 +207,7 @@ function S.cpp.compile ( out, sources )
 				end
 			end
 
-			local o = compiler.flags.optimize[S.cpp.optimization] -- Set the optimization
+			local o = compiler.flags.optimize[state.optimization] -- Set the optimization
 			if o then                                             -- level.
 				if type(o) == "table" then                        --
 					cmd:extend(o)                                 --
@@ -185,7 +216,7 @@ function S.cpp.compile ( out, sources )
 				end                                               --
 			end                                                   --
 
-			cmd:extend(arguments)
+			cmd:extend(state.arguments)
 			cmd:append(source)
 
 			C.addGenerator({object}, sources, cmd, {
@@ -199,55 +230,6 @@ function S.cpp.compile ( out, sources )
 
 	linker = S.ld.swapState(ln) -- Put their linker back.
 end
-
-function S.cpp.stash ( )
-	old = {
-		args = arguments,
-		link = linker,
-
-		debug        = S.cpp.debug,
-		optimization = S.cpp.optimization,
-		profile      = S.cpp.profile,
-	}
-
-	S.cpp.load(S.cpp.newState())
-
-	return old
-end
-
-function S.cpp.newState ( )
-	data = {
-		args = List(),
-		link = S.ld.newState(),
-	}
-
-	data.debug = false
-	if D.debug then data.debug = true end
-
-	data.optimization = "regular"
-	if D.debug then data.optimization = "none" end
-
-	data.profile = false
-	if D.debug then data.profile = true end
-
-	return data
-end
-
-function S.cpp.load ( data )
-	arguments = data.args
-	old = {
-		args = arguments,
-		link = nil,
-
-		debug        = S.cpp.debug,
-		optimization = S.cpp.optimization,
-		profile      = S.cpp.profile,
-	}
-	S.cpp.debug        = data.debug
-	S.cpp.optimization = data.optimization
-	S.cpp.profile      = data.profile
-end
-
 
 end
 setup()
