@@ -102,7 +102,57 @@ function S.c.addInclude ( dir )
 	end
 end
 
-S.c.addLib = S.ld.addLib
+function S.c.addLib ( name )
+	S.ld.addLib(name)
+end
+
+function S.c.stash ( )
+	old = {
+		args = arguments,
+		link = nil,
+
+		debug        = S.c.debug,
+		optimization = S.c.optimization,
+		profile      = S.c.profile,
+	}
+
+	S.c.load(S.c.newState())
+
+	return old
+end
+
+function S.c.newState ( )
+	data = {
+		args = {},
+		link = nil,
+	}
+
+	data.debug = false
+	if D.debug then data.debug = true end
+
+	data.optimization = "regular"
+	if D.debug then data.optimization = "none" end
+
+	data.profile = false
+	if D.debug then data.profile = true end
+
+	return data
+end
+
+function S.c.load ( data )
+	arguments = data.args
+	old = {
+		args = arguments,
+		link = nil,
+
+		debug        = S.c.debug,
+		optimization = S.c.optimization,
+		profile      = S.c.profile,
+	}
+	S.c.debug        = data.debug
+	S.c.optimization = data.optimization
+	S.c.profile      = data.profile
+end
 
 function S.c.compile ( out, sources )
 	sources = List(sources)
