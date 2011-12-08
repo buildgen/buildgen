@@ -27,6 +27,30 @@ S.ld = {}
 if not P.S.ld then P.S.ld = {} end
 
 local function setup () -- So that we can hide our locals.
+function S.ld.newState ( )
+	data = {
+		arguments = List(),
+	}
+
+	return data
+end
+local state = S.ld.newState()
+
+function S.ld.stashState ( )
+	return S.ld.swapState(S.ld.newState())
+end
+
+function S.ld.swapState ( new )
+	local old = state
+
+	S.ld.loadState(new)
+
+	return old
+end
+
+function S.ld.loadState ( data )
+	state = data
+end
 
 if not P.S.ld.linker then
 	local linkers = {
@@ -57,13 +81,12 @@ if not P.S.ld.linker then
 	end
 end
 
-local arguments = List()
 function S.ld.addArg ( arg )
 	if type(arg) ~= "table" then
 		arg = {tostring(arg)}
 	end
 
-	arguments:extend(arg)
+	state.arguments:extend(arg)
 end
 
 function S.ld.addLib ( lib )
@@ -96,38 +119,12 @@ function S.ld.link ( out, objects )
 		cmd:append(i:format(out))     -- the command line.
 	end
 
-	cmd:extend(arguments)
+	cmd:extend(state.arguments)
 	cmd:extend(objects)
 
 	C.addGenerator({out}, objects, cmd, {
 		description = "Linking "..out
 	})
-end
-
-function S.ld.stashState ( )
-	return S.ld.swapState(S.ld.newState())
-end
-
-function S.ld.swapState ( new )
-	old = {
-		args = arguments,
-	}
-
-	S.ld.loadState(new)
-
-	return old
-end
-
-function S.ld.newState ( )
-	data = {
-		args = List(),
-	}
-
-	return data
-end
-
-function S.ld.loadState ( data )
-	arguments = data.args
 end
 
 end
