@@ -102,10 +102,20 @@ function S.cpp.addInclude ( dir )
 	end
 end
 
-S.cpp.addLib = S.ld.addLib
-S.ld.addLib "stdc++"
+local linker = S.ld.newState()
+
+function S.cpp.addLib ( lib )
+	local ln = S.ld.swapState(linker)
+
+	S.ld.addLib(lib)
+
+	linker = S.ld.swapState(ln)
+end
+S.cpp.addLib "stdc++"
 
 function S.cpp.compile ( out, sources )
+	local ln = S.ld.swapState(linker) -- Use our linker
+
 	sources = List(sources)
 	local compiler = P.S.cpp.compiler
 
@@ -186,6 +196,8 @@ function S.cpp.compile ( out, sources )
 	end
 
 	S.ld.link(out, toLink)
+
+	linker = S.ld.swapState(ln) -- Put their linker back.
 end
 
 function S.cpp.stash ( )
