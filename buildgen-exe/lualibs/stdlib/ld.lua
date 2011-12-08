@@ -104,12 +104,16 @@ function S.ld.link ( out, objects )
 	})
 end
 
-function S.ld.stash ( )
+function S.ld.stashState ( )
+	return S.ld.swapState(S.ld.newState())
+end
+
+function S.ld.swapState ( new )
 	old = {
 		args = arguments,
 	}
 
-	S.ld.load(S.ld.newState())
+	S.ld.load(new)
 
 	return old
 end
@@ -122,7 +126,7 @@ function S.ld.newState ( )
 	return data
 end
 
-function S.ld.load ( data )
+function S.ld.loadState ( data )
 	arguments = data.args
 end
 
