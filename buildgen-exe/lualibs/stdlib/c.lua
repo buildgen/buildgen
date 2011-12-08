@@ -106,19 +106,8 @@ function S.c.addLib ( name )
 	S.ld.addLib(name)
 end
 
-function S.c.stash ( )
-	old = {
-		args = arguments,
-		link = nil,
-
-		debug        = S.c.debug,
-		optimization = S.c.optimization,
-		profile      = S.c.profile,
-	}
-
-	S.c.load(S.c.newState())
-
-	return old
+function S.c.stashState ( )
+	return S.c.swapState(S.c.newState())
 end
 
 function S.c.newState ( )
@@ -139,7 +128,22 @@ function S.c.newState ( )
 	return data
 end
 
-function S.c.load ( data )
+function S.c.swapState ( new )
+	old = {
+		args = arguments,
+		link = nil,
+
+		debug        = S.c.debug,
+		optimization = S.c.optimization,
+		profile      = S.c.profile,
+	}
+
+	S.c.load(new)
+
+	return old
+end
+
+function S.c.loadState ( data )
 	arguments = data.args
 	old = {
 		args = arguments,
