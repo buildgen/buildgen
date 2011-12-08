@@ -203,7 +203,7 @@ end
 function S.cpp.stash ( )
 	old = {
 		args = arguments,
-		link = nil,
+		link = linker,
 
 		debug        = S.cpp.debug,
 		optimization = S.cpp.optimization,
@@ -217,8 +217,8 @@ end
 
 function S.cpp.newState ( )
 	data = {
-		args = {},
-		link = nil,
+		args = List(),
+		link = S.ld.newState(),
 	}
 
 	data.debug = false
