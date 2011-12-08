@@ -104,6 +104,28 @@ function S.ld.link ( out, objects )
 	})
 end
 
+function S.ld.stash ( )
+	old = {
+		args = arguments,
+	}
+
+	S.ld.load(S.ld.newState())
+
+	return old
+end
+
+function S.ld.newState ( )
+	data = {
+		args = {},
+	}
+
+	return data
+end
+
+function S.ld.load ( data )
+	arguments = data.args
+end
+
 end
 setup()
 setup=nil
