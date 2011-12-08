@@ -188,6 +188,55 @@ function S.cpp.compile ( out, sources )
 	S.ld.link(out, toLink)
 end
 
+function S.cpp.stash ( )
+	old = {
+		args = arguments,
+		link = nil,
+
+		debug        = S.cpp.debug,
+		optimization = S.cpp.optimization,
+		profile      = S.cpp.profile,
+	}
+
+	S.cpp.load(S.cpp.newState())
+
+	return old
+end
+
+function S.cpp.newState ( )
+	data = {
+		args = {},
+		link = nil,
+	}
+
+	data.debug = false
+	if D.debug then data.debug = true end
+
+	data.optimization = "regular"
+	if D.debug then data.optimization = "none" end
+
+	data.profile = false
+	if D.debug then data.profile = true end
+
+	return data
+end
+
+function S.cpp.load ( data )
+	arguments = data.args
+	old = {
+		args = arguments,
+		link = nil,
+
+		debug        = S.cpp.debug,
+		optimization = S.cpp.optimization,
+		profile      = S.cpp.profile,
+	}
+	S.cpp.debug        = data.debug
+	S.cpp.optimization = data.optimization
+	S.cpp.profile      = data.profile
+end
+
+
 end
 setup()
 setup=nil
