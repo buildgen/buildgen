@@ -136,16 +136,16 @@ end
 local linker = S.ld.newState()
 
 function S.cpp.addLib ( lib )
-	local ln = S.ld.swapState(linker)
+	local ln = S.ld.swapState(state.linker)
 
 	S.ld.addLib(lib)
 
-	linker = S.ld.swapState(ln)
+	state.linker = S.ld.swapState(ln)
 end
 S.cpp.addLib "stdc++"
 
 function S.cpp.compile ( out, sources )
-	local ln = S.ld.swapState(linker) -- Use our linker
+	local ln = S.ld.swapState(state.linker) -- Use our linker
 
 	sources = List(sources)
 	local compiler = P.S.cpp.compiler
@@ -192,14 +192,14 @@ function S.cpp.compile ( out, sources )
 				cmd:append(i:format(object))        -- the command line.
 			end                                     --
 
-			if state.debug then                     -- Add the debug flag.
+			if S.cpp.debug then                     -- Add the debug flag.
 				if type(compiler.flags.debug) == "table" then
 					cmd:extend(compiler.flags.debug)
 				else
 					cmd:append(compiler.flags.debug)
 				end
 			end
-			if state.profile then                     -- Add the profile flag.
+			if S.cpp.profile then                     -- Add the profile flag.
 				if type(compiler.flags.profile) == "table" then
 					cmd:extend(compiler.flags.profile)
 				else
@@ -207,7 +207,7 @@ function S.cpp.compile ( out, sources )
 				end
 			end
 
-			local o = compiler.flags.optimize[state.optimization] -- Set the optimization
+			local o = compiler.flags.optimize[S.cpp.optimization] -- Set the optimization
 			if o then                                             -- level.
 				if type(o) == "table" then                        --
 					cmd:extend(o)                                 --
@@ -228,7 +228,7 @@ function S.cpp.compile ( out, sources )
 
 	S.ld.link(out, toLink)
 
-	linker = S.ld.swapState(ln) -- Put their linker back.
+	state.linker = S.ld.swapState(ln) -- Put their linker back.
 end
 
 end
