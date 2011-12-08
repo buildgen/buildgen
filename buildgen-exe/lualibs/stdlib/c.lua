@@ -29,6 +29,48 @@ if not P.S.c then P.S.c = {} end
 S.import "ld"
 
 local function setup () -- So that we can hide our locals.
+function S.c.newState ( )
+	local data = {
+		arguments = List(),
+		linker    = S.ld.newState(),
+	}
+
+	data.debug = false
+	if D.debug then data.debug = true end
+
+	data.optimization = "regular"
+	if D.debug then data.optimization = "none" end
+
+	data.profile = false
+	if D.debug then data.profile = true end
+
+	return data
+end
+local state = S.c.newState()
+
+function S.c.stashState ( )
+	return S.c.swapState(S.c.newState())
+end
+
+function S.c.swapState ( new )
+	local old = state
+
+	old.debug        = S.c.debug
+	old.optimization = S.c.optimization
+	old.profile      = S.c.profile
+
+	S.c.loadState(new)
+
+	return old
+end
+
+function S.c.loadState ( data )
+	state = data
+
+	S.c.debug        = data.debug
+	S.c.optimization = data.optimization
+	S.c.profile      = data.profile
+end
 
 if not P.S.c.compiler then
 	local compilers = {
@@ -73,23 +115,12 @@ if not P.S.c.compiler then
 	end
 end
 
-S.c.debug = false
-if D.debug then S.c.debug = true end
-
-S.c.optimization = "regular"
-if D.debug then S.c.optimization = "none" end
-
-S.c.profile = false
-if D.debug then S.c.profile = true end
-
-local arguments = List()
-
 function S.c.addArg ( arg )
 	if type(arg) ~= "table" then
 		arg = {tostring(arg)}
 	end
 
-	for k, v in pairs(arg) do arguments:append(v) end
+	for k, v in pairs(arg) do state.arguments:append(v) end
 end
 
 function S.c.addInclude ( dir )
@@ -102,62 +133,16 @@ function S.c.addInclude ( dir )
 	end
 end
 
-local linker = S.ld.newState()
 function S.c.addLib ( lib )
-	local ln = S.ld.swapState(linker)
+	local ln = S.ld.swapState(state.linker)
 
 	S.ld.addLib(lib)
 
-	linker = S.ld.swapState(ln)
-end
-
-function S.c.stashState ( )
-	return S.c.swapState(S.c.newState())
-end
-
-function S.c.newState ( )
-	data = {
-		args = {},
-		link = S.ld.newState(),
-	}
-
-	data.debug = false
-	if D.debug then data.debug = true end
-
-	data.optimization = "regular"
-	if D.debug then data.optimization = "none" end
-
-	data.profile = false
-	if D.debug then data.profile = true end
-
-	return data
-end
-
-function S.c.swapState ( new )
-	old = {
-		args = arguments,
-		link = linker,
-
-		debug        = S.c.debug,
-		optimization = S.c.optimization,
-		profile      = S.c.profile,
-	}
-
-	S.c.loadState(new)
-
-	return old
-end
-
-function S.c.loadState ( data )
-	arguments        = data.args
-	linker           = data.link
-	S.c.debug        = data.debug
-	S.c.optimization = data.optimization
-	S.c.profile      = data.profile
+	state.linker = S.ld.swapState(ln)
 end
 
 function S.c.compile ( out, sources )
-	local ln = S.ld.swapState(linker) -- Use our linker.
+	local ln = S.ld.swapState(state.linker) -- Use our linker.
 
 	sources = List(sources)
 	local compiler = P.S.c.compiler
@@ -222,7 +207,7 @@ function S.c.compile ( out, sources )
 				end                                             --
 			end                                                 --
 
-			cmd:extend(arguments)
+			cmd:extend(state.arguments)
 			cmd:append(source)
 
 			C.addGenerator({object}, sources, cmd, {
@@ -234,7 +219,7 @@ function S.c.compile ( out, sources )
 
 	S.ld.link(out, toLink)
 
-	linker = S.ld.swapState(ln) -- Put thier linker back.
+	state.linker = S.ld.swapState(ln) -- Put thier linker back.
 end
 
 function S.c.generateHeader ( head, src, definitions )
