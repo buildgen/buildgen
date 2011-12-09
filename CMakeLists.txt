@@ -30,3 +30,5 @@ PROJECT(BuildGen)
 
 SUBDIRS(buildgen-exe)
 SUBDIRS(generators)
+
+INSTALL(FILES LICENSE DESTINATION "share/licenses/buildgen/")

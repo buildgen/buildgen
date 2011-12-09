@@ -29,6 +29,48 @@ if not P.S.c then P.S.c = {} end
 S.import "ld"
 
 local function setup () -- So that we can hide our locals.
+function S.c.newState ( )
+	local data = {
+		arguments = List(),
+		linker    = S.ld.newState(),
+	}
+
+	data.debug = false
+	if D.debug then data.debug = true end
+
+	data.optimization = "regular"
+	if D.debug then data.optimization = "none" end
+
+	data.profile = false
+	if D.debug then data.profile = true end
+
+	return data
+end
+local state = S.c.newState()
+
+function S.c.stashState ( )
+	return S.c.swapState(S.c.newState())
+end
+
+function S.c.swapState ( new )
+	local old = state
+
+	old.debug        = S.c.debug
+	old.optimization = S.c.optimization
+	old.profile      = S.c.profile
+
+	S.c.loadState(new)
+
+	return old
+end
+
+function S.c.loadState ( data )
+	state = data
+
+	S.c.debug        = data.debug
+	S.c.optimization = data.optimization
+	S.c.profile      = data.profile
+end
 
 if not P.S.c.compiler then
 	local compilers = {
@@ -38,8 +80,8 @@ if not P.S.c.compiler then
 				output   = {"-o", "%s"}, -- the option to set the output file name.
 				debug    = "-g",         -- the option to enable debug mode.
 				profile  = "-p",         -- the option to enable profiling.
-				link     = {"-l", "%s"}, -- the option to link a library.
 				include  = {"-I", "%s"}, -- the option to add an include directory.
+				define   = {"-D%s"}, -- the option to add an include directory.
 				optimize = {             -- Flags for different levels of optimization.
 					none    = {},
 					quick   = "-O",
@@ -73,23 +115,12 @@ if not P.S.c.compiler then
 	end
 end
 
-S.c.debug = false
-if D.debug then S.c.debug = true end
-
-S.c.optimization = "regular"
-if D.debug then S.c.optimization = "none" end
-
-S.c.profile = false
-if D.debug then S.c.profile = true end
-
-local arguments = List()
-
 function S.c.addArg ( arg )
 	if type(arg) ~= "table" then
 		arg = {tostring(arg)}
 	end
 
-	for k, v in pairs(arg) do arguments:append(v) end
+	for k, v in pairs(arg) do state.arguments:append(v) end
 end
 
 function S.c.addInclude ( dir )
@@ -98,15 +129,46 @@ function S.c.addInclude ( dir )
 	end
 
 	for k, v in pairs(dir) do
-		S.c.addArg({"-I", C.path(v)})
+		v = C.path(v)
+		for l, w in pairs(P.S.c.compiler.flags.include) do
+			S.c.addArg(w:format(v))
+		end
 	end
 end
 
-S.c.addLib = S.ld.addLib
+function S.c.define ( map )
+	if type(map) ~= "table" then
+		dir = {tostring(map)}
+	end
+
+	for k, v in pairs(map) do
+		if type(value) ~= "string" then
+			value = ""
+		else
+			value = "="..value
+		end
+		for l, w in pairs(P.S.c.compiler.flags.define) do
+			S.c.addArg(w:format(v))
+		end
+	end
+end
+
+function S.c.addLib ( lib )
+	local ln = S.ld.swapState(state.linker)
+
+	S.ld.addLib(lib)
+
+	state.linker = S.ld.swapState(ln)
+end
 
 function S.c.compile ( out, sources )
+	local ln = S.ld.swapState(state.linker) -- Use our linker.
+
 	sources = List(sources)
 	local compiler = P.S.c.compiler
+
+	local projectRoot = C.path("<") -- Cache this.
+	local outRoot     = C.path(">") --
 
 	out = C.path(out)
 
@@ -117,7 +179,16 @@ function S.c.compile ( out, sources )
 
 		if stringx.endswith(source, ".c") or stringx.endswith(source, ".C") then
 			-- Get path to put object file.
-			local object = C.path("@"..source:sub(#C.path("<"))..".o")
+			local object = nil;
+
+			if source:sub(0, #projectRoot) == projectRoot then
+				object = C.path(">"..source:sub(#projectRoot)..".o")
+			elseif source:sub(0, #outRoot) == outRoot then
+				object = C.path(source..".o") -- Already in the out dir.
+			else
+				object = C.path("@"..source:sub(#projectRoot)..".o") -- Put inside
+				                                                     -- the build
+			end                                                      -- dir.
 
 			local cmd = List()
 			cmd:append(compiler.name)
@@ -156,7 +227,7 @@ function S.c.compile ( out, sources )
 				end                                             --
 			end                                                 --
 
-			cmd:extend(arguments)
+			cmd:extend(state.arguments)
 			cmd:append(source)
 
 			C.addGenerator({object}, sources, cmd, {
@@ -167,6 +238,8 @@ function S.c.compile ( out, sources )
 	end
 
 	S.ld.link(out, toLink)
+
+	state.linker = S.ld.swapState(ln) -- Put thier linker back.
 end
 
 function S.c.generateHeader ( head, src, definitions )

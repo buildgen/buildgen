@@ -8,6 +8,9 @@ headerName = arg[1]
 headerDontIncludeName = headerName:upper():gsub("[^%w]", "_")
 srcName = arg[2]
 
+dir.makepath(path.dirname(headerName))
+dir.makepath(path.dirname(srcName))
+
 header = assert(io.open(headerName, "w"))
 src    = assert(io.open(srcName, "w"))
 
@@ -45,7 +48,7 @@ while #arg > i do
 	                          ["\n"] = "\\n"
 	                        })
 
-	header:write   ("extern const char *"..key..';\n')
+	header:write("extern const char *"..key..';\n')
 	src:write("const char *"..key..' = "'..value..'";\n')
 end
 

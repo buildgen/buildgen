@@ -29,6 +29,48 @@ if not P.S.cpp then P.S.cpp = {} end
 S.import "ld"
 
 local function setup () -- So that we can hide our locals.
+function S.cpp.newState ( )
+	local data = {
+		arguments = List(),
+		linker    = S.ld.newState(),
+	}
+
+	data.debug = false
+	if D.debug then data.debug = true end
+
+	data.optimization = "regular"
+	if D.debug then data.optimization = "none" end
+
+	data.profile = false
+	if D.debug then data.profile = true end
+
+	return data
+end
+local state = S.cpp.newState()
+
+function S.cpp.stashState ( )
+	return S.cpp.swapState(S.cpp.newState())
+end
+
+function S.cpp.swapState ( new )
+	local old = state
+
+	old.debug        = S.cpp.debug
+	old.optimization = S.cpp.optimization
+	old.profile      = S.cpp.profile
+
+	S.cpp.loadState(new)
+
+	return old
+end
+
+function S.cpp.loadState ( data )
+	state = data
+
+	S.cpp.debug        = data.debug
+	S.cpp.optimization = data.optimization
+	S.cpp.profile      = data.profile
+end
 
 if not P.S.cpp.compiler then
 	local compilers = {
@@ -38,7 +80,7 @@ if not P.S.cpp.compiler then
 				output   = {"-o", "%s"}, -- the option to set the output file name.
 				debug    = "-g",         -- the option to enable debug mode.
 				profile  = "-p",         -- the option to enable profiling.
-				link     = {"-l", "%s"}, -- the option to link a library.
+				define   = {"-D%s"},     -- the option to link a library.
 				include  = {"-I", "%s"}, -- the option to add an include directory.
 				optimize = {             -- Flags for different levels of optimization.
 					none    = {},
@@ -73,23 +115,12 @@ if not P.S.cpp.compiler then
 	end
 end
 
-S.cpp.debug = false
-if D.debug then S.cpp.debug = true end
-
-S.cpp.optimization = "regular"
-if D.debug then S.cpp.optimization = "none" end
-
-S.cpp.profile = false
-if D.debug then S.cpp.profile = true end
-
-local arguments = List()
-
 function S.cpp.addArg ( arg )
 	if type(arg) ~= "table" then
 		arg = {tostring(arg)}
 	end
 
-	for k, v in pairs(arg) do arguments:append(v) end
+	for k, v in pairs(arg) do state.arguments:append(v) end
 end
 
 function S.cpp.addInclude ( dir )
@@ -98,18 +129,65 @@ function S.cpp.addInclude ( dir )
 	end
 
 	for k, v in pairs(dir) do
-		S.cpp.addArg({"-I", C.path(v)})
+		v = C.path(v)
+		for l, w in pairs(P.S.cpp.compiler.flags.include) do
+			S.cpp.addArg(w:format(v))
+		end
 	end
 end
 
-S.cpp.addLib = S.ld.addLib
-S.ld.addLib "stdc++"
+function S.cpp.define ( map )
+	if type(map) ~= "table" then
+		dir = {tostring(map)}
+	end
+
+	for k, v in pairs(map) do
+		if type(value) ~= "string" then
+			value = ""
+		else
+			value = "="..value
+		end
+		for l, w in pairs(P.S.cpp.compiler.flags.define) do
+			S.cpp.addArg(w:format(v))
+		end
+	end
+end
+
+function S.cpp.addLib ( lib )
+	local ln = S.ld.swapState(state.linker)
+
+	S.ld.addLib(lib)
+
+	state.linker = S.ld.swapState(ln)
+end
+S.cpp.addLib "stdc++"
+
+
+function S.cpp.define ( map )
+	if type(map) ~= "table" then
+		dir = {tostring(map)}
+	end
+
+	for k, v in pairs(map) do
+		if type(v) ~= "string" then
+			v = ""
+		else
+			v = "="..v
+		end
+		S.cpp.addArg("-D"..k..v)
+	end
+end
 
 function S.cpp.compile ( out, sources )
+	local ln = S.ld.swapState(state.linker) -- Use our linker
+
 	sources = List(sources)
 	local compiler = P.S.cpp.compiler
 
 	out = C.path(out)
+
+	local projectRoot = C.path("<") -- Cache this.
+	local outRoot     = C.path(">") --
 
 	local toLink = List()
 
@@ -123,7 +201,17 @@ function S.cpp.compile ( out, sources )
 		   stringx.endswith(source, ".cxx") or
 		   stringx.endswith(source, ".CXX")  then
 			-- Get path to put object file.
-			local object = C.path("@"..source:sub(#C.path("<"))..".o")
+
+			local object = nil;
+
+			if source:sub(0, #projectRoot) == projectRoot then
+				object = C.path(">"..source:sub(#projectRoot)..".o")
+			elseif source:sub(0, #outRoot) == outRoot then
+				object = C.path(source..".o") -- Already in the out dir.
+			else
+				object = C.path("@"..source:sub(#projectRoot)..".o") -- Put inside
+				                                                     -- the build
+			end                                                      -- dir.
 
 			local cmd = List()
 			cmd:append(compiler.name)
@@ -135,10 +223,10 @@ function S.cpp.compile ( out, sources )
 			end
 
 			for i in iter(compiler.flags.output) do -- Add the desired output file to
-				cmd:append(i:format(object))           -- the command line.
+				cmd:append(i:format(object))        -- the command line.
 			end                                     --
 
-			if S.cpp.debug then                       -- Add the debug flag.
+			if S.cpp.debug then                     -- Add the debug flag.
 				if type(compiler.flags.debug) == "table" then
 					cmd:extend(compiler.flags.debug)
 				else
@@ -162,7 +250,7 @@ function S.cpp.compile ( out, sources )
 				end                                               --
 			end                                                   --
 
-			cmd:extend(arguments)
+			cmd:extend(state.arguments)
 			cmd:append(source)
 
 			C.addGenerator({object}, sources, cmd, {
@@ -173,6 +261,8 @@ function S.cpp.compile ( out, sources )
 	end
 
 	S.ld.link(out, toLink)
+
+	state.linker = S.ld.swapState(ln) -- Put their linker back.
 end
 
 end

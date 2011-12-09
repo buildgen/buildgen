@@ -24,3 +24,7 @@
 
 C.addDir "buildgen-exe"
 C.addDir "generators"
+
+S.import "stdlib"
+
+S.install("LICENSE", "share/licenses/"..name.."/")
