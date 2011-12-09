@@ -80,7 +80,7 @@ if not P.S.cpp.compiler then
 				output   = {"-o", "%s"}, -- the option to set the output file name.
 				debug    = "-g",         -- the option to enable debug mode.
 				profile  = "-p",         -- the option to enable profiling.
-				link     = {"-l", "%s"}, -- the option to link a library.
+				define   = {"-D%s"},     -- the option to link a library.
 				include  = {"-I", "%s"}, -- the option to add an include directory.
 				optimize = {             -- Flags for different levels of optimization.
 					none    = {},
@@ -129,7 +129,27 @@ function S.cpp.addInclude ( dir )
 	end
 
 	for k, v in pairs(dir) do
-		S.cpp.addArg({"-I", C.path(v)})
+		v = C.path(v)
+		for l, w in pairs(P.S.cpp.compiler.flags.include) do
+			S.cpp.addArg(w:format(v))
+		end
+	end
+end
+
+function S.cpp.define ( map )
+	if type(map) ~= "table" then
+		dir = {tostring(map)}
+	end
+
+	for k, v in pairs(map) do
+		if type(value) ~= "string" then
+			value = ""
+		else
+			value = "="..value
+		end
+		for l, w in pairs(P.S.cpp.compiler.flags.define) do
+			S.cpp.addArg(w:format(v))
+		end
 	end
 end
 

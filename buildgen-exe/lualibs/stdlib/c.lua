@@ -80,8 +80,8 @@ if not P.S.c.compiler then
 				output   = {"-o", "%s"}, -- the option to set the output file name.
 				debug    = "-g",         -- the option to enable debug mode.
 				profile  = "-p",         -- the option to enable profiling.
-				link     = {"-l", "%s"}, -- the option to link a library.
 				include  = {"-I", "%s"}, -- the option to add an include directory.
+				define   = {"-D%s"}, -- the option to add an include directory.
 				optimize = {             -- Flags for different levels of optimization.
 					none    = {},
 					quick   = "-O",
@@ -129,7 +129,10 @@ function S.c.addInclude ( dir )
 	end
 
 	for k, v in pairs(dir) do
-		S.c.addArg({"-I", C.path(v)})
+		v = C.path(v)
+		for l, w in pairs(P.S.c.compiler.flags.include) do
+			S.c.addArg(w:format(v))
+		end
 	end
 end
 
@@ -144,7 +147,9 @@ function S.c.define ( map )
 		else
 			value = "="..value
 		end
-		S.c.addArg("-D"..k..v)
+		for l, w in pairs(P.S.c.compiler.flags.define) do
+			S.c.addArg(w:format(v))
+		end
 	end
 end
 
