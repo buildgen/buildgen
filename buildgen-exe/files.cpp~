@@ -72,7 +72,7 @@ void Files::init ( char *srcdir, char *buildgen_root )
 		exit(EX_USAGE);
 	}
 	fchdir(dirfd(d));
-	project_root = getcwd(NULL, 0); // As a default.  The value will be copied if needed
+	project_root = get_current_dir_name(); // As a default.  The value will be copied if needed
 	findProjectRoot();
 	fchdir(dirfd(d));
 	findInfoFile();
@@ -257,7 +257,7 @@ char *Files::normalizeFilename( const char *path )
 	if ( *path == '!' ) path++; // We didn't want the first character
 	                            // to be looked at.
 
-	char *n = getcwd(NULL, 0);
+	char *n = get_current_dir_name();
 	int cwdlen = strlen(n);
 
 	n = (char*)realloc(n, (cwdlen+2+strlen(path))*sizeof(char));

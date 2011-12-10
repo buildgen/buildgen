@@ -29,7 +29,7 @@
 #include <algorithm>
 
 Makefile::Makefile ( std::set<Target *, Target::comparator> *targets ):
-	cwd(get_current_dir_name()),
+	cwd(getcwd(NULL, 0)),
 	cwdlen(strlen(cwd)+1), // The one is to mimic the trailing slash
 	targets(targets)
 {
