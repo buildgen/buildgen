@@ -37,6 +37,7 @@ class Makefile
 	std::set<Target*, Target::comparator> *targets;
 
 	std::string relitiveName(std::string path);
+	std::string escape(std::string path);
 
 	std::string writeTarget(Target *t);
 	std::string writeGenerator(Generator *g);
