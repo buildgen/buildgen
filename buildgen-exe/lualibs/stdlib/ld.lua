@@ -67,7 +67,7 @@ if not P.S.ld.linker then
 	List(linkers) -- turn tabe into a penlight 'list'
 
 	local linker;
-	for l in iter(linkers) do          -- Find the first compiler they have
+	for l in iter(linkers) do            -- Find the first linker they have
 		if S.findExecutable(l.name) then -- installed on thier system.
 			linker = l
 			linker.name = S.findExecutable(linker.name)
