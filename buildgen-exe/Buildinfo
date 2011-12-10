@@ -49,7 +49,6 @@ S.cpp.compile("@gen", {
 	"lua-functions.cpp",
 	"lua-init.hpp",
 	"lua-init.cpp",
-	"main.hpp",
 	"main.cpp",
 	"messages.hpp",
 	"messages.cpp",
