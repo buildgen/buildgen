@@ -62,13 +62,15 @@ std::string Makefile::escape ( std::string path )
 		switch (path[i])
 		{
 			case ' ':
-				str.replace(i, 2, "\\ ");
+				path.replace(i, 2, "\\ ");
 				break;
 			case '\\':
-				str.replace(i, 2, "\\\\");
+				path.replace(i, 2, "\\\\");
 				break;
 		}
 	}
+
+	return path;
 }
 
 std::string Makefile::generate ( void )
@@ -112,7 +114,7 @@ std::string Makefile::writeTarget(Target *t)
 	{
 		Target *d = *di;
 
-		out += rescape(elitiveName(d->path));
+		out += escape(relitiveName(d->path));
 		out += " ";
 	}
 	if (t->generator) out += relitiveName(t->generator->path);

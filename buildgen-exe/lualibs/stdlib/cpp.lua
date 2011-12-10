@@ -29,6 +29,8 @@ if not P.S.cpp then P.S.cpp = {} end
 S.import "ld"
 
 local function setup () -- So that we can hide our locals.
+local state = {}
+
 function S.cpp.newState ( )
 	local data = {
 		arguments = List(),
@@ -46,7 +48,6 @@ function S.cpp.newState ( )
 
 	return data
 end
-local state = S.cpp.newState()
 
 function S.cpp.stashState ( )
 	return S.cpp.swapState(S.cpp.newState())
@@ -71,6 +72,8 @@ function S.cpp.loadState ( data )
 	S.cpp.optimization = data.optimization
 	S.cpp.profile      = data.profile
 end
+
+S.cpp.swapState(S.cpp.newState())
 
 if not P.S.cpp.compiler then
 	local compilers = {

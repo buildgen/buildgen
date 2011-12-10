@@ -27,6 +27,7 @@ S.ld = {}
 if not P.S.ld then P.S.ld = {} end
 
 local function setup () -- So that we can hide our locals.
+local state = {}
 function S.ld.newState ( )
 	data = {
 		arguments = List(),
@@ -34,7 +35,6 @@ function S.ld.newState ( )
 
 	return data
 end
-local state = S.ld.newState()
 
 function S.ld.stashState ( )
 	return S.ld.swapState(S.ld.newState())
@@ -51,6 +51,8 @@ end
 function S.ld.loadState ( data )
 	state = data
 end
+
+S.ld.swapState(S.ld.newState())
 
 if not P.S.ld.linker then
 	local linkers = {
