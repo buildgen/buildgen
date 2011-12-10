@@ -77,7 +77,7 @@ std::string Makefile::writeTarget(Target *t)
 {
 	std::string out;
 
-	if ( !t->generator && !t->depends.size()) return out; // This is an existing file
+	if ( (t->generator == NULL) && (!t->magic) ) return out; // This is an existing file
 
 	if (t->magic)
 	{
