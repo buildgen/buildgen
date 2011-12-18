@@ -175,6 +175,7 @@ function S.c.compile ( out, sources )
 
 	out = C.path(out)
 
+	local length = #state.arguments
 	local toLink = List()
 
 	local h, s = List(), List()
@@ -185,6 +186,25 @@ function S.c.compile ( out, sources )
 			s:append(source)
 		end
 	end
+
+	local oldarguments = List(state.arguments)
+	state.arguments:insert(1, compiler.name)
+
+	S.cpp.addArg(compiler.flags.compile)
+
+	if S.cpp.debug then                     -- Add the debug flag.
+		S.cpp.addArg(compiler.flags.debug)
+	end
+	if S.cpp.profile then                    -- Add the profile flag.
+		S.cpp.addArg(compiler.flags.profile)
+	end
+	local o = compiler.flags.optimize[S.cpp.optimization] -- Set the optimization
+	if o then                                             -- level.                                --
+		S.cpp.addArg(o)                                   --
+	end                                                   --
+
+	local length = #state.arguments
+	local toLink = List()
 
 	for source in iter(sources) do
 		source = C.path(source)
@@ -201,58 +221,22 @@ function S.c.compile ( out, sources )
 			                                                     -- the build
 		end                                                      -- dir.
 
-		local cmd = List()
-		cmd:append(compiler.name)
-
-		if type(compiler.flags.compile) == "table" then
-			cmd:extend(compiler.flags.compile)
-		else
-			cmd:append(compiler.flags.compile)
-		end
-
-		for i in iter(compiler.flags.output) do -- Add the desired output file to
-			cmd:append(i:format(object))           -- the command line.
-		end                                     --
-
-		if S.c.debug then                       -- Add the debug flag.
-			if type(compiler.flags.debug) == "table" then
-				cmd:extend(compiler.flags.debug)
-			else
-				cmd:append(compiler.flags.debug)
-			end
-		end
-		if S.c.profile then                     -- Add the profile flag.
-			if type(compiler.flags.profile) == "table" then
-				cmd:extend(compiler.flags.profile)
-			else
-				cmd:append(compiler.flags.profile)
-			end
-		end
-
-		local o = compiler.flags.optimize[S.c.optimization] -- Set the optimization
-		if o then                                           -- level.
-			if type(o) == "table" then                      --
-				cmd:extend(o)                               --
-			else                                            --
-				cmd:append(o)                               --
-			end                                             --
-		end                                                 --
-
-		cmd:extend(state.arguments)
-		cmd:append(source)
+		S.c.addArg(source)
 
 		h:append(source) -- Prepare the dependancies.
 
-		C.addGenerator({object}, h, cmd, {
+		C.addGenerator({object}, h, state.arguments, {
 			description = "Compiling "..object
 		})
 		toLink:append(object)
 
+		state.arguments:chop(length) -- Remove the source from the command.
 		h:pop() -- Remove the source from the headers.
 	end
 
 	S.ld.link(out, toLink)
 
+	state.arguments = oldarguments;
 	state.linker = S.ld.swapState(ln) -- Put thier linker back.
 end
 

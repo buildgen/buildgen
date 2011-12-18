@@ -26,7 +26,7 @@
 --- The Standard library namespace.
 S.imported = true
 
-require "lfs"
+T = require "lfs"
 require "pl"
 stringx.import()
 
