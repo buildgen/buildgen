@@ -26,6 +26,8 @@ S.import "cpp"
 
 S.cpp.addInclude "<"
 
+S.cpp.addLib "m"
+
 S.cpp.compile("@gen-makefile", {
 	"commandline.hpp",
 	"commandline.cpp",

@@ -33,7 +33,7 @@ local state = {}
 
 function S.cpp.newState ( )
 	local data = {
-		arguments = List(),
+		arguments = T.List(),
 		linker    = S.ld.newState(),
 	}
 
@@ -99,7 +99,7 @@ if not P.S.cpp.compiler then
 			}
 		},
 	}
-	List(compilers) -- turn tabe into a penlight 'list'
+	T.List(compilers) -- turn tabe into a penlight 'list'
 
 	local compiler;
 	for c in iter(compilers) do          -- Find the first compiler they have
@@ -184,7 +184,7 @@ end
 function S.cpp.compile ( out, sources )
 	local ln = S.ld.swapState(state.linker) -- Use our linker
 
-	sources = List(sources)
+	sources = T.List(sources)
 	local compiler = P.S.cpp.compiler
 
 	out = C.path(out)
@@ -192,7 +192,7 @@ function S.cpp.compile ( out, sources )
 	local projectRoot = C.path("<") -- Cache this.
 	local outRoot     = C.path(">") --
 
-	local h, s = List(), List()
+	local h, s = T.List(), T.List()
 	for source in iter(sources) do
 		if source:match("[Hh]") then
 			h:append(source)
@@ -201,7 +201,7 @@ function S.cpp.compile ( out, sources )
 		end
 	end
 
-	local oldarguments = List(state.arguments)
+	local oldarguments = T.List(state.arguments)
 	state.arguments:insert(1, compiler.name)
 
 	S.cpp.addArg(compiler.flags.compile)
@@ -218,7 +218,7 @@ function S.cpp.compile ( out, sources )
 	end                                                   --
 
 	local length = #state.arguments
-	local toLink = List()
+	local toLink = T.List()
 
 	for source in iter(s) do
 		source = C.path(source)

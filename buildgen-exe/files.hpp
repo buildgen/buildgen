@@ -33,6 +33,7 @@ class Files
 {
 public:
 	char *project_root;
+	char *lualibs_root;
 	char *out_root;
 
 	const char *infofilename;

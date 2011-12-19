@@ -46,6 +46,7 @@ namespace opt
 	extern char *src_dir;
 
 	extern void get_options(int *argc, char ***argv);
+	extern void do_options(void);
 }
 
 #endif

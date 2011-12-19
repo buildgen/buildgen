@@ -46,7 +46,7 @@ if not P.S.util.cmd.cp then
 			}
 		},
 	}
-	List(cps) -- turn tabe into a penlight 'list'
+	T.List(cps) -- turn tabe into a penlight 'list'
 
 	local cp;
 	for c in iter(cps) do          -- Find the first compiler they have
@@ -84,7 +84,7 @@ if not P.S.util.cmd.mv then
 			}
 		},
 	}
-	List(mvs) -- turn tabe into a penlight 'list'
+	T.List(mvs) -- turn tabe into a penlight 'list'
 
 	local mv;
 	for c in iter(mvs) do          -- Find the first compiler they have
@@ -118,7 +118,7 @@ if not P.S.util.cmd.rm then
 			}
 		},
 	}
-	List(rms) -- turn tabe into a penlight 'list'
+	T.List(rms) -- turn tabe into a penlight 'list'
 
 	local rm;
 	for c in iter(rms) do          -- Find the first compiler they have
@@ -152,7 +152,7 @@ if not P.S.util.cmd.install then
 			}
 		},
 	}
-	List(installs) -- turn tabe into a penlight 'list'
+	T.List(installs) -- turn tabe into a penlight 'list'
 
 	local install;
 	for c in iter(installs) do          -- Find the first compiler they have
@@ -175,7 +175,7 @@ function S.util.cp ( src, dest )
 	src  = C.path(src)
 	dest = C.path(dest)
 
-	cmd = List()
+	cmd = T.List()
 	cmd:append(P.S.util.cmd.cp.name)
 	cmd:append(src)
 	cmd:append(dest)
@@ -189,7 +189,7 @@ function S.util.mv ( src, dest )
 	src  = C.path(src)
 	dest = C.path(dest)
 
-	cmd = List()
+	cmd = T.List()
 	cmd:append(P.S.util.cmd.mv.name)
 	cmd:append(src)
 	cmd:append(dest)
@@ -202,7 +202,7 @@ end
 function S.util.rm ( file )
 	file = C.path(file)
 
-	cmd = List()
+	cmd = T.List()
 	cmd:append(P.S.util.cmd.rm.name)
 	cmd:append(file)
 
@@ -215,7 +215,7 @@ function S.util.install ( src, dest )
 	src  = C.path(src)
 	dest = C.path(dest)
 
-	cmd = List()
+	cmd = T.List()
 	cmd:append(P.S.util.cmd.install.name)
 	cmd:append(P.S.util.cmd.cp.flags.preargs)
 	cmd:append(src)

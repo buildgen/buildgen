@@ -24,16 +24,17 @@
 
 
 S.c = {}
-if not P.S.c then P.S.c = {} end
 
 S.import "ld"
+
+if not P.S.c then P.S.c = {} end
 
 local function setup () -- So that we can hide our locals.
 local state = {}
 
 function S.c.newState ( )
 	local data = {
-		arguments = List(),
+		arguments = T.List(),
 		linker    = S.ld.newState(),
 	}
 
@@ -99,7 +100,7 @@ if not P.S.c.compiler then
 			}
 		},
 	}
-	List(compilers) -- turn tabe into a penlight 'list'
+	T.List(compilers) -- turn tabe into a penlight 'list'
 
 	local compiler;
 	for c in iter(compilers) do          -- Find the first compiler they have
@@ -167,7 +168,7 @@ end
 function S.c.compile ( out, sources )
 	local ln = S.ld.swapState(state.linker) -- Use our linker.
 
-	sources = List(sources)
+	sources = T.List(sources)
 	local compiler = P.S.c.compiler
 
 	local projectRoot = C.path("<") -- Cache this.
@@ -176,9 +177,9 @@ function S.c.compile ( out, sources )
 	out = C.path(out)
 
 	local length = #state.arguments
-	local toLink = List()
+	local toLink = T.List()
 
-	local h, s = List(), List()
+	local h, s = T.List(), T.List()
 	for source in iter(sources) do
 		if source:match("[Hh]") then
 			h:append(source)
@@ -187,7 +188,7 @@ function S.c.compile ( out, sources )
 		end
 	end
 
-	local oldarguments = List(state.arguments)
+	local oldarguments = T.List(state.arguments)
 	state.arguments:insert(1, compiler.name)
 
 	S.cpp.addArg(compiler.flags.compile)
@@ -204,7 +205,7 @@ function S.c.compile ( out, sources )
 	end                                                   --
 
 	local length = #state.arguments
-	local toLink = List()
+	local toLink = T.List()
 
 	for source in iter(sources) do
 		source = C.path(source)
@@ -246,7 +247,7 @@ function S.c.generateHeader ( head, src, definitions )
 	head = C.path(head)
 	src  = C.path(src)
 
-	cmd = List()
+	cmd = T.List()
 	cmd:append "*lua"
 	cmd:append(generatorScript)
 	cmd:append(head)

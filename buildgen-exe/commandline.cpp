@@ -80,19 +80,23 @@ namespace opt
 
 	char *src_dir;
 
+	unsigned int toDo = 0; // Will be read in do_options();
+
 	void get_options ( int *argc, char ***argv )
 	{
 		char *gen = NULL;
 		int flag = 0;
 
 		static struct option longopts[] = {
-			{ "define",    required_argument, NULL, 'D' },
-			{ "generator", optional_argument, NULL, 'g' },
-			{ "help",            no_argument, NULL, 'h' },
-			{ "out",       optional_argument, NULL, 'o' },
-			{ "verbose",   optional_argument, NULL, 'v' },
-			{ "version",         no_argument, &flag, 1  },
-			{ NULL,                        0, NULL,  0  },
+			{ "buildgen-root",     no_argument,       &flag, 1  },
+			{ "buildgenlibs-root", no_argument,       &flag, 2  },
+			{ "define",            required_argument, NULL, 'D' },
+			{ "generator",         optional_argument, NULL, 'g' },
+			{ "help",              no_argument,       NULL, 'h' },
+			{ "out",               optional_argument, NULL, 'o' },
+			{ "verbose",           optional_argument, NULL, 'v' },
+			{ "version",           no_argument,       &flag, 0  },
+			{ NULL,                0,                 NULL,  0  },
 		};
 
 		int i;
@@ -103,8 +107,11 @@ namespace opt
 			case 0:
 				switch (flag)
 				{
-				case 1:
+				case 0:
 					version();
+				case 1:
+				case 2:
+					toDo = flag;
 				}
 				break;
 			case 'D': // Define a build property
@@ -189,5 +196,17 @@ namespace opt
 		else                   fclose(xml_out);
 
 		xml_out = NULL;
+	}
+
+	void do_options ( void )
+	{
+		switch (toDo)
+		{
+		case 1:
+			puts(files->buildgen_root);
+		case 2:
+			puts(files->lualibs_root);
+		}
+
 	}
 }

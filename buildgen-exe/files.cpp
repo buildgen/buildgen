@@ -48,12 +48,12 @@ Files::Files ( char *srcdir, char *buildgen_root ):
 	init(srcdir, buildgen_root);
 }
 
-void Files::init ( char *srcdir, char *buildgen_root )
+void Files::init ( char *srcdir, char *buildgenroot )
 {
 	out_root = getcwd(NULL, 0);
 	appendSlash(&out_root);
 
-	char *br = normalizeFilename(buildgen_root);
+	char *br = normalizeFilename(buildgenroot);
 
 	unsigned int ls = strlen(br);
 	while ( br[ls] != '/' ) ls--;
@@ -61,9 +61,16 @@ void Files::init ( char *srcdir, char *buildgen_root )
 	while ( br[ls] != '/' ) ls--;
 	br[ls+1] = '\0';
 
-	this->buildgen_root = normalizeFilename(br);
+	buildgen_root = strdup(br);
 
 	free(br);
+
+	unsigned int bgl = strlen(buildgen_root);
+	unsigned int llrl = strlen(LUALIBS_ROOT);
+
+	lualibs_root = (char*)malloc((bgl+llrl+1)*sizeof(char));
+	strcpy(lualibs_root, buildgen_root);
+	strcpy(lualibs_root+bgl, LUALIBS_ROOT);
 
 	DIR *d = opendir(srcdir);
 	if ( d == NULL )

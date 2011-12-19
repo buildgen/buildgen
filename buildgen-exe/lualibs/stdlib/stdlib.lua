@@ -26,11 +26,49 @@
 --- The Standard library namespace.
 S.imported = true
 
-T = require "lfs"
-require "pl"
-stringx.import()
+--- Import Penlight
+T = {}
 
-S.version = _s_version
+T.List = require "pl.list".List
+T.class = require "pl.class"
+T.Map = T.class.Map
+T.Set = T.class.Set
+T.class = T.class.class
+
+T.classx = require "pl.classx"
+T.OrderedMap = T.classx.OrderedMap
+T.MultiMap = T.classx.MultiMap
+T.TypedList = T.classx.TypedList
+T.classx = nil
+
+T.app = require "pl.app"
+T.array2d = require "pl.array2d"
+T.comprehension = require "pl.comprehension"
+T.config = require "pl.config"
+T.data = require "pl.data"
+T.dir = require "pl.dir"
+T.file = require "pl.file"
+T.func = require "pl.func"
+T.input = require "pl.input"
+T.lapp = require "pl.lapp"
+T.lexer = require "pl.lexer"
+T.luabalanced = require "pl.luabalanced"
+T.operator = require "pl.operator"
+T.path = require "pl.path"
+T.permute = require "pl.permute"
+T.pretty = require "pl.pretty"
+T.seq = require "pl.seq"
+T.sip = require "pl.sip"
+T.stringio = require "pl.stringio"
+T.stringx = require "pl.stringx"
+T.tablex = require "pl.tablex"
+T.test = require "pl.test"
+T.text = require "pl.text"
+T.utils = require "pl.utils"
+
+T.stringx.import()
+
+--S.version = _s_version
 S.os = _s_os
 
 if not S.prefix then
@@ -63,7 +101,7 @@ end
 
 function S.findExecutable ( name )
 	if name:find("/", 1, true) == 1 then
-		if path.isfile(name) then
+		if T.path.isfile(name) then
 			return name
 		end
 
@@ -71,8 +109,8 @@ function S.findExecutable ( name )
 	end
 
 	for k, v in pairs(S.path) do
-		local p = path.join(v, name);
-		if path.isfile(p) then
+		local p = T.path.join(v, name);
+		if T.path.isfile(p) then
 			return p
 		end
 	end
@@ -87,13 +125,13 @@ function S.install ( path, to )
 	end
 	local apath = C.path(path)
 
-	if lfs.attributes(apath, "mode") == "directory" then
+	if T.path.isdir(apath) then
 		local i = string.find(string.sub(string.reverse(apath), 2), "/", 1, true)
 		if i then
-			dirname = string.sub(apath, -i)
+			dirname = apath:sub(-i)
 		end
 
-		for root, dirs, files in dir.walk(apath) do
+		for root, dirs, files in T.dir.walk(apath) do
 			for f in iter(files) do
 				t = to..dirname..string.sub(root, #apath).."/"..f
 

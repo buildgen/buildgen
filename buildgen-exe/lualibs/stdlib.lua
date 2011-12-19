@@ -28,7 +28,7 @@
 S = {} -- Std libraries
 S.imported = false
 L = {} -- User libraries
-if not P.S then P.S = {} end
+if not P.S then P.S = {} end -- Persistant storage
 
 S.lualibsRoot = _s_lualibs_root.."stdlib/"
 L.lualibsRoot = _s_lualibs_root.."custom/"

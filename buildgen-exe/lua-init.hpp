@@ -33,7 +33,6 @@ class BuildGenLuaEnv
 	char *root_file;
 
 	char *corefile;
-	char *libroot;
 
 	void init(void);
 	void init_lua(void);

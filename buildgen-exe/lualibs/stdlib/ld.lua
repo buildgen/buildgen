@@ -30,7 +30,7 @@ local function setup () -- So that we can hide our locals.
 local state = {}
 function S.ld.newState ( )
 	data = {
-		arguments = List(),
+		arguments = T.List(),
 	}
 
 	return data
@@ -64,7 +64,7 @@ if not P.S.ld.linker then
 			}
 		},
 	}
-	List(linkers) -- turn tabe into a penlight 'list'
+	T.List(linkers) -- turn tabe into a penlight 'list'
 
 	local linker;
 	for l in iter(linkers) do            -- Find the first linker they have
@@ -96,7 +96,7 @@ function S.ld.addLib ( lib )
 		lib = {tostring(lib)}
 	end
 
-	local args = List()
+	local args = T.List()
 	for k, v in pairs(lib) do
 		for l, w in pairs(P.S.ld.linker.flags.lib) do
 			args:append(w:format(v))
@@ -108,7 +108,7 @@ end
 function S.ld.link ( out, objects )
 	linker = P.S.ld.linker
 
-	local cmd = List()
+	local cmd = T.List()
 	cmd:append(linker.name)
 
 	if type(linker.flags.link) == "table" then
@@ -118,7 +118,7 @@ function S.ld.link ( out, objects )
 	end
 
 	for i in iter(linker.flags.out) do -- Add the desired output file to
-		cmd:append(i:format(out))     -- the command line.
+		cmd:append(i:format(out))      -- the command line.
 	end
 
 	cmd:extend(state.arguments)
