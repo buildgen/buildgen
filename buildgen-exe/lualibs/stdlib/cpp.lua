@@ -168,7 +168,7 @@ S.cpp.addLib "stdc++"
 
 function S.cpp.define ( map )
 	if type(map) ~= "table" then
-		dir = {tostring(map)}
+		map = {tostring(map)}
 	end
 
 	for k, v in pairs(map) do
