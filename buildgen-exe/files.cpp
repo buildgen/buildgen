@@ -292,14 +292,14 @@ char *Files::prettyPath ( char *path )
 		}
 		else if ( i[1] == '.' )
 		{
-			if ( i[1] == '/' || i[1] == '\0' ) // . current directory
+			if ( i[2] == '/' || i[2] == '\0' ) // . current directory
 			{ /* /dir/./file */
 			  /*     ^^^     */
 				i += 2; // skip it, it doesn't tell us anything
 			}
 			else if ( i[2] == '.' && ( i[3] == '/' || i[3] == '\0' ) ) // .. go up
 			{ /* /dir/otherdir/../file */
-			/*                ^^^^     */
+			  /*              ^^^^     */
 				i += 3;
 				o--;
 				while ( o > path && *o != '/' )
@@ -318,5 +318,6 @@ char *Files::prettyPath ( char *path )
 		}
 	}
 	*o = '\0';
+
 	return path;
 }

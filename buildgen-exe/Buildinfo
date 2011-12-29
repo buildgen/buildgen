@@ -58,8 +58,6 @@ S.cpp.compile("@gen", {
 
 	"<buildgen-xml/common.cpp",
 	"<buildgen-xml/common.hpp",
-	"<buildgen-xml/load.cpp",
-	"<buildgen-xml/load.hpp",
 	"<buildgen-xml/save.cpp",
 	"<buildgen-xml/save.hpp",
 	"<buildgen-xml/target.cpp",

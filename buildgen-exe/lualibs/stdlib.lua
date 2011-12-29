@@ -29,6 +29,7 @@ S = {} -- Std libraries
 S.imported = false
 L = {} -- User libraries
 if not P.S then P.S = {} end -- Persistant storage
+if not P.L then P.L = {} end --
 
 S.lualibsRoot = _s_lualibs_root.."stdlib/"
 L.lualibsRoot = _s_lualibs_root.."custom/"
@@ -45,18 +46,23 @@ function S.import ( name )
 	end
 end
 
-function L.import ( path )
-	local name = path:reverse():find("/", 1, true)
-	if i then
-		name = name:sub(-i+1)
+function L.import ( name )
+	local global = false
+	local lname
+
+	if name:sub(-4) == ".lua" then
+		global = false
+		lname = name:sub(name:rfind("/"), -3)
+	else
+		global = true
+		lname = name
 	end
 
-	if not L[name]
-	then
-		if path:find(".") then
-			dofile(C.path(path))
-		else
+	if not L[lname]	then
+		if global then
 			dofile(L.lualibsRoot..name..".lua")
+		else
+			dofile(C.path(name))
 		end
 	end
 end
