@@ -22,22 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <stdlib.h>
-#include <sysexits.h>
-#include <set>
-#include <ext/slist>
+char *mstrdup ( const char *s );
+char *myalloc ( size_t chars );
 
-#include "messages.hpp"
-#include "files.hpp"
-#include "buildgen-xml/target.hpp"
-
-Files *files;
-
-void checkAlloc ( void *p )
-{
-	if (!p)
-	{
-		msg::error("Error could not allocate memory");
-		exit(EX_OSERR);
-	}
-}
+char *mstrcat ( const char *s1, const char *s2 );
+char *mstrcat ( const char *s1, const char *s2, const char *s3 );

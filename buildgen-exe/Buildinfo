@@ -52,6 +52,8 @@ S.cpp.compile("@gen", {
 	"main.cpp",
 	"messages.hpp",
 	"messages.cpp",
+	"mystring.hpp",
+	"mystring.cpp",
 
 	"@info.h",
 	"@info.cpp",

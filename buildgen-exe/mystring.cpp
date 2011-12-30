@@ -22,22 +22,52 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <stdlib.h>
-#include <sysexits.h>
-#include <set>
-#include <ext/slist>
+#include <string.h>
 
+#include "globals.hpp"
 #include "messages.hpp"
-#include "files.hpp"
-#include "buildgen-xml/target.hpp"
 
-Files *files;
-
-void checkAlloc ( void *p )
+char *mstrdup ( const char *s )
 {
-	if (!p)
-	{
-		msg::error("Error could not allocate memory");
-		exit(EX_OSERR);
-	}
+	char *r = strdup(s);
+	checkAlloc(r);
+	return r;
+}
+
+char *myalloc ( size_t chars )
+{
+	void *r = malloc(chars*sizeof(char));
+	checkAlloc(r);
+	return (char*)r;
+}
+
+char *mstrcat ( const char *s1, const char *s2 )
+{
+	size_t l1 = strlen(s1);
+	size_t l2 = strlen(s2);
+
+	char *r = myalloc(l1+l2+1);
+
+	strcpy(r, s1);
+	strcpy(r+l1, s2);
+
+	return r;
+}
+
+char *mstrcat ( const char *s1, const char *s2, const char *s3 )
+{
+	size_t l1 = strlen(s1);
+	size_t l2 = strlen(s2);
+	size_t l3 = strlen(s3);
+
+	char *r = myalloc(l1+l2+l3+1);
+
+	char *e1 = r+l1;
+	char *e2 = e1+l2;
+
+	strcpy(r, s1);
+	strcpy(e1, s2);
+	strcpy(e2, s2);
+
+	return r;
 }

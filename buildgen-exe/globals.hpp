@@ -29,5 +29,6 @@
 #include "buildgen-xml/target.hpp"
 
 extern Files *files;
+void checkAlloc ( void *p );
 
 #endif

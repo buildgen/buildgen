@@ -280,6 +280,7 @@ char *Files::normalizeFilename( const char *path )
 
 char *Files::prettyPath ( char *path )
 {
+	assert( path != NULL );
 	char *i, *o;
 	i = o = path;
 

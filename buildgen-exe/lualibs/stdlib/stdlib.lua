@@ -81,20 +81,6 @@ if not S.prefix then
 	S.prefix = D.prefix
 end
 
-local shutdownFunctions = {}
-function S._doShutdownFunctions ( )
-	for k,v in pairs(shutdownFunctions) do v() end
-
-	shutdownFunctions = {}
-end
-
-function S.registerShutdown ( func )
-	assert(type(func) == "function", "S.registerShutdown expects a function.")
-	print "S.shutdown is depreciated."
-
-	shutdownFunctions[#shutdownFunctions+1] = func
-end
-
 function S.addToDefault ( path )
 	C.addDependancy("all", path, { magic = true })
 end

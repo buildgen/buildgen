@@ -25,20 +25,24 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <assert.h>
 #include <sysexits.h> // BSD recomended exit stati
 #include <libgen.h>
 
+#include "info.h"
+#include "globals.hpp"
 #include "messages.hpp"
+
+#include "mystring.hpp"
 
 #include "lua-init.hpp"
 #include "lua-functions.hpp"
 
-#include "info.h"
-#include "globals.hpp"
-
 BuildGenLuaEnv::BuildGenLuaEnv ( const char *root ):
 	root_file(NULL)
 {
+	assert( root != NULL );
+
 	root_file = strdup(root);
 
 	init();
@@ -46,15 +50,16 @@ BuildGenLuaEnv::BuildGenLuaEnv ( const char *root ):
 
 BuildGenLuaEnv::~BuildGenLuaEnv ( )
 {
+	assert(L);
+
 	lua_close(L);
+	L = NULL;
 }
 
 void BuildGenLuaEnv::init ( void )
 {
 	const char *cf = "core.lua";
-	corefile = (char*)malloc((strlen(files->lualibs_root)+strlen(cf)+1)*sizeof(char));
-	strcpy(corefile, files->lualibs_root);
-	strcat(corefile, cf);
+	corefile = mstrcat(files->lualibs_root, cf);
 
 	init_lua();
 	dmakeify_lua();
@@ -63,6 +68,11 @@ void BuildGenLuaEnv::init ( void )
 void BuildGenLuaEnv::init_lua ( void )
 {
 	L = lua_open();
+	if (!L)
+	{
+		msg::error("Could not create lua state.");
+		exit(EX_SOFTWARE);
+	}
 	luaL_openlibs(L);
 
 	lua_newtable(L);
@@ -101,6 +111,7 @@ void BuildGenLuaEnv::define( char *key, char *value )
 void BuildGenLuaEnv::doRunFile ( const char *path )
 {
 	char *d = strdup(path);
+	checkAlloc(d);
 	chdir(dirname(d));
 	free(d);
 
