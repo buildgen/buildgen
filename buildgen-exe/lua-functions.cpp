@@ -75,8 +75,8 @@ int add_depandancy (lua_State *L)
 	char *dep = NULL;
 	if (!(magic & 0x01)) targ = files->normalizeFilename(lua_tostring(L, 1));
 	else                 targ = mstrdup(lua_tostring(L, 1));
-	if (!(magic & 0x02)) dep = files->normalizeFilename(lua_tostring(L, 2));
-	else                 dep = mstrdup(lua_tostring(L, 2));
+	if (!(magic & 0x02)) dep  = files->normalizeFilename(lua_tostring(L, 2));
+	else                 dep  = mstrdup(lua_tostring(L, 2));
 
 	Target *t = Target::newTarget(targ);
 	Target *d = Target::newTarget(dep);
