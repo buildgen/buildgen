@@ -29,7 +29,7 @@ S.import "ld"
 
 if not P.S.c then P.S.c = {} end
 
-local function setup () -- So that we can hide our locals.
+do -- So that we can hide our locals.
 local state = {}
 
 function S.c.newState ( )
@@ -176,9 +176,6 @@ function S.c.compile ( out, sources )
 
 	out = C.path(out)
 
-	local length = #state.arguments
-	local toLink = T.List()
-
 	local h, s = T.List(), T.List()
 	for source in iter(sources) do
 		if source:match("[Hh]") then
@@ -188,21 +185,24 @@ function S.c.compile ( out, sources )
 		end
 	end
 
-	local oldarguments = T.List(state.arguments)
-	state.arguments:insert(1, compiler.name)
+	local oldarguments = state.arguments
+	state.arguments = T.List()
 
-	S.cpp.addArg(compiler.flags.compile)
+	S.c.addArg(compiler.name)
+	S.c.addArg(compiler.flags.compile)
 
-	if S.cpp.debug then                     -- Add the debug flag.
-		S.cpp.addArg(compiler.flags.debug)
+	S.c.addArg(oldarguments)
+
+	if S.c.debug then                     -- Add the debug flag.
+		S.c.addArg(compiler.flags.debug)
 	end
-	if S.cpp.profile then                    -- Add the profile flag.
-		S.cpp.addArg(compiler.flags.profile)
+	if S.c.profile then                    -- Add the profile flag.
+		S.c.addArg(compiler.flags.profile)
 	end
-	local o = compiler.flags.optimize[S.cpp.optimization] -- Set the optimization
+	local o = compiler.flags.optimize[S.c.optimization] -- Set the optimization
 	if o then                                             -- level.                                --
-		S.cpp.addArg(o)                                   --
-	end                                                   --
+		S.c.addArg(o)                                   --
+	end
 
 	local length = #state.arguments
 	local toLink = T.List()
@@ -220,7 +220,11 @@ function S.c.compile ( out, sources )
 		else
 			object = C.path("@"..source:sub(#projectRoot)..".o") -- Put inside
 			                                                     -- the build
-		end                                                      -- dir.
+		end
+
+		for i in iter(compiler.flags.output) do -- Add the desired output file to
+			S.c.addArg(i:format(object))      -- the command line.
+		end                                               -- dir.
 
 		S.c.addArg(source)
 
@@ -263,5 +267,3 @@ function S.c.generateHeader ( head, src, definitions )
 end
 
 end
-setup()
-setup=nil
