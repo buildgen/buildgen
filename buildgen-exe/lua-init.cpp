@@ -130,6 +130,5 @@ void BuildGenLuaEnv::runFile ( const char *path )
 
 	doRunFile(path);
 
-	LuaFunctions::S::call_shutdown(L);
 	//LuaFunctions::clean_up(L);
 }

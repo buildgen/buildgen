@@ -28,7 +28,7 @@ if not P.S.cpp then P.S.cpp = {} end
 
 S.import "ld"
 
-local function setup () -- So that we can hide our locals.
+do -- So that we can hide our locals.
 local state = {}
 
 function S.cpp.newState ( )
@@ -45,6 +45,12 @@ function S.cpp.newState ( )
 
 	data.profile = false
 	if D.debug then data.profile = true end
+
+	local s = S.cpp.swapState(data)
+
+	S.cpp.addLib "stdc++"
+
+	S.cpp.loadState(s)
 
 	return data
 end
@@ -73,8 +79,6 @@ function S.cpp.loadState ( data )
 	S.cpp.profile      = data.profile
 end
 
-S.cpp.swapState(S.cpp.newState())
-
 if not P.S.cpp.compiler then
 	local compilers = {
 		{	name = "g++", -- Name of the executable
@@ -83,7 +87,7 @@ if not P.S.cpp.compiler then
 				output   = {"-o", "%s"}, -- the option to set the output file name.
 				debug    = "-g",         -- the option to enable debug mode.
 				profile  = "-p",         -- the option to enable profiling.
-				define   = {"-D%s"},     -- the option to link a library.
+				define   = {"-D%s=%s"},  -- the option to define a macro.
 				include  = {"-I", "%s"}, -- the option to add an include directory.
 				optimize = {             -- Flags for different levels of optimization.
 					none    = {},
@@ -145,13 +149,11 @@ function S.cpp.define ( map )
 	end
 
 	for k, v in pairs(map) do
-		if type(value) ~= "string" then
-			value = ""
-		else
-			value = "="..value
+		if type(v) ~= "string" then
+			v = ""
 		end
 		for l, w in pairs(P.S.cpp.compiler.flags.define) do
-			S.cpp.addArg(w:format(v))
+			S.cpp.addArg(w:format(k, v))
 		end
 	end
 end
@@ -162,23 +164,6 @@ function S.cpp.addLib ( lib )
 	S.ld.addLib(lib)
 
 	state.linker = S.ld.swapState(ln)
-end
-S.cpp.addLib "stdc++"
-
-
-function S.cpp.define ( map )
-	if type(map) ~= "table" then
-		map = {tostring(map)}
-	end
-
-	for k, v in pairs(map) do
-		if type(v) ~= "string" then
-			v = ""
-		else
-			v = "="..v
-		end
-		S.cpp.addArg("-D"..k..v)
-	end
 end
 
 function S.cpp.compile ( out, sources )
@@ -258,6 +243,6 @@ function S.cpp.compile ( out, sources )
 	state.linker = S.ld.swapState(ln) -- Put their linker back.
 end
 
+S.cpp.swapState(S.cpp.newState())
+
 end
-setup()
-setup=nil

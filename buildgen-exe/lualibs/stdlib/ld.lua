@@ -26,7 +26,7 @@
 S.ld = {}
 if not P.S.ld then P.S.ld = {} end
 
-local function setup () -- So that we can hide our locals.
+do -- So that we can hide our locals.
 local state = {}
 function S.ld.newState ( )
 	data = {
@@ -130,5 +130,3 @@ function S.ld.link ( out, objects )
 end
 
 end
-setup()
-setup=nil

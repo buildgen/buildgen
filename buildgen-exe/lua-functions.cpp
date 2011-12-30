@@ -224,24 +224,4 @@ int path (lua_State *L)
 }
 
 } // End of d
-namespace S
-{
-void call_shutdown ( lua_State *L )
-{
-	lua_getglobal(L, "S");
-	lua_pushstring(L, "_doShutdownFunctions");
-	lua_gettable(L, -2);
-	if (!lua_isfunction(L, -1))
-		return;
-
-	if (lua_pcall(L, 0, 0, 0)) // Errors
-	{
-		msg::error("%s", lua_tostring(L, -1));
-		lua_pop(L, 1); // remove error message
-		exit(EX_DATAERR);
-	}
-
-	lua_settop(L, 0);
-}
-} // End of S
 } // End of LuaFunctions
