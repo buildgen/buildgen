@@ -31,10 +31,14 @@
 #include <math.h> // BSD recomended exit stati
 #include <errno.h>
 
+#include "info.h"
+#include "globals.hpp"
+
+#include "mystring.hpp"
+
 #include "messages.hpp"
 #include "files.hpp"
 #include "buildgen-xml/target.hpp"
-#include "info.h"
 
 Files::Files ( char *srcdir, char *buildgen_root ):
 	project_root(NULL),
@@ -68,9 +72,7 @@ void Files::init ( char *srcdir, char *buildgenroot )
 	unsigned int bgl = strlen(buildgen_root);
 	unsigned int llrl = strlen(LUALIBS_ROOT);
 
-	lualibs_root = (char*)malloc((bgl+llrl+1)*sizeof(char));
-	strcpy(lualibs_root, buildgen_root);
-	strcpy(lualibs_root+bgl, LUALIBS_ROOT);
+	lualibs_root = mstrcat(buildgen_root, LUALIBS_ROOT);
 
 	DIR *d = opendir(srcdir);
 	if ( d == NULL )
@@ -179,30 +181,22 @@ char *Files::normalizeFilename( const char *path )
 	switch (path[0])
 	{
 	case '<': // Input
-		{
-			char *n = (char*)malloc((strlen(project_root)+strlen(path))*sizeof(char));
-			strcpy(n, project_root);
-			strcat(n, path+1);
-			return prettyPath(n);
-		}
+			return prettyPath(mstrcat(project_root, path+1));
 	case '>': // Output
 		{
-			char *n = (char*)malloc((strlen(out_root)+strlen(path))*sizeof(char));
-			strcpy(n, out_root);
-			strcat(n, path+1);
-			return prettyPath(n);
+			return prettyPath(mstrcat(out_root, path+1));
 		}
 	case '@': // Auto path
 		{
-			char *p = strdup(path);
+			char *p = mstrdup(path);
 			p[0] = '!';
 			char *b = normalizeFilename(p);
 			free(p);
-			char *n = (char*)malloc((strlen(b)
-							   - strlen(project_root)
-							   + strlen(out_root)
-							   + 1
-							  )*sizeof(char));
+			char *n = myalloc(  strlen(b)
+			                  - strlen(project_root)
+			                  + strlen(out_root)
+			                  + 1
+			                 );
 			strcpy(n, out_root);
 			strcat(n, b+strlen(project_root)); // -1 is to include the slash.
 
@@ -216,7 +210,7 @@ char *Files::normalizeFilename( const char *path )
 
 			DIR *cwd  = opendir(".");
 
-			char *pathdir = strdup(getenv("PATH"));
+			char *pathdir = mstrdup(getenv("PATH"));
 			char *nt = pathdir; // NULL-terminator
 			bool moredirs = true;
 
@@ -238,13 +232,11 @@ char *Files::normalizeFilename( const char *path )
 				{
 					unsigned int dlen = strlen(pathdir);
 					unsigned int flen = strlen(exename);
-					char *n = (char*)malloc((dlen+flen+2)*sizeof(char));
-					strcpy(n, pathdir);
-					n[dlen] = '/';
-					strcpy(n+dlen+1, exename);
+					char *n = mstrcat(pathdir, '/', exename);
 
 					fchdir(dirfd(cwd));
 					closedir(cwd);
+
 					return prettyPath(n);
 				}
 			}

@@ -30,6 +30,9 @@
 #include <lua.hpp>
 
 #include "globals.hpp"
+#include "messages.hpp"
+#include "mystring.hpp"
+
 #include "commandline.hpp"
 #include "buildgen-xml/target.hpp"
 #include "lua-init.hpp"
@@ -42,11 +45,7 @@ char *findOurPath ( char *a ) // Turn argv[0] into a BuildGen path
 		if ( *b == '/' ) // Relitive or absolute.
 			return a;
 
-	char *b = (char*)malloc((strlen(a)+2)*sizeof(char));
-	b[0] = '*'; // System path
-	strcpy(b+1, a);
-
-	return b;
+	return mstrcat('*', a); // System path
 }
 
 int main ( int argc, char **argv )

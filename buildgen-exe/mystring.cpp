@@ -54,6 +54,18 @@ char *mstrcat ( const char *s1, const char *s2 )
 	return r;
 }
 
+char *mstrcat ( char c, const char *s2 )
+{
+	size_t l2 = strlen(s2);
+
+	char *r = myalloc(l2+2);
+
+	*r = c;
+	strcpy(r+1, s2);
+
+	return r;
+}
+
 char *mstrcat ( const char *s1, const char *s2, const char *s3 )
 {
 	size_t l1 = strlen(s1);
@@ -67,7 +79,41 @@ char *mstrcat ( const char *s1, const char *s2, const char *s3 )
 
 	strcpy(r, s1);
 	strcpy(e1, s2);
+	strcpy(e2, s3);
+
+	return r;
+}
+
+char *mstrcat ( const char *s1, char c, const char *s3 )
+{
+	size_t l1 = strlen(s1);
+	size_t l3 = strlen(s3);
+
+	char *r = myalloc(l1+l3+2);
+
+	char *e1 = r+l1;
+	char *e2 = e1+1;
+
+	strcpy(r, s1);
+	*e1 = c;
+	strcpy(e2, s3);
+
+	return r;
+}
+
+char *mstrcat ( char c,const char *s2,  const char *s3 )
+{
+	size_t l2 = strlen(s2);
+	size_t l3 = strlen(s3);
+
+	char *r = myalloc(l2+l3+2);
+
+	char *e2 = r+1;
+	char *e3 = e2+l2;
+
+	*r = c;
 	strcpy(e2, s2);
+	strcpy(e3, s3);
 
 	return r;
 }
