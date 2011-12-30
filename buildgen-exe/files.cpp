@@ -65,7 +65,7 @@ void Files::init ( char *srcdir, char *buildgenroot )
 	while ( br[ls] != '/' ) ls--;
 	br[ls+1] = '\0';
 
-	buildgen_root = strdup(br);
+	buildgen_root = mstrdup(br);
 
 	free(br);
 
@@ -206,7 +206,7 @@ char *Files::normalizeFilename( const char *path )
 		}
 	case '*': // System path
 		{
-			path = strdup(path);
+			path = mstrdup(path);
 
 			DIR *cwd  = opendir(".");
 
@@ -248,7 +248,7 @@ char *Files::normalizeFilename( const char *path )
 		msg::error("System path \"%s\" not found.", path);
 		exit(EX_DATAERR);
 	case '/': // Already absolute
-		return prettyPath(strdup(path));
+		return prettyPath(mstrdup(path));
 	}
 
 	// Regular relative path

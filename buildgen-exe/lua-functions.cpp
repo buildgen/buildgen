@@ -34,11 +34,13 @@
 #include <math.h>
 
 #include "messages.hpp"
-#include "lua-functions.hpp"
+#include "info.h"
 #include "globals.hpp"
+#include "mystring.hpp"
+
+#include "lua-functions.hpp"
 #include "buildgen-xml/target.hpp"
 #include "lua-init.hpp"
-#include "info.h"
 
 namespace LuaFunctions
 {
@@ -72,9 +74,9 @@ int add_depandancy (lua_State *L)
 	char *targ = NULL;
 	char *dep = NULL;
 	if (!(magic & 0x01)) targ = files->normalizeFilename(lua_tostring(L, 1));
-	else                 targ = strdup(lua_tostring(L, 1));
+	else                 targ = mstrdup(lua_tostring(L, 1));
 	if (!(magic & 0x02)) dep = files->normalizeFilename(lua_tostring(L, 2));
-	else                 dep = strdup(lua_tostring(L, 2));
+	else                 dep = mstrdup(lua_tostring(L, 2));
 
 	Target *t = Target::newTarget(targ);
 	Target *d = Target::newTarget(dep);

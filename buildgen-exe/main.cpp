@@ -52,7 +52,7 @@ int main ( int argc, char **argv )
 {
 	std::vector<char*> cmd(argc);  // Grab command line before we mess with it.
 	for (int i = argc; --i; )      // Note that 0 doesn't get hit
-		cmd[i] = strdup(argv[i]);  // Or else getopt changes them.
+		cmd[i] = mstrdup(argv[i]);  // Or else getopt changes them.
 	cmd[0] = findOurPath(argv[0]); // We will process this after files is init'ed.
 
 	opt::get_options(&argc, &argv);

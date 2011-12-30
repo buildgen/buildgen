@@ -43,7 +43,7 @@ BuildGenLuaEnv::BuildGenLuaEnv ( const char *root ):
 {
 	assert( root != NULL );
 
-	root_file = strdup(root);
+	root_file = mstrdup(root);
 
 	init();
 }
@@ -110,16 +110,14 @@ void BuildGenLuaEnv::define( char *key, char *value )
 
 void BuildGenLuaEnv::doRunFile ( const char *path )
 {
-	char *d = strdup(path);
-	checkAlloc(d);
+	char *d = mstrdup(path);
 	chdir(dirname(d));
 	free(d);
 
 	int s = luaL_loadfile(L, (char*)path);
 	if ( s == 0 )
-	{
-		// execute Lua program
-		s = lua_pcall(L, 0, LUA_MULTRET, 0);
+    {
+		s = lua_pcall(L, 0, LUA_MULTRET, 0); // execute Lua program
 	}
 
 	if (s) // Errors
