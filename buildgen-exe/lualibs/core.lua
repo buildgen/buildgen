@@ -22,10 +22,6 @@
 [                                                                              ]
 [-----------------------------------------------------------------------------]]
 
---- The Core namespace.
---[[[
-	This is where the core build related functions go.
-]]
 C = {}
 
 --- Add A Generator
@@ -103,9 +99,6 @@ C.path = _c_path
 -- @param path The key of the defined value.
 -- @param default The value to be put if the value is not defined.  Defaults to
 -- nil.
---
--- @class function
--- @name D.resolvePath
 function D.resolvePath ( path , default )
 	if not D[path] then
 		D[path] = default
@@ -118,7 +111,4 @@ function D.resolvePath ( path , default )
 	end
 end
 
--- End of D
-
-if not P then P = {} end
 dofile(_s_lualibs_root.."stdlib.lua")

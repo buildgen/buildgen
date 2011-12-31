@@ -25,15 +25,33 @@
 
 --- The Standard library namespace.
 
-S = {} -- Std libraries
+S = {} -- Standard libraries
 S.imported = false
 L = {} -- User libraries
-if not P.S then P.S = {} end -- Persistant storage
+
+if not P then P = {} end     -- Persistant storage
+if not P.S then P.S = {} end --
 if not P.L then P.L = {} end --
 
+--- The Standard Library Root.
+--
+-- This is the root directory of the standard library files.  This is mostly for
+-- internal use.  This is an absolute path.
 S.lualibsRoot = _s_lualibs_root.."stdlib/"
+
+--- The Custom Library Root.
+--
+-- This is the root directory of the custom library files.  This is mostly for
+-- internal use and for installing custom libraries.  This is an absolute path.
 L.lualibsRoot = _s_lualibs_root.."custom/"
 
+--- Load a Standard Library
+--
+-- Loads the library <span class="code">name</span>.  The library will become
+-- available in <span class="code">S[name]</span>.  There is no harm in trying
+-- to load a library more than once.
+--
+-- @param name The name of the library to load.
 function S.import ( name )
 	if not S.imported
 	then
@@ -46,6 +64,16 @@ function S.import ( name )
 	end
 end
 
+--- Load a Custom Library
+--
+-- Loads the library <span class="code">name</span>.  There is no harm in trying
+-- to load a library more than once.
+--
+-- If <span class="code">name</span> ends in <span class="code">.lua</span> it
+-- will be treated as a BuildGen path, else it will be loaded form the system
+-- library directory.
+--
+-- @param name The name of the library to load.
 function L.import ( name )
 	local global = false
 	local lname

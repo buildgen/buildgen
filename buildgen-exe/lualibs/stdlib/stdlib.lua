@@ -22,8 +22,6 @@
 [                                                                              ]
 [-----------------------------------------------------------------------------]]
 
-
---- The Standard library namespace.
 S.imported = true
 
 --- Import Penlight
@@ -68,7 +66,7 @@ T.utils = require "pl.utils"
 
 T.stringx.import()
 
---S.version = _s_version
+--- OS
 S.os = _s_os
 
 if not S.prefix then
@@ -81,10 +79,22 @@ if not S.prefix then
 	S.prefix = D.prefix
 end
 
+--- Add a Terget to the Default Build
+--
+-- Adds <span class="code">path</span> to the default buid.  This means that if
+-- the builder doesn't specify what they want build this will be built.
+--
+-- @param path The path of the target.
 function S.addToDefault ( path )
 	C.addDependancy("all", path, { magic = true })
 end
 
+--- Find the path to an executable.
+--
+-- Look for the program in the location(s) appropriate to the system.  For
+-- example in UNIX-style os's it will search your path.
+--
+-- @param name The path of the executable.
 function S.findExecutable ( name )
 	if name:find("/", 1, true) == 1 then
 		if T.path.isfile(name) then
@@ -104,6 +114,19 @@ function S.findExecutable ( name )
 	return false
 end
 
+--- Add a Target to the Install Target
+--
+-- Installs <span class="code">path</span>.  If <span class="code">path</span>
+-- is a directory it will be installed recursivly.  Please note that the
+-- directory will be installed, not it's contents.  Example:
+-- <span class="code">S.install("foo/", "bar/")</span> will result in
+-- <span class="code">bar/foo/</span> not <span class="code">bar/{foo_contents}
+-- </span>.
+--
+-- @param path The path of the target.
+-- @param to Where to install the file.  This is treated as relative to the
+--	install prefix (S.prefix) unless it is prefixed by a ‘/’ in which case it
+--	is treated as an absolute path.
 function S.install ( path, to )
 	S.import "util"
 	if string.find(to, "/", 1, true) ~= 1 then
@@ -136,10 +159,12 @@ function S.install ( path, to )
     end
 end
 
-local function setup ( )
-
-	--- Populate S.path ---
-	S.path = {} -- Will hold folders in the operating systems path.
+do
+	--- The system's path
+	-- A list of directorys in the systems executable search path.  Please note
+	-- that the order is significant and the directories should be searched from
+	-- first to last.
+	S.path = T.List()
 
 	local ospath = os.getenv("PATH")
 	local seperator = ""
@@ -154,6 +179,4 @@ local function setup ( )
 		S.path = ospath:split(seperator)
 	end
 end
-setup()
-setup = nil
 
