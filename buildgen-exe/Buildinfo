@@ -36,6 +36,7 @@ S.c.generateHeader("@info.h", "@info.cpp", {
 S.cpp.addInclude "@"
 
 S.cpp.addLib{"m", "lua"}
+
 S.cpp.addInclude "<"
 
 S.cpp.compile("@gen", {

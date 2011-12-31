@@ -191,10 +191,10 @@ end
 --	paths.
 function S.cpp.addInclude ( dir )
 	if type(dir) ~= "table" then
-		dir = {tostring(dir)}
+		dir = T.List{tostring(dir)}
 	end
 
-	for k, v in pairs(dir) do
+	for v in iter(dir) do
 		v = C.path(v)
 		for l, w in pairs(P.S.cpp.compiler.flags.include) do
 			S.cpp.addArg(w:format(v))
@@ -243,6 +243,7 @@ function S.cpp.compileObject ( obj, src, headers )
 	obj = C.path(obj)
 	src = C.path(src)
 	headers = T.List(headers):map(C.path)
+	headers:append(src)
 
 	local compiler = P.S.cpp.compiler
 
@@ -261,12 +262,12 @@ function S.cpp.compileObject ( obj, src, headers )
 		S.cpp.addArg(compiler.flags.profile)
 	end
 	local o = compiler.flags.optimize[S.cpp.optimization] -- Set the optimization
-	if o then                                             -- level.                                --
+	if o then                                             -- level.
 		S.cpp.addArg(o)                                   --
 	end                                                   --
 
 	for i in iter(compiler.flags.output) do -- Add the desired output file to
-		S.cpp.addArg(i:format(obj))      -- the command line.
+		S.cpp.addArg(i:format(obj))        -- the command line.
 	end                                     --
 
 	S.cpp.addArg(src)
@@ -325,7 +326,6 @@ function S.cpp.compile ( out, sources )
 
 	S.ld.link(out, objects)
 
-	state.arguments = oldarguments;
 	state.linker = S.ld.swapState(ln) -- Put their linker back.
 end
 

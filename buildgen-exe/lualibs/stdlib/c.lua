@@ -181,7 +181,7 @@ function S.c.addArg ( args )
 		args = T.List(args)
 	end
 
-	for a in args do state.arguments:append(a) end
+	for a in iter(args) do state.arguments:append(a) end
 end
 
 --- Add an include directory
@@ -287,15 +287,13 @@ end
 -- @param sources A list of sources (bot header and source files) that will be
 --	used when compiling the executable.
 function S.c.compile ( out, sources )
-	local ln = S.ld.swapState(state.linker) -- Use our linker.
+	out = C.path(out)
+	sources = T.List(sources):map(C.path)
 
-	sources = T.List(sources)
-	local compiler = P.S.c.compiler
+	local ln = S.ld.swapState(state.linker) -- Use our linker
 
 	local projectRoot = C.path("<") -- Cache this.
 	local outRoot     = C.path(">") --
-
-	out = C.path(out)
 
 	local h, s = T.List(), T.List()
 	for source in iter(sources) do
@@ -306,33 +304,12 @@ function S.c.compile ( out, sources )
 		end
 	end
 
-	local oldarguments = state.arguments
-	state.arguments = T.List()
+	local objects = T.List()
 
-	S.c.addArg(compiler.name)
-	S.c.addArg(compiler.flags.compile)
-
-	S.c.addArg(oldarguments)
-
-	if S.c.debug then                     -- Add the debug flag.
-		S.c.addArg(compiler.flags.debug)
-	end
-	if S.c.profile then                    -- Add the profile flag.
-		S.c.addArg(compiler.flags.profile)
-	end
-	local o = compiler.flags.optimize[S.c.optimization] -- Set the optimization
-	if o then                                             -- level.                                --
-		S.c.addArg(o)                                   --
-	end
-
-	local length = #state.arguments
-	local toLink = T.List()
-
-	for source in iter(sources) do
+	for source in iter(s) do
 		source = C.path(source)
 
-		-- Get path to put object file.
-		local object = nil;
+		local object = nil; -- Get path to put object file.
 
 		if source:sub(0, #projectRoot) == projectRoot then
 			object = C.path(">"..source:sub(#projectRoot)..".o")
@@ -341,29 +318,16 @@ function S.c.compile ( out, sources )
 		else
 			object = C.path("@"..source:sub(#projectRoot)..".o") -- Put inside
 			                                                     -- the build
-		end
+		end                                                      -- dir.
 
-		for i in iter(compiler.flags.output) do -- Add the desired output file to
-			S.c.addArg(i:format(object))      -- the command line.
-		end                                               -- dir.
-
-		S.c.addArg(source)
-
-		h:append(source) -- Prepare the dependancies.
-
-		C.addGenerator({object}, h, state.arguments, {
-			description = "Compiling "..object
-		})
-		toLink:append(object)
-
-		state.arguments:chop(length) -- Remove the source from the command.
-		h:pop() -- Remove the source from the headers.
+		S.c.compileObject(object, source, h)
+		objects:append(object)
 	end
 
-	S.ld.link(out, toLink)
+	S.ld.link(out, objects)
 
 	state.arguments = oldarguments;
-	state.linker = S.ld.swapState(ln) -- Put thier linker back.
+	state.linker = S.ld.swapState(ln) -- Put their linker back.
 end
 
 --- Create a header file with definitions.
