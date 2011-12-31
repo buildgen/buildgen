@@ -31,6 +31,11 @@ S.import "ld"
 do -- So that we can hide our locals.
 local state = {}
 
+--- Create new cpp state
+-- Creates and returns an opaque state.  This state is a table and is therefore
+-- passed by refrence.
+--
+-- @return The newly created state.
 function S.cpp.newState ( )
 	local data = {
 		arguments = T.List(),
@@ -55,10 +60,20 @@ function S.cpp.newState ( )
 	return data
 end
 
+--- Stashes the current state.
+-- Returns the current state and loads a new state.  This is equivilent to
+-- S.cpp.swapState(S.cpp.newState()).
+--
+-- @return The old state.
 function S.cpp.stashState ( )
 	return S.cpp.swapState(S.cpp.newState())
 end
 
+--- Swap the state
+-- Swaps new with the current state.
+--
+-- @param new The new state to load.
+-- @return The old state.
 function S.cpp.swapState ( new )
 	local old = state
 
@@ -71,6 +86,10 @@ function S.cpp.swapState ( new )
 	return old
 end
 
+--- Load a state
+-- Loads the state data
+--
+-- @param data The state to load.
 function S.cpp.loadState ( data )
 	state = data
 
@@ -122,6 +141,42 @@ if not P.S.cpp.compiler then
 	end
 end
 
+--- The optimization level.
+--
+-- A string value representing the level of optimization to use when building
+-- the project. Possible values are:
+-- <ul><li>
+--		none - Perform no optimization.
+--</li><li>
+--		quick - Perform light optimization.
+--</li><li>
+--		regular - Perform regular optimization.
+--</li><li>
+--		full - Fully optimize the executable.
+--</li><li>
+--		max - Optimize as much as possible (possibly experimental optimizations).
+--</li></ul>
+S.cpp.optimization = S.cpp.optimization
+
+--- Whether to profile.
+--
+-- If true profiling code will be present in the resulting executable. This
+-- value defaults to true if D.debug is set otherwise false.
+S.cpp.profile = S.cpp.profile
+
+--- Whether to produce debugging symbols.
+-- If true debugging symbols will be produced in the resulting executable. This
+-- value defaults to true if D.debug is set otherwise false.
+S.cpp.debug = S.cpp.debug
+
+--- Add an argrment.
+-- Add an argument to the compiler command line.  Please try to avoid using this
+-- as it is not portable across compilers.  Please use the other functions that
+-- modify the command line (Such as S.coo.optimization and S.cpp.define()) as they
+-- are localized to the compiler being used.
+--
+-- @param args a string or list of strings to be added to the compiler command
+--	line.
 function S.cpp.addArg ( arg )
 	if type(arg) ~= "table" then
 		arg = {tostring(arg)}
@@ -130,6 +185,10 @@ function S.cpp.addArg ( arg )
 	for k, v in pairs(arg) do state.arguments:append(v) end
 end
 
+--- Add an include directory
+--
+-- @param dir an string or list of strings.  These will be treated as BuildGen
+--	paths.
 function S.cpp.addInclude ( dir )
 	if type(dir) ~= "table" then
 		dir = {tostring(dir)}
@@ -143,6 +202,10 @@ function S.cpp.addInclude ( dir )
 	end
 end
 
+--- Define a macro
+-- Define a macro during compliation.
+--
+-- @param map A table of key/value pairs to be defined during compilation.
 function S.cpp.define ( map )
 	if type(map) ~= "table" then
 		dir = {tostring(map)}
@@ -158,6 +221,11 @@ function S.cpp.define ( map )
 	end
 end
 
+--- Link a library.
+--
+-- This just calls S.ld.addLib() with the linker being used by S.c.
+--
+-- @param dir a string or list of strings as the name of the libraries.
 function S.cpp.addLib ( lib )
 	local ln = S.ld.swapState(state.linker)
 
@@ -166,6 +234,11 @@ function S.cpp.addLib ( lib )
 	state.linker = S.ld.swapState(ln)
 end
 
+--- Compile a source into an object.
+--
+-- @param obj The place to put the resulting object file.
+-- @prarm src The file to compile.
+-- @ headers A list of headers that are needed.
 function S.cpp.compileObject ( obj, src, headers )
 	obj = C.path(obj)
 	src = C.path(src)
@@ -205,6 +278,13 @@ function S.cpp.compileObject ( obj, src, headers )
 	state.arguments = oldarguments;
 end
 
+--- Compile an Executable
+-- Compiles and links a list of files into executables.
+--
+-- @param out The file to be created.  ".exe" will be appended if compiling on
+--	Windows.
+-- @param sources A list of sources (bot header and source files) that will be
+--	used when compiling the executable.
 function S.cpp.compile ( out, sources )
 	out = C.path(out)
 	sources = T.List(sources):map(C.path)

@@ -32,6 +32,11 @@ if not P.S.c then P.S.c = {} end
 do -- So that we can hide our locals.
 local state = {}
 
+--- Create new c state
+-- Creates and returns an opaque state.  This state is a table and is therefore
+-- passed by refrence.
+--
+-- @return The newly created state.
 function S.c.newState ( )
 	local data = {
 		arguments = T.List(),
@@ -50,10 +55,20 @@ function S.c.newState ( )
 	return data
 end
 
+--- Stashes the current state.
+-- Returns the current state and loads a new state.  This is equivilent to
+-- S.c.swapState(S.c.newState()).
+--
+-- @return The old state.
 function S.c.stashState ( )
 	return S.c.swapState(S.c.newState())
 end
 
+--- Swap the state
+-- Swaps new with the current state.
+--
+-- @param new The new state to load.
+-- @return The old state.
 function S.c.swapState ( new )
 	local old = state
 
@@ -66,6 +81,10 @@ function S.c.swapState ( new )
 	return old
 end
 
+--- Load a state
+-- Loads the state data
+--
+-- @param data The state to load.
 function S.c.loadState ( data )
 	state = data
 
@@ -119,14 +138,56 @@ if not P.S.c.compiler then
 	end
 end
 
-function S.c.addArg ( arg )
-	if type(arg) ~= "table" then
-		arg = {tostring(arg)}
+--- The optimization level.
+--
+-- A string value representing the level of optimization to use when building
+-- the project. Possible values are:
+-- <ul><li>
+--		none - Perform no optimization.
+--</li><li>
+--		quick - Perform light optimization.
+--</li><li>
+--		regular - Perform regular optimization.
+--</li><li>
+--		full - Fully optimize the executable.
+--</li><li>
+--		max - Optimize as much as possible (possibly experimental optimizations).
+--</li></ul>
+S.c.optimization = S.c.optimization
+
+--- Whether to profile.
+--
+-- If true profiling code will be present in the resulting executable. This
+-- value defaults to true if D.debug is set otherwise false.
+S.c.profile = S.c.profile
+
+--- Whether to produce debugging symbols.
+-- If true debugging symbols will be produced in the resulting executable. This
+-- value defaults to true if D.debug is set otherwise false.
+S.c.debug = S.c.debug
+
+--- Add an argrment.
+-- Add an argument to the compiler command line.  Please try to avoid using this
+-- as it is not portable across compilers.  Please use the other functions that
+-- modify the command line (Such as S.c.optimization and S.c.define()) as they
+-- are localized to the compiler being used.
+--
+-- @param args a string or list of strings to be added to the compiler command
+--	line.
+function S.c.addArg ( args )
+	if type(args) ~= "table" then
+		args = T.List{tostring(args)}
+	else
+		args = T.List(args)
 	end
 
-	for k, v in pairs(arg) do state.arguments:append(v) end
+	for a in args do state.arguments:append(a) end
 end
 
+--- Add an include directory
+--
+-- @param dir an string or list of strings.  These will be treated as BuildGen
+--	paths.
 function S.c.addInclude ( dir )
 	if type(dir) ~= "table" then
 		dir = {tostring(dir)}
@@ -140,6 +201,10 @@ function S.c.addInclude ( dir )
 	end
 end
 
+--- Define a macro
+-- Define a macro during compliation.
+--
+-- @param map A table of key/value pairs to be defined during compilation.
 function S.c.define ( map )
 	if type(map) ~= "table" then
 		dir = {tostring(map)}
@@ -157,6 +222,11 @@ function S.c.define ( map )
 	end
 end
 
+--- Link a library.
+--
+-- This just calls S.ld.addLib() with the linker being used by S.c.
+--
+-- @param dir a string or list of strings as the name of the libraries.
 function S.c.addLib ( lib )
 	local ln = S.ld.swapState(state.linker)
 
@@ -165,6 +235,13 @@ function S.c.addLib ( lib )
 	state.linker = S.ld.swapState(ln)
 end
 
+--- Compile an Executable
+-- Compiles and links a list of files into executables.
+--
+-- @param out The file to be created.  ".exe" will be appended if compiling on
+--	Windows.
+-- @param sources A list of sources (bot header and source files) that will be
+--	used when compiling the executable.
 function S.c.compile ( out, sources )
 	local ln = S.ld.swapState(state.linker) -- Use our linker.
 
@@ -245,6 +322,16 @@ function S.c.compile ( out, sources )
 	state.linker = S.ld.swapState(ln) -- Put thier linker back.
 end
 
+--- Create a header file with definitions.
+-- Creates a header/source pair with definitions. Currently all values are
+-- treated as strings with type  <span class="code">const char*</span>.
+--
+-- @param header Where to put the genereated header.  This is treated as a
+--	BuildGen path.
+-- @param header Where to put the genereated source file.  This is treated as a
+--	BuildGen path.
+-- @param An object consisting of key/value pairs where the key will be the
+--	variable name and the value will be the value.
 function S.c.generateHeader ( head, src, definitions )
 	local generatorScript = S.lualibsRoot .. "c/generateHeader.lua"
 
@@ -262,7 +349,7 @@ function S.c.generateHeader ( head, src, definitions )
 	end
 
 	C.addGenerator({head, src}, {}, cmd, {
-		description = "Generating '"..head.."'..."
+		description = "Generating "..head
 	})
 end
 
