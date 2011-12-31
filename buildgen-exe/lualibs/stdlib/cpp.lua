@@ -166,13 +166,50 @@ function S.cpp.addLib ( lib )
 	state.linker = S.ld.swapState(ln)
 end
 
-function S.cpp.compile ( out, sources )
-	local ln = S.ld.swapState(state.linker) -- Use our linker
+function S.cpp.compileObject ( obj, src, headers )
+	obj = C.path(obj)
+	src = C.path(src)
+	headers = T.List(headers):map(C.path)
 
-	sources = T.List(sources)
 	local compiler = P.S.cpp.compiler
 
+	local oldarguments = state.arguments
+	state.arguments = T.List()
+
+	S.cpp.addArg(compiler.name)
+	S.cpp.addArg(compiler.flags.compile)
+
+	S.cpp.addArg(oldarguments)
+
+	if S.cpp.debug then                      -- Add the debug flag.
+		S.cpp.addArg(compiler.flags.debug)
+	end
+	if S.cpp.profile then                    -- Add the profile flag.
+		S.cpp.addArg(compiler.flags.profile)
+	end
+	local o = compiler.flags.optimize[S.cpp.optimization] -- Set the optimization
+	if o then                                             -- level.                                --
+		S.cpp.addArg(o)                                   --
+	end                                                   --
+
+	for i in iter(compiler.flags.output) do -- Add the desired output file to
+		S.cpp.addArg(i:format(obj))      -- the command line.
+	end                                     --
+
+	S.cpp.addArg(src)
+
+	C.addGenerator({obj}, headers, state.arguments, {
+		description = "Compiling "..obj
+	})
+
+	state.arguments = oldarguments;
+end
+
+function S.cpp.compile ( out, sources )
 	out = C.path(out)
+	sources = T.List(sources):map(C.path)
+
+	local ln = S.ld.swapState(state.linker) -- Use our linker
 
 	local projectRoot = C.path("<") -- Cache this.
 	local outRoot     = C.path(">") --
@@ -186,31 +223,12 @@ function S.cpp.compile ( out, sources )
 		end
 	end
 
-	local oldarguments = T.List(state.arguments)
-	state.arguments:insert(1, compiler.name)
-
-	S.cpp.addArg(compiler.flags.compile)
-
-	if S.cpp.debug then                     -- Add the debug flag.
-		S.cpp.addArg(compiler.flags.debug)
-	end
-	if S.cpp.profile then                    -- Add the profile flag.
-		S.cpp.addArg(compiler.flags.profile)
-	end
-	local o = compiler.flags.optimize[S.cpp.optimization] -- Set the optimization
-	if o then                                             -- level.                                --
-		S.cpp.addArg(o)                                   --
-	end                                                   --
-
-	local length = #state.arguments
-	local toLink = T.List()
+	local objects = T.List()
 
 	for source in iter(s) do
 		source = C.path(source)
 
-		-- Get path to put object file.
-
-		local object = nil;
+		local object = nil; -- Get path to put object file.
 
 		if source:sub(0, #projectRoot) == projectRoot then
 			object = C.path(">"..source:sub(#projectRoot)..".o")
@@ -221,23 +239,11 @@ function S.cpp.compile ( out, sources )
 			                                                     -- the build
 		end                                                      -- dir.
 
-		for i in iter(compiler.flags.output) do -- Add the desired output file to
-			S.cpp.addArg(i:format(object))      -- the command line.
-		end                                     --
-
-		S.cpp.addArg(source)
-		h:append(source) -- Prepare the dependancies.
-
-		C.addGenerator({object}, h, state.arguments, {
-			description = "Compiling "..object
-		})
-		toLink:append(object)
-
-		state.arguments:chop(length) -- Remove the source from the command.
-		h:pop()                      -- Remove the source from the headers.
+		S.cpp.compileObject(object, source, h)
+		objects:append(object)
 	end
 
-	S.ld.link(out, toLink)
+	S.ld.link(out, objects)
 
 	state.arguments = oldarguments;
 	state.linker = S.ld.swapState(ln) -- Put their linker back.
