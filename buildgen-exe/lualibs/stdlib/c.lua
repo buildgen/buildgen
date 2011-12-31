@@ -235,6 +235,50 @@ function S.c.addLib ( lib )
 	state.linker = S.ld.swapState(ln)
 end
 
+--- Compile a source into an object.
+--
+-- @param obj The place to put the resulting object file.
+-- @prarm src The file to compile.
+-- @ headers A list of headers that are needed.
+function S.c.compileObject ( obj, src, headers )
+	obj = C.path(obj)
+	src = C.path(src)
+	headers = T.List(headers):map(C.path)
+
+	local compiler = P.S.c.compiler
+
+	local oldarguments = state.arguments
+	state.arguments = T.List()
+
+	S.c.addArg(compiler.name)
+	S.c.addArg(compiler.flags.compile)
+
+	S.c.addArg(oldarguments)
+
+	if S.c.debug then                      -- Add the debug flag.
+		S.p.addArg(compiler.flags.debug)
+	end
+	if S.c.profile then                    -- Add the profile flag.
+		S.c.addArg(compiler.flags.profile)
+	end
+	local o = compiler.flags.optimize[S.c.optimization] -- Set the optimization
+	if o then                                           -- level.                                --
+		S.c.addArg(o)                                   --
+	end                                                 --
+
+	for i in iter(compiler.flags.output) do -- Add the desired output file to
+		S.c.addArg(i:format(obj))      -- the command line.
+	end                                     --
+
+	S.c.addArg(src)
+
+	C.addGenerator({obj}, headers, state.arguments, {
+		description = "Compiling "..obj
+	})
+
+	state.arguments = oldarguments;
+end
+
 --- Compile an Executable
 -- Compiles and links a list of files into executables.
 --
