@@ -30,7 +30,7 @@ P.S.util.cmd = P.S.util.cmd or {}
 local function setup () -- So that we can hide our locals.
 
 if not P.S.util.cmd.cp then
-	local cps = {
+	local cps = T.List{
 		{	name = "cp", -- Name of the executable
 			flags = {
 				noover  = "-n",
@@ -46,10 +46,9 @@ if not P.S.util.cmd.cp then
 			}
 		},
 	}
-	T.List(cps) -- turn tabe into a penlight 'list'
 
 	local cp;
-	for c in iter(cps) do          -- Find the first compiler they have
+	for c in cps:iter() do          -- Find the first compiler they have
 		if S.findExecutable(c.name) then -- installed on thier system.
 			cp = c
 			cp.name = S.findExecutable(cp.name)
@@ -66,7 +65,7 @@ if not P.S.util.cmd.cp then
 end
 
 if not P.S.util.cmd.mv then
-	local mvs = {
+	local mvs = T.List{
 		{	name = "mv", -- Name of the executable
 			flags = {
 				over    = {},
@@ -84,10 +83,9 @@ if not P.S.util.cmd.mv then
 			}
 		},
 	}
-	T.List(mvs) -- turn tabe into a penlight 'list'
 
 	local mv;
-	for c in iter(mvs) do          -- Find the first compiler they have
+	for c in mvs:iter() do          -- Find the first compiler they have
 		if S.findExecutable(c.name) then -- installed on thier system.
 			mv = c
 			mv.name = S.findExecutable(mv.name)
@@ -104,7 +102,7 @@ if not P.S.util.cmd.mv then
 end
 
 if not P.S.util.cmd.rm then
-	local rms = {
+	local rms = T.List{
 		{	name = "rm", -- Name of the executable
 			flags = {
 				recurse = {"-r"},
@@ -118,10 +116,9 @@ if not P.S.util.cmd.rm then
 			}
 		},
 	}
-	T.List(rms) -- turn tabe into a penlight 'list'
 
 	local rm;
-	for c in iter(rms) do          -- Find the first compiler they have
+	for c in rms:iter() do          -- Find the first compiler they have
 		if S.findExecutable(c.name) then -- installed on thier system.
 			rm = c
 			rm.name = S.findExecutable(rm.name)
@@ -138,7 +135,7 @@ if not P.S.util.cmd.rm then
 end
 
 if not P.S.util.cmd.install then
-	local installs = {
+	local installs = T.List{
 		{	name = "install", -- Name of the executable
 			flags = {
 				preargs = {"-D"},
@@ -152,10 +149,9 @@ if not P.S.util.cmd.install then
 			}
 		},
 	}
-	T.List(installs) -- turn tabe into a penlight 'list'
 
 	local install;
-	for c in iter(installs) do          -- Find the first compiler they have
+	for c in installs:iter() do          -- Find the first compiler they have
 		if S.findExecutable(c.name) then -- installed on thier system.
 			install = c
 			install.name = S.findExecutable(install.name)

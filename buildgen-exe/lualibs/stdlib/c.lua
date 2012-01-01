@@ -122,7 +122,7 @@ if not P.S.c.compiler then
 	T.List(compilers) -- turn tabe into a penlight 'list'
 
 	local compiler;
-	for c in iter(compilers) do          -- Find the first compiler they have
+	for c in compilers:iter() do          -- Find the first compiler they have
 		if S.findExecutable(c.name) then -- installed on thier system.
 			compiler = c
 			compiler.name = S.findExecutable(compiler.name)
@@ -181,7 +181,7 @@ function S.c.addArg ( args )
 		args = T.List(args)
 	end
 
-	for a in iter(args) do state.arguments:append(a) end
+	for a in args:iter() do state.arguments:append(a) end
 end
 
 --- Add an include directory
@@ -266,7 +266,7 @@ function S.c.compileObject ( obj, src, headers )
 		S.c.addArg(o)                                   --
 	end                                                 --
 
-	for i in iter(compiler.flags.output) do -- Add the desired output file to
+	for i in T.List(compiler.flags.output) do -- Add the desired output file to
 		S.c.addArg(i:format(obj))      -- the command line.
 	end                                     --
 
@@ -296,7 +296,7 @@ function S.c.compile ( out, sources )
 	local outRoot     = C.path(">") --
 
 	local h, s = T.List(), T.List()
-	for source in iter(sources) do
+	for source in sources:iter() do
 		if source:match("[Hh]") then
 			h:append(source)
 		else
@@ -306,7 +306,7 @@ function S.c.compile ( out, sources )
 
 	local objects = T.List()
 
-	for source in iter(s) do
+	for source in s:iter() do
 		source = C.path(source)
 
 		local object = nil; -- Get path to put object file.

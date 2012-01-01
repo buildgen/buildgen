@@ -25,7 +25,7 @@
 
 --- The Standard library namespace.
 
-S = s or {} -- Standard libraries
+S = {} -- Standard libraries
 S.imported = false
 L = {} -- User libraries
 

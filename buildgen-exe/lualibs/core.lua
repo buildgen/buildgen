@@ -39,8 +39,6 @@
 -- @class function
 -- @name C.addGenerator
 
---C.addGenerator = _c_add_generator
-
 --- Add A Dependancy
 --
 -- Add dependency to target.  This ensures that dependancy exist before target
@@ -65,8 +63,6 @@
 -- @class function
 -- @name C.addDependancy
 
---C.addDependancy = _c_add_depandancy
-
 --- Add A Directory
 --
 -- Add dir to the build.
@@ -75,8 +71,6 @@
 --
 -- @class function
 -- @name C.addDir
-
---C.addDir = _c_add_dir
 
 --- Resolve a BuildGen path.
 --
@@ -88,8 +82,6 @@
 -- @class function
 -- @name C.path
 
---C.path = _c_path
-
 --- Resolve a path passed as a define.
 --
 -- Replaces the value in the D prefix with an abosolute path.  The path is
@@ -100,7 +92,7 @@
 --
 -- @param path The key of the defined value.
 -- @param default The value to be put if the value is not defined.  Defaults to
--- nil.
+--	nil.
 function D.resolvePath ( path , default )
 	if not D[path] then
 		D[path] = default

@@ -74,15 +74,12 @@ void BuildGenLuaEnv::init_lua ( void )
 		exit(EX_SOFTWARE);
 	}
 	luaL_openlibs(L);
-
-	lua_newtable(L);
-	lua_setglobal(L, "D");
 }
 
 void BuildGenLuaEnv::dmakeify_lua ( void )
 {
 	lua_settop(L, 0);
-	lua_newtable(L); // 1
+	lua_newtable(L); // Index: 1
 
 	lua_pushcfunction(L, &LuaFunctions::C::add_depandancy);
 	lua_setfield(L, 1, "addDependancy");
@@ -99,10 +96,23 @@ void BuildGenLuaEnv::dmakeify_lua ( void )
 	lua_setglobal(L, "_s_lualibs_root");
 	lua_pushstring(L, OS_STRING);
 	lua_setglobal(L, "_s_os");
-#ifdef DEBUG
-	lua_pushboolean(L, 1);
-	lua_setglobal(L, "_s_debug");
-#endif
+
+	lua_newtable(L);
+	lua_setglobal(L, "D");
+
+	/*** Create our "clean" Global Table ***/
+	lua_newtable(L); // Index: 1
+
+	lua_pushnil(L);
+	while (lua_next(L, LUA_GLOBALSINDEX))
+	{
+		lua_pushvalue(L, -2); // Duplicate the key
+		lua_insert(L, -2);    // Put the key under the value
+
+		lua_settable(L, 1);
+	}
+
+	lua_setfield(L, LUA_REGISTRYINDEX, "buildgen_G");
 }
 
 void BuildGenLuaEnv::define( char *key, char *value )
@@ -115,6 +125,19 @@ void BuildGenLuaEnv::define( char *key, char *value )
 	lua_setfield(L, -2, key);
 
 	lua_pop(L, 1);
+}
+
+void BuildGenLuaEnv::clenseEnvironment ( void )
+{
+	lua_newtable(L);
+
+	lua_newtable(L);
+	lua_getfield(L, LUA_REGISTRYINDEX, "buildgen_G");
+	lua_setfield(L, -2, "__index");
+
+	lua_setmetatable(L, -2);
+
+	lua_replace(L, LUA_GLOBALSINDEX); // Replace the global table with our proxy.
 }
 
 void BuildGenLuaEnv::doRunFile ( const char *path )
@@ -135,18 +158,16 @@ void BuildGenLuaEnv::doRunFile ( const char *path )
 		lua_pop(L, 1); // remove error message
 		exit(EX_DATAERR);
 	}
-
-	//LuaFunctions::clean_up(L);
 }
 
 void BuildGenLuaEnv::runFile ( const char *path )
 {
+	clenseEnvironment();
+
 	doRunFile(corefile);
 
 	if ( root_file != NULL ) // Run the root file.
 		doRunFile(root_file);
 
 	doRunFile(path);
-
-	//LuaFunctions::clean_up(L);
 }

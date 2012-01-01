@@ -84,10 +84,10 @@ if not P.S.ld.linker then
 			}
 		},
 	}
-	T.List(linkers) -- turn tabe into a penlight 'list'
+	linkers = T.List(linkers) -- turn tabe into a penlight 'list'
 
 	local linker;
-	for l in iter(linkers) do            -- Find the first linker they have
+	for l in linkers:iter() do            -- Find the first linker they have
 		if S.findExecutable(l.name) then -- installed on thier system.
 			linker = l
 			linker.name = S.findExecutable(linker.name)
@@ -154,8 +154,8 @@ function S.ld.link ( out, objects )
 		cmd:append(linker.flags.link)
 	end
 
-	for i in iter(linker.flags.out) do -- Add the desired output file to
-		cmd:append(i:format(out))      -- the command line.
+	for i in T.List(linker.flags.out):iter() do -- Add the desired output file
+		cmd:append(i:format(out))               -- to the command line.
 	end
 
 	cmd:extend(state.arguments)

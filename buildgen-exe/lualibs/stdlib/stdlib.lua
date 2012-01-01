@@ -141,7 +141,7 @@ function S.install ( path, to )
 		end
 
 		for root, dirs, files in T.dir.walk(apath) do
-			for f in iter(files) do
+			for f in T.List(files):iter() do
 				t = to..dirname..string.sub(root, #apath).."/"..f
 
 				S.util.install(root.."/"..f, t)

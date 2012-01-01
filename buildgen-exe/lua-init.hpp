@@ -39,6 +39,8 @@ class BuildGenLuaEnv
 	void dmakeify_lua(void);
 	void report_errors(lua_State *L, int status);
 
+	void clenseEnvironment(void);
+
 	void doRunFile ( const char *path );
 public:
 	BuildGenLuaEnv(const char *root);
