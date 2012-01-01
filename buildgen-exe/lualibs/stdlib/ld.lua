@@ -75,7 +75,7 @@ end
 S.ld.swapState(S.ld.newState())
 
 if not P.S.ld.linker then
-	local linkers = {
+	local linkers = T.List{
 		{	name="cc", -- Name of the executable
 			flags = {
 				link = {}, -- commands that need to be present.
@@ -84,8 +84,6 @@ if not P.S.ld.linker then
 			}
 		},
 	}
-	linkers = T.List(linkers) -- turn tabe into a penlight 'list'
-
 	local linker;
 	for l in linkers:iter() do            -- Find the first linker they have
 		if S.findExecutable(l.name) then -- installed on thier system.

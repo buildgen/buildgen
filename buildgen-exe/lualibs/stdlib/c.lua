@@ -266,9 +266,9 @@ function S.c.compileObject ( obj, src, headers )
 		S.c.addArg(o)                                   --
 	end                                                 --
 
-	for i in T.List(compiler.flags.output) do -- Add the desired output file to
-		S.c.addArg(i:format(obj))      -- the command line.
-	end                                     --
+	for i in T.List(compiler.flags.output):iter() do -- Add the desired output
+		S.c.addArg(i:format(obj))                    -- file to the command
+	end                                              -- line.
 
 	S.c.addArg(src)
 
