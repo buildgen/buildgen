@@ -256,7 +256,7 @@ function S.c.compileObject ( obj, src, headers )
 	S.c.addArg(oldarguments)
 
 	if S.c.debug then                      -- Add the debug flag.
-		S.p.addArg(compiler.flags.debug)
+		S.c.addArg(compiler.flags.debug)
 	end
 	if S.c.profile then                    -- Add the profile flag.
 		S.c.addArg(compiler.flags.profile)

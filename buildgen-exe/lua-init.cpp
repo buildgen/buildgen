@@ -81,10 +81,19 @@ void BuildGenLuaEnv::init_lua ( void )
 
 void BuildGenLuaEnv::dmakeify_lua ( void )
 {
-	lua_register(L, "_c_add_depandancy", &LuaFunctions::C::add_depandancy);
-	lua_register(L, "_c_add_dir", &LuaFunctions::C::add_dir);
-	lua_register(L, "_c_add_generator", &LuaFunctions::C::add_generator);
-	lua_register(L, "_c_path", &LuaFunctions::C::path);
+	lua_settop(L, 0);
+	lua_newtable(L); // 1
+
+	lua_pushcfunction(L, &LuaFunctions::C::add_depandancy);
+	lua_setfield(L, 1, "addDependancy");
+	lua_pushcfunction(L, &LuaFunctions::C::add_dir);
+	lua_setfield(L, 1, "addDir");
+	lua_pushcfunction(L, &LuaFunctions::C::add_generator);
+	lua_setfield(L, 1, "addGenerator");
+	lua_pushcfunction(L, &LuaFunctions::C::path);
+	lua_setfield(L, 1, "path");
+
+	lua_setglobal(L, "C");
 
 	lua_pushstring(L, files->lualibs_root);
 	lua_setglobal(L, "_s_lualibs_root");
