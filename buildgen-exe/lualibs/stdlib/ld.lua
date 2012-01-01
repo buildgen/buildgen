@@ -28,6 +28,12 @@ if not P.S.ld then P.S.ld = {} end
 
 do -- So that we can hide our locals.
 local state = {}
+
+--- Create new ld state
+-- Creates and returns an opaque state.  This state is a table and is therefore
+-- passed by refrence.
+--
+-- @return The newly created state.
 function S.ld.newState ( )
 	data = {
 		arguments = T.List(),
@@ -36,10 +42,20 @@ function S.ld.newState ( )
 	return data
 end
 
+--- Stashes the current state.
+-- Returns the current state and loads a new state.  This is equivilent to
+-- S.ld.swapState(S.ld.newState()).
+--
+-- @return The old state.
 function S.ld.stashState ( )
 	return S.ld.swapState(S.ld.newState())
 end
 
+--- Swap the state
+-- Swaps new with the current state.
+--
+-- @param new The new state to load.
+-- @return The old state.
 function S.ld.swapState ( new )
 	local old = state
 
@@ -48,6 +64,10 @@ function S.ld.swapState ( new )
 	return old
 end
 
+--- Load a state
+-- Loads the state data
+--
+-- @param data The state to load.
 function S.ld.loadState ( data )
 	state = data
 end
@@ -83,6 +103,14 @@ if not P.S.ld.linker then
 	end
 end
 
+--- Add an argrment.
+-- Add an argument to the linker command line.  Please try to avoid using this
+-- as it is not portable across compilers.  Please use the other functions that
+-- modify the command line (such as S.ld.addLib()) as they
+-- are localized to the linker being used.
+--
+-- @param args a string or list of strings to be added to the linker command
+--	line.
 function S.ld.addArg ( arg )
 	if type(arg) ~= "table" then
 		arg = {tostring(arg)}
@@ -91,6 +119,10 @@ function S.ld.addArg ( arg )
 	state.arguments:extend(arg)
 end
 
+--- Link a Library
+-- Link the library to the executable.
+--
+-- @param The name of the library to link.
 function S.ld.addLib ( lib )
 	if type(lib) ~= "table" then
 		lib = {tostring(lib)}
@@ -105,6 +137,11 @@ function S.ld.addLib ( lib )
 	S.ld.addArg(args)
 end
 
+--- Link an executable.
+-- Links object files into an executable.
+--
+-- @param out The location to put the executable.  This is treated as a BuildGen
+--	patg.
 function S.ld.link ( out, objects )
 	linker = P.S.ld.linker
 
