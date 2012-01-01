@@ -33,6 +33,35 @@
 
 Files *files;
 
+#if defined(__linux__)
+	const char *OS_STYLE = "linux";
+	const char *OS_COMPLIANCE = "posix";
+	const char *OS_KERNEL = "linux";
+#elif defined(BSD)
+	const char *OS_STYLE = "BSD";
+	const char *OS_COMPLIANCE = "posix";
+	#if defined(__FreeBSD__)
+		const char *OS_KERNEL = "FreeBSD";
+	#elif defined(__OpenBSD__)
+		const char *OS_KERNEL = "OpenBSD";
+	#elif defined(__NetBSD__)
+		const char *OS_KERNEL = "NetBSD";
+	#elif defined(__DragonFly__)
+		const char *OS_KERNEL = "DragonFly";
+	#endif
+#elif defined(_WIN32)
+	const char *OS_STYLE = "win32";
+	const char *OS_COMPLIANCE = "win32";
+	const char *OS_KERNEL = "win32";
+#elif defined(__APPLE__)
+	const char *OS_STYLE = "mac";
+	const char *OS_COMPLIANCE = "posix";
+	const char *OS_KERNEL = "darwin";
+#else
+	const char *OS_COMPLIANCE = "unknown";
+	const char *OS_KERNEL = "unknown";
+#endif
+
 void checkAlloc ( void *p )
 {
 	if (!p)

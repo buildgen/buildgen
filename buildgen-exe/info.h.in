@@ -30,12 +30,4 @@ extern const char *VERSION;
 extern const char *LUALIBS_ROOT;
 extern const char *DEFAULT_GENERATOR;
 
-#if defined(__linux__)
-	extern const char *OS_STRING;
-#elif defined(_WIN32)
-	extern const char *OS_STRING;
-#else
-	extern const char *OS_STRING;
-#endif
-
 #endif

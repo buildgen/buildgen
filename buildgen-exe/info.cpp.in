@@ -25,17 +25,11 @@
 #ifndef LUALIBS_H___GENERATED_INFO_FILE
 #define LUALIBS_H___GENERATED_INFO_FILE
 
+#include <sys/param.h>
+
 const char *VERSION = "0.1.0";
 
 const char *LUALIBS_ROOT = "@lualibs_root@";
 const char *DEFAULT_GENERATOR = "@default_generator@";
-
-#if defined(__linux__)
-	const char *OS_STRING = "posix";
-#elif defined(_WIN32)
-	const char *OS_STRING = "windows";
-#else
-	const char *OS_STRING = "unknown";
-#endif
 
 #endif

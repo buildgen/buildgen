@@ -67,7 +67,7 @@ T.utils = require "pl.utils"
 T.stringx.import()
 
 if not S.prefix then
-	if S.os == "windows" then
+	if S.os.compliance == "win32" then
 		D.resolvePath("prefix", "C:/Program Files/")
 	else
 		D.resolvePath("prefix", "/usr/local/")
@@ -166,9 +166,9 @@ do
 	local ospath = os.getenv("PATH")
 	local seperator = ""
 
-	if     S.os == "posix"   then
+	if     S.os.compliance == "posix"   then
 		seperator = ":"
-	elseif S.os == "windows" then
+	elseif S.os.compliance == "win32" then
 		seperator = ";" --@help Is the right?
 	end
 

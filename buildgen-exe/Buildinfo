@@ -31,7 +31,6 @@ S.c.generateHeader("@info.h", "@info.cpp", {
 	VERSION = version,
 	LUALIBS_ROOT = lualibsdir.."lualibs/",
 	DEFAULT_GENERATOR = "gen-makefile",
-	OS_STRING = S.os,
 })
 S.cpp.addInclude "@"
 

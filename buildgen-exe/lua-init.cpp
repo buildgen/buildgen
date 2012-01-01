@@ -99,9 +99,17 @@ void BuildGenLuaEnv::dmakeify_lua ( void )
 
 	lua_pushstring(L, files->lualibs_root);
 	lua_setfield(L, 1, "lualibsRoot");
-	lua_pushstring(L, OS_STRING);
-	lua_setfield(L, 1, "os");
 
+	lua_newtable(L); // Index: 2
+
+	lua_pushstring(L, OS_STYLE);
+	lua_setfield(L, 2, "style");
+	lua_pushstring(L, OS_KERNEL);
+	lua_setfield(L, 2, "kernel");
+	lua_pushstring(L, OS_COMPLIANCE);
+	lua_setfield(L, 2, "compliance");
+
+	lua_setfield(L, 1, "os");
 	lua_setglobal(L, "S");
 
 	/*** D ***/

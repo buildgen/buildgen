@@ -31,4 +31,8 @@
 extern Files *files;
 void checkAlloc ( void *p );
 
+extern const char *OS_STYLE;
+extern const char *OS_KERNEL;
+extern const char *OS_COMPLIANCE;
+
 #endif

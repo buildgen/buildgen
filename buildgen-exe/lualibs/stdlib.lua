@@ -44,6 +44,17 @@ S.lualibsRoot = _G.S.lualibsRoot.."stdlib/"
 -- internal use and for installing custom libraries.  This is an absolute path.
 L.lualibsRoot = _G.S.lualibsRoot.."custom/"
 
+--- Operating System Information
+-- Fields are:
+-- <ul><li>
+--		style: The style of OS.
+-- </li><li>
+--		kernel: The kernel the OS uses.
+-- </li><li>
+--		compliance: The standards that the os complies with.
+-- </li></ul>
+S.os = _G.S.os
+
 --- Load a Standard Library
 --
 -- Loads the library <span class="code">name</span>.  The library will become
