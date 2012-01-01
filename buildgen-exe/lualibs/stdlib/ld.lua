@@ -95,7 +95,7 @@ if not P.S.ld.linker then
 	end
 
 	if linker == nil then
-		error("Error: No linker found.", 0)
+		error("No linker found.", 0)
 	else
 		P.S.ld.linker = linker
 	end

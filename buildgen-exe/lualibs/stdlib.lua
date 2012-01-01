@@ -29,7 +29,6 @@ S = {} -- Standard libraries
 S.imported = false
 L = {} -- User libraries
 
-if not P then P = {} end     -- Persistant storage
 if not P.S then P.S = {} end --
 if not P.L then P.L = {} end --
 
@@ -37,13 +36,13 @@ if not P.L then P.L = {} end --
 --
 -- This is the root directory of the standard library files.  This is mostly for
 -- internal use.  This is an absolute path.
-S.lualibsRoot = _s_lualibs_root.."stdlib/"
+S.lualibsRoot = _G.S.lualibsRoot.."stdlib/"
 
 --- The Custom Library Root.
 --
 -- This is the root directory of the custom library files.  This is mostly for
 -- internal use and for installing custom libraries.  This is an absolute path.
-L.lualibsRoot = _s_lualibs_root.."custom/"
+L.lualibsRoot = _G.S.lualibsRoot.."custom/"
 
 --- Load a Standard Library
 --

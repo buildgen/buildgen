@@ -66,9 +66,6 @@ T.utils = require "pl.utils"
 
 T.stringx.import()
 
---- OS
-S.os = _s_os
-
 if not S.prefix then
 	if S.os == "windows" then
 		D.resolvePath("prefix", "C:/Program Files/")

@@ -105,4 +105,4 @@ function D.resolvePath ( path , default )
 	end
 end
 
-dofile(_s_lualibs_root.."stdlib.lua")
+dofile(S.lualibsRoot.."stdlib.lua")

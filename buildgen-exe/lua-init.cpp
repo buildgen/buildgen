@@ -79,6 +79,8 @@ void BuildGenLuaEnv::init_lua ( void )
 void BuildGenLuaEnv::dmakeify_lua ( void )
 {
 	lua_settop(L, 0);
+
+	/*** C ***/
 	lua_newtable(L); // Index: 1
 
 	lua_pushcfunction(L, &LuaFunctions::C::add_depandancy);
@@ -92,26 +94,27 @@ void BuildGenLuaEnv::dmakeify_lua ( void )
 
 	lua_setglobal(L, "C");
 
-	lua_pushstring(L, files->lualibs_root);
-	lua_setglobal(L, "_s_lualibs_root");
-	lua_pushstring(L, OS_STRING);
-	lua_setglobal(L, "_s_os");
+	/*** S ***/
+	lua_newtable(L); // Index: 1
 
+	lua_pushstring(L, files->lualibs_root);
+	lua_setfield(L, 1, "lualibsRoot");
+	lua_pushstring(L, OS_STRING);
+	lua_setfield(L, 1, "os");
+
+	lua_setglobal(L, "S");
+
+	/*** D ***/
 	lua_newtable(L);
 	lua_setglobal(L, "D");
 
-	/*** Create our "clean" Global Table ***/
-	lua_newtable(L); // Index: 1
+	/*** P ***/
+	lua_newtable(L);
+	lua_setglobal(L, "P");
 
-	lua_pushnil(L);
-	while (lua_next(L, LUA_GLOBALSINDEX))
-	{
-		lua_pushvalue(L, -2); // Duplicate the key
-		lua_insert(L, -2);    // Put the key under the value
+	/*** Save the current "clean" environment ***/
 
-		lua_settable(L, 1);
-	}
-
+	lua_pushvalue(L, LUA_GLOBALSINDEX);
 	lua_setfield(L, LUA_REGISTRYINDEX, "buildgen_G");
 }
 
