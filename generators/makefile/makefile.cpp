@@ -61,12 +61,18 @@ std::string Makefile::escape ( std::string path )
 	{                                   // worry about the growth of the string.
 		switch (path[i])
 		{
-			case ' ':
-				path.replace(i, 2, "\\ ");
-				break;
-			case '\\':
-				path.replace(i, 2, "\\\\");
-				break;
+		case ' ':
+			path.replace(i, 2, "\\ ");
+			break;
+		case '\'':
+			path.replace(i, 2, "\\'");
+			break;
+		case '"':
+			path.replace(i, 2, "\\\"");
+			break;
+		case '\\':
+			path.replace(i, 2, "\\\\");
+			break;
 		}
 	}
 
@@ -89,6 +95,7 @@ std::string Makefile::generate ( void )
 	}
 
 	out += writeClean();
+	out += writeHelp();
 
 	return out;
 }
@@ -97,7 +104,7 @@ std::string Makefile::writeTarget(Target *t)
 {
 	std::string out;
 
-	if ( (t->generator == NULL) && (!t->magic) )return out; // This is an existing file
+	if ( (t->generator == NULL) && (!t->magic) ) return out; // This is an existing file
 
 	if (t->magic)
 	{
@@ -105,7 +112,7 @@ std::string Makefile::writeTarget(Target *t)
 		out += escape(std::string(t->path));
 		out += "\n\n";
 	}
-	else cleantargets.push(t); // We are creating it so it needs to be cleaned.
+	else generated.push_back(t); // We are creating it so it needs to be cleaned.
 
 	out += escape(relitiveName(t->path));
 	out += ": ";
@@ -171,20 +178,43 @@ std::string Makefile::writeClean (void)
 	out += "clean:\n";
 	out += "	rm -rv";
 
-	while (cleantargets.size())
+	std::list<Target*>::const_iterator i = generated.begin();
+	do
 	{
-		Target *t = cleantargets.front();
+		Target *t = *i;
 
 		if ( !strncmp(cwd, t->path, cwdlen-1) && t != makefile ) // strcmp is so
 		{ // that we only delete files in the build directory.
 			out += " ";
-			out += t->path;
+			out += escape(relitiveName(t->path));
 		}
+	} while ( ++i != generated.begin() );
 
-		cleantargets.pop();
+	out += " || true\n\n";
+
+	return out;
+}
+
+std::string Makefile::writeHelp ( void )
+{
+	std::string out;
+
+	out += ".PHONY: help\n\n";
+
+	out += "help:\n";
+
+	for ( std::set<Target *,Target::comparator>::iterator i = Target::targets.begin();
+	      i != Target::targets.end(); ++i
+	    )
+	{
+		Target *t = *i;
+
+		if ( (t->generator == NULL) && (!t->magic) ) continue; // Not a generated file.
+
+		out += "	@echo '";
+		out += escape(relitiveName(t->path));
+		out += "'\n";
 	}
-
-	out += " || true";
 
 	return out;
 }

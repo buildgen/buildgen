@@ -26,7 +26,7 @@
 #define MAKEFILE_HPP
 
 #include <set>
-#include <queue>
+#include <list>
 
 #include "buildgen-xml/target.hpp"
 
@@ -36,7 +36,7 @@ class Makefile
 	const unsigned int cwdlen;
 
 	std::set<Target*, Target::comparator> *targets;
-	std::queue<Target*> cleantargets;
+	std::list<Target*> generated;
 
 	std::string relitiveName(std::string path);
 	std::string escape(std::string path);
@@ -45,6 +45,7 @@ class Makefile
 	std::string writeGenerator(Generator *g);
 
 	std::string writeClean(void);
+	std::string writeHelp(void);
 
 public:
     Makefile( std::set<Target*, Target::comparator> *targets);
