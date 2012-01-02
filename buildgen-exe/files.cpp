@@ -40,7 +40,7 @@
 #include "files.hpp"
 #include "buildgen-xml/target.hpp"
 
-Files::Files ( char *srcdir, char *buildgen_root ):
+Files::Files ( const char *srcdir, char *buildgen_root ):
 	project_root(NULL),
 	out_root(NULL),
 
@@ -52,7 +52,7 @@ Files::Files ( char *srcdir, char *buildgen_root ):
 	init(srcdir, buildgen_root);
 }
 
-void Files::init ( char *srcdir, char *buildgenroot )
+void Files::init ( const char *srcdir, char *buildgenroot )
 {
 	out_root = getcwd(NULL, 0);
 	appendSlash(&out_root);

@@ -34,34 +34,42 @@
 
 void help ( void )
 {
-	puts("Usage:                                                                ");
-	puts("  --define <key>=<value>, -D <key>=<value>                            ");
-	puts("  --define <flag>, -D <flag>                                          ");
+	puts("Usage:"                                                                );
+	puts("  --define <key>=<value>, -D <key>=<value>"                            );
+	puts("  --buildgen-root"                                                     );
+	puts("    Print out the root directory of the BuildGen install."             );
+	puts("  --buildgenlibs-root"                                                 );
+	puts("    Print out the root directory of the BuildGen libraries.  Standard" );
+	puts("    libraries are located in ${buildgenlibs-root}/stdlib/ and custom"  );
+	puts("    libraries are located in ${buildgenlibs-root}/custom/."            );
+	puts("  --define <flag>, -D <flag>"                                          );
 	puts("    Defines a variable for use in the configuration files.  The actual");
-	puts("    use of the values depends on the project.  Some common values are ");
-	puts("    listed below.  Check the projects documentation for the           ");
-	puts("    definitions they support.                                         ");
-	puts("      -D debug                                                        ");
-	puts("        This flag sets the build to debug mode.  The default is to turn off");
-	puts("        optimization and enable debuging and profiling.  The project can do");
-	puts("        whatever they like with this value or may ingore it.");
-	puts("      -D 'prefix=/opt/proj/'");
-	puts("        Sets the default install directory to '/opt/proj' (or whatever you)");
-	puts("        provide.");
-	puts("  --generator <name>, -g <name>");
-	puts("    Sets the generator to use.  <name> must be an executable in your path or");
-	puts("    the full path to the executable.  The default is system dependant.");
-	puts("  --help, -h");
-	puts("    Print this message and quit.");
-	puts("  --out <file>, -o <file>");
-	puts("    Instead of passing the BuildGen xml output directly to a generator put it");
-	puts("    in <file>.");
-	puts("  --verbose, -v");
-	puts("  --verbose <level>, -v <level>");
-	puts("    Set verbosity level to <level>.  If no argument is given the verbosity");
-	puts("    is raised by 1 for each time this argument is passed.");
-	puts("  --version");
-	puts("    Print the version of BuildGen and exit.");
+	puts("    use of the values depends on the project.  Some common values are" );
+	puts("    listed below.  Check the projects documentation for the"           );
+	puts("    definitions they support."                                         );
+	puts("      -D debug"                                                        );
+	puts("        This flag sets the build to debug mode.  The default is to"    );
+	puts("        turn off optimization and enable debuging and profiling."      );
+	puts("        The project can do whatever they like with this value or may"  );
+	puts("        ingore it."                                                    );
+	puts("      -D 'prefix=/opt/proj/'"                                          );
+	puts("        Sets the default install directory to '/opt/proj' (or whatever");
+	puts("         you) provide."                                                );
+	puts("  --generator <name>, -g <name>"                                       );
+	puts("    Sets the generator to use.  <name> must be an executable in your"  );
+	puts("    path or the full path to the executable.  The default is system"   );
+	puts("    dependant."                                                        );
+	puts("  --help, -h"                                                          );
+	puts("    Print this message and quit."                                      );
+	puts("  --out <file>, -o <file>"                                             );
+	puts("    Instead of passing the BuildGen xml output directly to a generator");
+	puts("    put it in <file>."                                                 );
+	puts("  --verbose, -v"                                                       );
+	puts("  --verbose <level>, -v <level>"                                       );
+	puts("    Set verbosity level to <level>.  If no argument is given the"      );
+	puts("    verbosity is raised by 1 for each time this argument is passed."   );
+	puts("  --version"                                                           );
+	puts("    Print the version of BuildGen and exit."                           );
 	exit(0);
 }
 
@@ -74,17 +82,17 @@ void version ( void )
 namespace opt
 {
 	bool xml_out_isProcess = false;
-	FILE *xml_out = stdout;
+	FILE *xml_out = NULL;
 
 	std::vector<Definition> defines;
 
-	char *src_dir;
+	const char *src_dir;
 
 	unsigned int toDo = 0; // Will be read in do_options();
 
 	void get_options ( int *argc, char ***argv )
 	{
-		char *gen = NULL;
+		const char *gen = NULL;
 		int flag = 0;
 
 		static struct option longopts[] = {
@@ -172,21 +180,26 @@ namespace opt
 		}
 		*argc -= optind; *argv += optind;
 
-		if (__builtin_expect( *argc ,1))
+		if ( argc > 0 )
 		{
 			src_dir = (*argv)[0];
 			(*argc)--; (*argv)--;
 		}
 		else src_dir = ".";
 
-		if ( xml_out == stdout )
+		if ( xml_out == NULL )
 		{
-			if ( gen == NULL )
+			xml_out_isProcess = true;
+
+			if ( gen == NULL ) gen = DEFAULT_GENERATOR;
+
+			xml_out = popen(gen, "w");
+
+			if (!xml_out)
 			{
-				xml_out = popen(DEFAULT_GENERATOR, "w");
-				xml_out_isProcess = true;
+				msg::error("Could not open generator %s", gen);
+				exit(EX_CANTCREAT); //@todo Right status.
 			}
-			else if (!strcmp(gen, "makefile")) xml_out = popen("gen-makefile", "w");
 		}
 	}
 
@@ -204,8 +217,10 @@ namespace opt
 		{
 		case 1:
 			puts(files->buildgen_root);
+			exit(0);
 		case 2:
 			puts(files->lualibs_root);
+			exit(0);
 		}
 
 	}

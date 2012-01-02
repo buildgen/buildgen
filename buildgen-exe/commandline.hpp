@@ -43,7 +43,7 @@ namespace opt
 	extern FILE *xml_out;
 	extern void close_xml_out(void);
 
-	extern char *src_dir;
+	extern const char *src_dir;
 
 	extern void get_options(int *argc, char ***argv);
 	extern void do_options(void);

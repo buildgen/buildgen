@@ -42,10 +42,10 @@ public:
 	const char *config_file_user;
 	const char *buildgen_root;
 private:
-	void init(char *srcdir, char *buildgen_root);
+	void init(const char *srcdir, char *buildgen_root);
 	void appendSlash(char **inputoutput);
 public:
-	Files(char *srcdir, char *buildgen_root);
+	Files(const char *srcdir, char *buildgen_root);
 	std::queue<char*> infofile;
 
 	void findInfoFile(void);
