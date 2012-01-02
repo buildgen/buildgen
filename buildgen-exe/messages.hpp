@@ -72,8 +72,8 @@ namespace msg
 
 		These messages should log everything significant that the program does.
 		Any variable part of the message should be double quotes for easy
-		identificaton. (No need to escape quotes as the last quote is assumed to
-		close it.
+		identificaton. (No need to escape quotes inside strings as the last
+		quote of the message is assumed to close it.
 	*/
 	inline void log(const char *msg, ...)
 	{
