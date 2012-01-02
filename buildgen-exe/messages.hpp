@@ -96,7 +96,7 @@ namespace msg
 		These won't display in release builds and will likely be optimized into
 		oblivion.  It is safe to leave these in but please remove these after
 		you finish working on a section so you don't spam the output.  If you
-		think this would be helpfull to anyone debuging there is a good chance
+		think this would be helpful to anyone debuging there is a good chance
 		you should be using log().
 
 		There is no required format just use what you pefer.  The output stream
