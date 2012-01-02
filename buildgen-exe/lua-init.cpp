@@ -67,7 +67,7 @@ void BuildGenLuaEnv::init ( void )
 
 void BuildGenLuaEnv::init_lua ( void )
 {
-	L = lua_open();
+	L = luaL_newstate();
 	if (!L)
 	{
 		msg::error("Could not create lua state.");
