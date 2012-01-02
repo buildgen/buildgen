@@ -128,13 +128,11 @@ namespace msg
 		va_list args;
 		va_start(args, msg);
 
-		if ( msg::verbosity != 0 )
-		{
-			fputs("Error: ", err_out);
-			vfprintf(err_out, msg, args);
-			fputc('\n', err_out);
-			fflush(err_out);
-		}
+		fputs("Error: ", err_out);
+		vfprintf(err_out, msg, args);
+		fputc('\n', err_out);
+		fflush(err_out);
+
 
 		va_end(args);
 	}
