@@ -24,6 +24,7 @@
 
 char *mstrdup ( const char *s );
 char *myalloc ( size_t chars );
+char *myrealloc ( char *s, size_t chars );
 
 char *mstrcat ( const char *s1, const char *s2 );
 char *mstrcat ( char c, const char *s2 );

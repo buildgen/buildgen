@@ -64,7 +64,7 @@ public:
 	  * 	<dir/file
 	  * 		Turns into the file "file" inside the directory "dir" inside
 	  * 		the source directory.
-	  *		*file
+	  *		@file
 	  *			returns the "matching" filename in the build directory.  For
 	  *			example, if this is called in "/src/mylib" it will return
 	  *			"/build/mylib/file" (assumeing "/build" is your build directory).
@@ -80,6 +80,8 @@ public:
 	  *
 	  * \arg path The path to normalize.
 	  * \returns A newly malloc'ed path.
+	  *		\note This function does not return a failure value because it does
+	  *			it's own error handling.
 	  */
 	char *normalizeFilename(const char *path);
 
@@ -92,7 +94,7 @@ public:
 	  *		becomes: /dir/file
 	  *
 	  * \arg path An absolute path to be prettified in place.
-	  * \return path (the same value you put in)
+	  * \return path (the same value you put in).  This function does not fail.
 	  */
 	char *prettyPath(char *path);
 };

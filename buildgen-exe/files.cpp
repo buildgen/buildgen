@@ -46,8 +46,8 @@ Files::Files ( const char *srcdir, char *buildgen_root ):
 
 	infofilename("Buildinfo"),
 	rootfilename("Buildroot"),
-	config_file_system("/etc/buildgen/buildgen"),
-	config_file_user("~/.config/BuildGen")
+	config_file_system("/etc/buildgen/buildgen.conf"),
+	config_file_user("~/.config/buildgen/buildgen.conf")
 {
 	init(srcdir, buildgen_root);
 }
@@ -57,6 +57,7 @@ void Files::init ( const char *srcdir, char *buildgenroot )
 	out_root = getcwd(NULL, 0);
 	appendSlash(&out_root);
 
+	/*** Get BuildGen root ***/
 	char *br = normalizeFilename(buildgenroot);
 
 	unsigned int ls = strlen(br);
@@ -69,24 +70,29 @@ void Files::init ( const char *srcdir, char *buildgenroot )
 
 	free(br);
 
+	/*** Get LuaLibs root ***/
 	unsigned int bgl = strlen(buildgen_root);
 	unsigned int llrl = strlen(LUALIBS_ROOT);
 
 	lualibs_root = mstrcat(buildgen_root, LUALIBS_ROOT);
 
-	DIR *d = opendir(srcdir);
-	if ( d == NULL )
+	if (srcdir) // We don't need this if we are just listing directories.
 	{
-		msg::error("Can not switch to the source directory.");
-		exit(EX_USAGE);
-	}
-	fchdir(dirfd(d));
-	project_root = getcwd(NULL, 0); // As a default.  The value will be copied if needed
-	findProjectRoot();
-	fchdir(dirfd(d));
-	findInfoFile();
+		DIR *d = opendir(srcdir);
+		if ( d == NULL )
+		{
+			msg::error("Can not switch to the source directory.");
+			exit(EX_USAGE);
+		}
+		fchdir(dirfd(d));
 
-	closedir(d);
+		findProjectRoot();
+
+		fchdir(dirfd(d));
+		findInfoFile();
+
+		closedir(d);
+	}
 }
 
 void Files::findInfoFile ( void )
@@ -133,7 +139,7 @@ void Files::appendSlash ( char **inputoutput )
 
 	if ( io[len] == '/' ) return;
 
-	io = (char*)realloc(io, (len+2*sizeof(char)));
+	io = myrealloc(io, len+2);
 	io[len]   = '/' ;
 	io[len+1] = '\0';
 
@@ -147,7 +153,7 @@ void Files::findProjectRoot( void )
 
 	while (!root)
 	{
-		if (__builtin_expect( i > 10 , 0)) //@todo But in a macro for windows ( i think only gcc has this )
+		if ( i > 10 ) // Check for the root directory every once and a while.
 		{
 			char *cur = getcwd(NULL, 0);
 			if (!cur[1]) // This is the root directory
@@ -163,7 +169,7 @@ void Files::findProjectRoot( void )
 		else i++;
 
 		chdir("..");
-		root = fopen(rootfilename, "r");
+		root = freopen(rootfilename, "r", root);
 	}
 	fclose(root);
 

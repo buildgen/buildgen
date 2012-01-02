@@ -41,6 +41,13 @@ char *myalloc ( size_t chars )
 	return (char*)r;
 }
 
+char *myrealloc ( char *s, size_t chars )
+{
+	s = (char*)realloc(s, chars*sizeof(char));
+	checkAlloc(s);
+	return s;
+}
+
 char *mstrcat ( const char *s1, const char *s2 )
 {
 	size_t l1 = strlen(s1);

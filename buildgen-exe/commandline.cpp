@@ -86,7 +86,7 @@ namespace opt
 
 	std::vector<Definition> defines;
 
-	const char *src_dir;
+	const char *src_dir = NULL;
 
 	unsigned int toDo = 0; // Will be read in do_options();
 
@@ -120,6 +120,7 @@ namespace opt
 				case 1:
 				case 2:
 					toDo = flag;
+					return; // This argument stops processing.
 				}
 				break;
 			case 'D': // Define a build property
