@@ -54,8 +54,8 @@ public:
 
 	void findProjectRoot(void);
 
-	/** Makes a BuildGen filename absolute.
-//	  *
+	/** Makes a BuildGen path absolute.
+	  *
 	  * Takes a path and finds the absolute meathod of expressing it.  This
 	  * function performs the following translations:
 	  * 	>dir/file
