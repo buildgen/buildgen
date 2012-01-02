@@ -68,7 +68,7 @@ int main ( int argc, char **argv )
 	BuildGenLuaEnv lua(rootFileName);
 	free(rootFileName);
 
-	Target *regen = Target::newTarget("regen");
+	Target *regen = Target::newTarget("regen", false);
 	regen->magic = 1;
 
 	cmd[0] = files->normalizeFilename(cmd[0]);

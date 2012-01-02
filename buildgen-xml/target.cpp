@@ -82,7 +82,7 @@ Target *Target::findTarget ( const char *path )
  *
  * \param path the loacation of the target.  This must be an absolute path.
  */
-Target *Target::newTarget ( const char *path, bool autodepend )
+Target *Target:: newTarget ( const char *path, bool autodepend )
 {
 	Target *t = new Target(path, autodepend);
 

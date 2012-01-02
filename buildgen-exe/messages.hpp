@@ -80,7 +80,7 @@ namespace msg
 		va_list args;
 		va_start(args, msg);
 
-		if ( msg::verbosity < 0 || msg::verbosity >= 3 )
+		if ( msg::verbosity < 0 || msg::verbosity >= 2 )
 		{
 			fputs("Log:   ", msg_out);
 			vfprintf(msg_out, msg, args);
