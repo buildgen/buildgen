@@ -88,6 +88,8 @@ std::string Makefile::generate ( void )
 		out += writeTarget(*ti);
 	}
 
+	out += writeClean();
+
 	return out;
 }
 
@@ -95,7 +97,7 @@ std::string Makefile::writeTarget(Target *t)
 {
 	std::string out;
 
-	if ( (t->generator == NULL) && (!t->magic) ) return out; // This is an existing file
+	if ( (t->generator == NULL) && (!t->magic) )return out; // This is an existing file
 
 	if (t->magic)
 	{
@@ -103,6 +105,7 @@ std::string Makefile::writeTarget(Target *t)
 		out += escape(std::string(t->path));
 		out += "\n\n";
 	}
+	else cleantargets.push(t); // We are creating it so it needs to be cleaned.
 
 	out += escape(relitiveName(t->path));
 	out += ": ";
@@ -153,6 +156,35 @@ std::string Makefile::writeGenerator(Generator *g)
 			out += '\n';
 		}
 	}
+
+	return out;
+}
+
+std::string Makefile::writeClean (void)
+{
+	std::string out;
+
+	Target *makefile = Target::findTarget("Makefile");
+
+	out += ".PHONY: clean\n\n";
+
+	out += "clean:\n";
+	out += "	rm -rv";
+
+	while (cleantargets.size())
+	{
+		Target *t = cleantargets.front();
+
+		if ( !strncmp(cwd, t->path, cwdlen-1) && t != makefile ) // strcmp is so
+		{ // that we only delete files in the build directory.
+			out += " ";
+			out += t->path;
+		}
+
+		cleantargets.pop();
+	}
+
+	out += " || true";
 
 	return out;
 }
