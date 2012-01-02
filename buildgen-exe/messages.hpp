@@ -80,6 +80,7 @@ namespace msg
 		va_list args;
 		va_start(args, msg);
 
+		printf("verbosity: %d\n", msg::verbosity);
 		if ( msg::verbosity < 0 || msg::verbosity >= 2 )
 		{
 			fputs("Log:   ", msg_out);
@@ -107,7 +108,6 @@ namespace msg
 		va_start(args, msg);
 
 #ifdef DEBUG //@help Is it safe to comment out the varg macros?
-		fputs("Debug: ", msg_out);
 		vfprintf(msg_out, msg, args);
 		fputc('\n', msg_out);
 		fflush(msg_out);

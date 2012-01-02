@@ -172,9 +172,12 @@ namespace opt
 						optarg++;
 					}
 
-					int v = 0;
-					sscanf(optarg, "%d", &v);
-					msg::verbosity = v;
+					if ( *optarg != '\0' )
+					{
+						int v = 0;
+						sscanf(optarg, "%d", &v);
+						msg::verbosity = v;
+					}
 				}
 				else msg::verbosity++;
 			}
