@@ -297,7 +297,7 @@ function S.c.compile ( out, sources )
 
 	local h, s = T.List(), T.List()
 	for source in sources:iter() do
-		if source:match("[Hh]") then
+		if source:match("\.[^\.]*[Hh][^\.]*$") then
 			h:append(source)
 		else
 			s:append(source)
