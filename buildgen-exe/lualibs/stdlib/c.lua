@@ -326,7 +326,6 @@ function S.c.compile ( out, sources )
 
 	S.ld.link(out, objects)
 
-	state.arguments = oldarguments;
 	state.linker = S.ld.swapState(ln) -- Put their linker back.
 end
 
