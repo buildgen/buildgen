@@ -129,7 +129,7 @@ void Files::addInfoFile ( const char *path )
 	char *info = normalizeFilename(path);
 	infofile.push(info);
 
-	msg::log("DMakeinfo file added at \"%s\"", info);
+	msg::log("Buildinfo file added at \"%s\"", info);
 }
 
 void Files::appendSlash ( char **inputoutput )
