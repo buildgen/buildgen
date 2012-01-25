@@ -32,6 +32,37 @@ if not P.S.c then P.S.c = {} end
 do -- So that we can hide our locals.
 local state = {}
 
+--- The optimization level.
+--
+-- A string value representing the level of optimization to use when building
+-- the project. Possible values are:
+-- <ul><li>
+--		none - Perform no optimization.
+--</li><li>
+--		quick - Perform light optimization.
+--</li><li>
+--		regular - Perform regular optimization.
+--</li><li>
+--		full - Fully optimize the executable.
+--</li><li>
+--		max - Optimize as much as possible (possibly experimental optimizations).
+--</li></ul>
+S.c.optimization = "regular"
+if D.debug then S.c.optimization = "none" end
+
+--- Whether to profile.
+--
+-- If true profiling code will be present in the resulting executable. This
+-- value defaults to true if D.debug is set otherwise false.
+S.c.profile = false
+if D.debug then S.c.profile = true end
+
+--- Whether to produce debugging symbols.
+-- If true debugging symbols will be produced in the resulting executable. This
+-- value defaults to true if D.debug is set otherwise false.
+S.c.debug = false
+if D.debug then S.c.debug = true end
+
 --- Create new c state
 -- Creates and returns an opaque state.  This state is a table and is therefore
 -- passed by refrence.
@@ -42,15 +73,6 @@ function S.c.newState ( )
 		arguments = T.List(),
 		linker    = S.ld.newState(),
 	}
-
-	data.debug = false
-	if D.debug then data.debug = true end
-
-	data.optimization = "regular"
-	if D.debug then data.optimization = "none" end
-
-	data.profile = false
-	if D.debug then data.profile = true end
 
 	return data
 end
@@ -72,9 +94,9 @@ end
 function S.c.swapState ( new )
 	local old = state
 
-	old.debug        = S.c.debug
-	old.optimization = S.c.optimization
-	old.profile      = S.c.profile
+	old.debug        = S.c.debugOveride
+	old.optimization = S.c.optimizationOveride
+	old.profile      = S.c.profileOveride
 
 	S.c.loadState(new)
 
@@ -88,9 +110,9 @@ end
 function S.c.loadState ( data )
 	state = data
 
-	S.c.debug        = data.debug
-	S.c.optimization = data.optimization
-	S.c.profile      = data.profile
+	S.c.debugOveride        = data.debug
+	S.c.optimizationOveride = data.optimization
+	S.c.profileOveride      = data.profile
 end
 
 S.c.swapState(S.c.newState())
@@ -138,33 +160,14 @@ if not P.S.c.compiler then
 	end
 end
 
---- The optimization level.
---
--- A string value representing the level of optimization to use when building
--- the project. Possible values are:
--- <ul><li>
---		none - Perform no optimization.
---</li><li>
---		quick - Perform light optimization.
---</li><li>
---		regular - Perform regular optimization.
---</li><li>
---		full - Fully optimize the executable.
---</li><li>
---		max - Optimize as much as possible (possibly experimental optimizations).
---</li></ul>
-S.c.optimization = S.c.optimization
+-- Overide the default optimization level.
+S.c.optimizationOveride = S.c.optimizationOveride
 
---- Whether to profile.
---
--- If true profiling code will be present in the resulting executable. This
--- value defaults to true if D.debug is set otherwise false.
-S.c.profile = S.c.profile
+-- Overide the default profile setting.
+S.c.profileOveride = S.c.profileOveride
 
---- Whether to produce debugging symbols.
--- If true debugging symbols will be produced in the resulting executable. This
--- value defaults to true if D.debug is set otherwise false.
-S.c.debug = S.c.debug
+-- Overide the default profile setting.
+S.c.debugOveride = S.c.debugOveride
 
 --- Add an argrment.
 -- Add an argument to the compiler command line.  Please try to avoid using this
@@ -255,16 +258,22 @@ function S.c.compileObject ( obj, src, headers )
 
 	S.c.addArg(oldarguments)
 
-	if S.c.debug then                      -- Add the debug flag.
+	local debug = S.c.debugOveride
+	if debug == nil then debug = S.c.debug end
+	if debug then                      -- Add the debug flag.
 		S.c.addArg(compiler.flags.debug)
 	end
-	if S.c.profile then                    -- Add the profile flag.
+	local profile = S.c.profileOveride
+	if profile == nil then profile = S.c.profile end
+	if profile then                    -- Add the profile flag.
 		S.c.addArg(compiler.flags.profile)
 	end
-	local o = compiler.flags.optimize[S.c.optimization] -- Set the optimization
-	if o then                                           -- level.                                --
-		S.c.addArg(o)                                   --
-	end                                                 --
+	local optimization = S.c.optimizationOveride
+	if optimization == nil then optimization = S.c.optimization end
+	local o = compiler.flags.optimize[optimization] -- Set the optimization
+	if o then                                       -- level.                                --
+		S.c.addArg(o)                               --
+	end                                             --
 
 	for i in T.List(compiler.flags.output):iter() do -- Add the desired output
 		S.c.addArg(i:format(obj))                    -- file to the command
