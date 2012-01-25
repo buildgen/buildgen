@@ -31,6 +31,37 @@ S.import "ld"
 do -- So that we can hide our locals.
 local state = {}
 
+--- The optimization level.
+--
+-- A string value representing the level of optimization to use when building
+-- the project. Possible values are:
+-- <ul><li>
+--		none - Perform no optimization.
+--</li><li>
+--		quick - Perform light optimization.
+--</li><li>
+--		regular - Perform regular optimization.
+--</li><li>
+--		full - Fully optimize the executable.
+--</li><li>
+--		max - Optimize as much as possible (possibly experimental optimizations).
+--</li></ul>
+S.cpp.optimization = "regular"
+if D.debug then S.cpp.optimization = "none" end
+
+--- Whether to profile.
+--
+-- If true profiling code will be present in the resulting executable. This
+-- value defaults to true if D.debug is set otherwise false.
+S.cpp.profile = false
+if D.debug then S.cpp.profile = true end
+
+--- Whether to produce debugging symbols.
+-- If true debugging symbols will be produced in the resulting executable. This
+-- value defaults to true if D.debug is set otherwise false.
+S.cpp.debug = false
+if D.debug then S.cpp.debug = true end
+
 --- Create new cpp state
 -- Creates and returns an opaque state.  This state is a table and is therefore
 -- passed by refrence.
@@ -41,15 +72,6 @@ function S.cpp.newState ( )
 		arguments = T.List(),
 		linker    = S.ld.newState(),
 	}
-
-	data.debug = false
-	if D.debug then data.debug = true end
-
-	data.optimization = "regular"
-	if D.debug then data.optimization = "none" end
-
-	data.profile = false
-	if D.debug then data.profile = true end
 
 	local s = S.cpp.swapState(data)
 
@@ -77,9 +99,9 @@ end
 function S.cpp.swapState ( new )
 	local old = state
 
-	old.debug        = S.cpp.debug
-	old.optimization = S.cpp.optimization
-	old.profile      = S.cpp.profile
+	old.debug        = S.cpp.debugOveride
+	old.optimization = S.cpp.optimizationOveride
+	old.profile      = S.cpp.profileOveride
 
 	S.cpp.loadState(new)
 
@@ -141,33 +163,14 @@ if not P.S.cpp.compiler then
 	end
 end
 
---- The optimization level.
---
--- A string value representing the level of optimization to use when building
--- the project. Possible values are:
--- <ul><li>
---		none - Perform no optimization.
---</li><li>
---		quick - Perform light optimization.
---</li><li>
---		regular - Perform regular optimization.
---</li><li>
---		full - Fully optimize the executable.
---</li><li>
---		max - Optimize as much as possible (possibly experimental optimizations).
---</li></ul>
-S.cpp.optimization = S.cpp.optimization
+-- Overide the default optimization level.
+S.cpp.optimizationOveride = S.c.optimizationOveride
 
---- Whether to profile.
---
--- If true profiling code will be present in the resulting executable. This
--- value defaults to true if D.debug is set otherwise false.
-S.cpp.profile = S.cpp.profile
+-- Overide the default profile setting.
+S.cpp.profileOveride = S.c.profileOveride
 
---- Whether to produce debugging symbols.
--- If true debugging symbols will be produced in the resulting executable. This
--- value defaults to true if D.debug is set otherwise false.
-S.cpp.debug = S.cpp.debug
+-- Overide the default profile setting.
+S.cpp.debugOveride = S.c.debugOveride
 
 --- Add an argrment.
 -- Add an argument to the compiler command line.  Please try to avoid using this
@@ -255,16 +258,22 @@ function S.cpp.compileObject ( obj, src, headers )
 
 	S.cpp.addArg(oldarguments)
 
-	if S.cpp.debug then                      -- Add the debug flag.
+	local debug = S.cpp.debugOveride
+	if debug == nil then debug = S.cpp.debug end
+	if debug then                      -- Add the debug flag.
 		S.cpp.addArg(compiler.flags.debug)
 	end
-	if S.cpp.profile then                    -- Add the profile flag.
+	local profile = S.cpp.profileOveride
+	if profile == nil then profile = S.cpp.profile end
+	if profile then                    -- Add the profile flag.
 		S.cpp.addArg(compiler.flags.profile)
 	end
-	local o = compiler.flags.optimize[S.cpp.optimization] -- Set the optimization
-	if o then                                             -- level.
-		S.cpp.addArg(o)                                   --
-	end                                                   --
+	local optimization = S.cpp.optimizationOveride
+	if optimization == nil then optimization = S.cpp.optimization end
+	local o = compiler.flags.optimize[optimization] -- Set the optimization
+	if o then                                       -- level.                                --
+		S.cpp.addArg(o)                             --
+	end                                             --
 
 	for i in T.List(compiler.flags.output):iter() do -- Add the desired output file to
 		S.cpp.addArg(i:format(obj))        -- the command line.
