@@ -276,8 +276,8 @@ function S.cpp.compileObject ( obj, src, headers )
 	end                                             --
 
 	for i in T.List(compiler.flags.output):iter() do -- Add the desired output file to
-		S.cpp.addArg(i:format(obj))        -- the command line.
-	end                                     --
+		S.cpp.addArg(i:format(obj))                  -- the command line.
+	end                                              --
 
 	S.cpp.addArg(src)
 
