@@ -164,13 +164,13 @@ if not P.S.cpp.compiler then
 end
 
 -- Overide the default optimization level.
-S.cpp.optimizationOveride = S.c.optimizationOveride
+S.cpp.optimizationOveride = S.cpp.optimizationOveride
 
 -- Overide the default profile setting.
-S.cpp.profileOveride = S.c.profileOveride
+S.cpp.profileOveride = S.cpp.profileOveride
 
 -- Overide the default profile setting.
-S.cpp.debugOveride = S.c.debugOveride
+S.cpp.debugOveride = S.cpp.debugOveride
 
 --- Add an argrment.
 -- Add an argument to the compiler command line.  Please try to avoid using this
