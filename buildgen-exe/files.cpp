@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 #include <dirent.h>
 #include <unistd.h>
 #include <string.h>
@@ -169,7 +170,7 @@ void Files::findProjectRoot( void )
 		else i++;
 
 		chdir("..");
-		root = freopen(rootfilename, "r", root);
+		root = fopen(rootfilename, "r");
 	}
 	fclose(root);
 
@@ -300,7 +301,7 @@ char *Files::prettyPath ( char *path )
 			{ /* /dir/otherdir/../file */
 			  /*              ^^^^     */
 				i += 3;
-				o--;
+				if ( o > path ) o--; // If is for root directory check.
 				while ( o > path && *o != '/' )
 					o--;                           // leading slash
 			}
@@ -319,4 +320,37 @@ char *Files::prettyPath ( char *path )
 	*o = '\0';
 
 	return path;
+}
+void _TEST_Files_prettyPath ( void )
+{
+	char *s, *r;
+
+	s = mstrdup("/this/is/a/test/");
+	r = "/this/is/a/test/";
+	assert( strcmp(Files::prettyPath(s), r) == 0 );
+	free(s);
+
+	s = mstrdup("//////this///////////test////////");
+	r = "/this/test/";
+	assert( strcmp(Files::prettyPath(s), r) == 0 );
+	free(s);
+
+	s = mstrdup("//////this/../../../../test////////");
+	r = "/test/";
+	assert( strcmp(Files::prettyPath(s), r) == 0 );
+	free(s);
+
+	s = mstrdup("/../this/is/./../this/./test");
+	r = "/this/this/test";
+	assert( strcmp(Files::prettyPath(s), r) == 0 );
+	free(s);
+
+	s = mstrdup("//////this/../../../../test////////");
+	r = "/test/";
+	assert( strcmp(Files::prettyPath(s), r) == 0 );
+	assert( strcmp(Files::prettyPath(s), r) == 0 );
+	assert( strcmp(Files::prettyPath(s), r) == 0 );
+	free(s);
+
+
 }

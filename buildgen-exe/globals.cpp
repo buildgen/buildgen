@@ -55,7 +55,7 @@ Files *files;
 	const char *OS_KERNEL = "win32";
 #elif defined(__APPLE__)
 	const char *OS_STYLE = "mac";
-	const char *OS_COMPLIANCE = "posix";
+	const char *OS_COMPLIANCE = "mac";
 	const char *OS_KERNEL = "darwin";
 #else
 	const char *OS_COMPLIANCE = "unknown";

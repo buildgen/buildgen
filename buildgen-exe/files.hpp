@@ -96,7 +96,9 @@ public:
 	  * \arg path An absolute path to be prettified in place.
 	  * \return path (the same value you put in).  This function does not fail.
 	  */
-	char *prettyPath(char *path);
+	static char *prettyPath(char *path);
 };
+
+void _TEST_Files_prettyPath(void);
 
 #endif

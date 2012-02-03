@@ -39,6 +39,7 @@ S.cpp.addLib{"m", "lua"}
 S.cpp.addInclude "<"
 
 S.cpp.compile("@gen", {
+	"main.cpp",
 	"commandline.hpp",
 	"commandline.cpp",
 	"files.hpp",
@@ -49,7 +50,36 @@ S.cpp.compile("@gen", {
 	"lua-functions.cpp",
 	"lua-init.hpp",
 	"lua-init.cpp",
-	"main.cpp",
+	"messages.hpp",
+	"messages.cpp",
+	"mystring.hpp",
+	"mystring.cpp",
+
+	"@info.h",
+	"@info.cpp",
+
+	"<buildgen-xml/common.cpp",
+	"<buildgen-xml/common.hpp",
+	"<buildgen-xml/save.cpp",
+	"<buildgen-xml/save.hpp",
+	"<buildgen-xml/target.cpp",
+	"<buildgen-xml/target.hpp",
+})
+
+
+C.addGenerator({"@test.cpp"}, {}, {C.path"test.lua", C.path"", C.path"@test.cpp"})
+S.cpp.compile("@test", {
+	"@test.cpp",
+	"commandline.hpp",
+	"commandline.cpp",
+	"files.hpp",
+	"files.cpp",
+	"globals.hpp",
+	"globals.cpp",
+	"lua-functions.hpp",
+	"lua-functions.cpp",
+	"lua-init.hpp",
+	"lua-init.cpp",
 	"messages.hpp",
 	"messages.cpp",
 	"mystring.hpp",
