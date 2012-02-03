@@ -25,6 +25,8 @@
 #ifndef LUA_FUNCTIONS_HPP
 #define LUA_FUNCTIONS_HPP
 
+#include <lua.hpp>
+
 namespace LuaFunctions
 {
 	namespace C
