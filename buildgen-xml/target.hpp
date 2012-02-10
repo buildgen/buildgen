@@ -87,7 +87,7 @@ public:
 	char *desc;
 	void addDescription ( const char *d );
 	std::vector< std::vector<char*> > cmds;
-	void addCommand ( const std::vector<const char*> &cmd );
+	virtual void addCommand ( const std::vector<const char*> &cmd );
 	virtual rapidxml::xml_node<> *toXML(rapidxml::xml_document<> &d);
 	static Generator *fromXML(const rapidxml::xml_node<> *n);
 };

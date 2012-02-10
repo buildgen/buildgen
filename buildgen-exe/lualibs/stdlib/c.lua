@@ -281,7 +281,7 @@ function S.c.compileObject ( obj, src, headers )
 
 	S.c.addArg(src)
 
-	C.addGenerator({obj}, headers, state.arguments, {
+	C.addGenerator(headers, state.arguments, {obj}, {
 		description = "Compiling "..obj
 	})
 
@@ -364,7 +364,7 @@ function S.c.generateHeader ( head, src, definitions )
 		cmd:append(k.."="..v)
 	end
 
-	C.addGenerator({head, src}, {}, cmd, {
+	C.addGenerator({}, cmd, {head, src}, {
 		description = "Generating "..head
 	})
 end

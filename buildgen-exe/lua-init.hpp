@@ -27,9 +27,13 @@
 
 #include <lua.hpp>
 
+#include "files.hpp"
+
 class BuildGenLuaEnv
 {
 	lua_State* L;
+	Files *files;
+
 	char *root_file;
 
 	char *corefile;
@@ -43,7 +47,7 @@ class BuildGenLuaEnv
 
 	void doRunFile ( const char *path );
 public:
-	BuildGenLuaEnv(const char *root);
+	BuildGenLuaEnv(Files *files, const char *root);
 	~BuildGenLuaEnv();
 
 	void define(char *key, char *value);

@@ -72,9 +72,6 @@ void Files::init ( const char *srcdir, char *buildgenroot )
 	free(br);
 
 	/*** Get LuaLibs root ***/
-	unsigned int bgl = strlen(buildgen_root);
-	unsigned int llrl = strlen(LUALIBS_ROOT);
-
 	lualibs_root = mstrcat(buildgen_root, LUALIBS_ROOT);
 
 	if (srcdir) // We don't need this if we are just listing directories.

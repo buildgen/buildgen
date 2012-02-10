@@ -26,9 +26,11 @@
 #define LUA_FUNCTIONS_HPP
 
 #include <lua.hpp>
+#include "files.hpp"
 
 namespace LuaFunctions
 {
+	extern Files *files;
 	namespace C
 	{
 		int add_depandancy(lua_State *L);

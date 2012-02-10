@@ -215,7 +215,7 @@ namespace opt
 		xml_out = NULL;
 	}
 
-	void do_options ( void )
+	void do_options ( Files *files )
 	{
 		switch (toDo)
 		{

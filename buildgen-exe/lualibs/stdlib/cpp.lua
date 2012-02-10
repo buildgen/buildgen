@@ -281,7 +281,7 @@ function S.cpp.compileObject ( obj, src, headers )
 
 	S.cpp.addArg(src)
 
-	C.addGenerator({obj}, headers, state.arguments, {
+	C.addGenerator(headers, state.arguments, {obj}, {
 		description = "Compiling "..obj
 	})
 

@@ -31,7 +31,7 @@
 #include "files.hpp"
 #include "buildgen-xml/target.hpp"
 
-Files *files;
+//Files *files;
 
 #if defined(__linux__)
 	const char *OS_STYLE = "linux";

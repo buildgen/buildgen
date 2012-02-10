@@ -176,7 +176,7 @@ function S.util.cp ( src, dest )
 	cmd:append(src)
 	cmd:append(dest)
 
-	C.addGenerator({dest}, {src}, cmd, {
+	C.addGenerator({src}, cmd, {dest}, {
 		description = "Coppying "..src.." to "..dest
 	})
 end
@@ -190,7 +190,7 @@ function S.util.mv ( src, dest )
 	cmd:append(src)
 	cmd:append(dest)
 
-	C.addGenerator({dest}, {src}, cmd, {
+	C.addGenerator({src}, cmd, {dest}, {
 		description = "Moving "..src.." to "..dest
 	})
 end
@@ -202,7 +202,7 @@ function S.util.rm ( file )
 	cmd:append(P.S.util.cmd.rm.name)
 	cmd:append(file)
 
-	C.addGenerator({}, {file}, cmd, {
+	C.addGenerator({file}, cmd, {}, {
 		description = "Deleting "..file
 	})
 end
@@ -217,7 +217,7 @@ function S.util.install ( src, dest )
 	cmd:append(src)
 	cmd:append(dest)
 
-	C.addGenerator({dest}, {src}, cmd, {
+	C.addGenerator({src}, cmd, {dest}, {
 		description = "Installing "..src.." to "..dest
 	})
 end

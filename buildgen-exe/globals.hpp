@@ -28,7 +28,7 @@
 #include "files.hpp"
 #include "buildgen-xml/target.hpp"
 
-extern Files *files;
+//extern Files *files;
 void checkAlloc ( void *p );
 
 extern const char *OS_STYLE;

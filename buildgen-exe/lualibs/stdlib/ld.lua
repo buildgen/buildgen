@@ -159,7 +159,7 @@ function S.ld.link ( out, objects )
 	cmd:extend(state.arguments)
 	cmd:extend(objects)
 
-	C.addGenerator({out}, objects, cmd, {
+	C.addGenerator(objects, cmd, {out}, {
 		description = "Linking "..out
 	})
 end

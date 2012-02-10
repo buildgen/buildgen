@@ -38,11 +38,12 @@
 #include "lua-init.hpp"
 #include "lua-functions.hpp"
 
-BuildGenLuaEnv::BuildGenLuaEnv ( const char *root ):
-	root_file(NULL)
+BuildGenLuaEnv::BuildGenLuaEnv (Files *files, const char *root)
 {
-	assert( root != NULL );
+	assert( files != NULL );
+	this->files = files;
 
+	assert( root != NULL );
 	root_file = mstrdup(root);
 
 	init();

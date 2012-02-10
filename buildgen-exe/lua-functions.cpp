@@ -44,6 +44,7 @@
 
 namespace LuaFunctions
 {
+	Files *files;
 
 namespace C
 {
@@ -102,24 +103,27 @@ int add_dir (lua_State *L)
 
 int add_generator (lua_State *L)
 {
-	luaL_checktype(L, 1, LUA_TTABLE); // Outputs
-	luaL_checktype(L, 2, LUA_TTABLE); // Inputs
+	luaL_checktype(L, 1, LUA_TTABLE); // Inputs
 
-	luaL_checktype(L, 3, LUA_TTABLE); // Command line
-	lua_pushinteger(L, 1);
+	luaL_checktype(L, 2, LUA_TTABLE); // Command line
+	lua_pushinteger(L, 1); // Get first item from table
+	lua_gettable(L, 2);    //
 	if (lua_isstring(L, -1)) // Check the first element of the table.
 	{
 		lua_createtable(L, 1, 0); // Create the wrapper table.
-		lua_insert(L, 3);         // Put it at the proper index
+		lua_insert(L, 2);         // Put it at the proper index
 		lua_pushinteger(L, 1);    // Push a 1 for the index of the settable()
-		lua_pushvalue(L, 4);      // Copy the old table.
-		lua_remove(L, 4);         // Delete the original old table.
-		lua_settable(L, 3);       // wrapper[1] = oldtable
+		lua_pushvalue(L, 3);      // Copy the old table.
+		lua_remove(L, 3);         // Delete the original table.
+		lua_settable(L, 2);       // wrapper[1] = oldtable
 	}
 	lua_pop(L, 1); // Pop the result of the test.
 
+	luaL_checktype(L, 3, LUA_TTABLE); // Outputs
+
 	if (lua_isnone(L, 4))
 		lua_newtable(L);
+
 	luaL_checktype(L, 4, LUA_TTABLE); // Options
 
 	lua_Debug ar;
@@ -141,10 +145,13 @@ int add_generator (lua_State *L)
 
 	/*** Get Command ***/
 	std::vector<const char*> cmd;
-	for ( unsigned int i = lua_objlen(L, 3); i >= 1; i-- )
+	for ( unsigned int i = lua_objlen(L, 2); i >= 1; i-- )
 	{
 		lua_pushnumber(L, i);
-		lua_gettable(L, 3);
+		lua_gettable(L, 2);
+
+		if (!lua_istable(L, -1))
+			luaL_error(L, "C.addGenerator was given a generator command line that is not a table.");
 
 		int curcmd = lua_gettop(L);
 
@@ -154,7 +161,7 @@ int add_generator (lua_State *L)
 			lua_pushnumber(L, j);
 			lua_gettable(L, curcmd);
 			if (!lua_isstring(L, -1))
-				luaL_error(L, "C.addGenerator was given a generator command that is not a string.");
+				luaL_error(L, "C.addGenerator was given a generator command argument that is not a string.");
 
 			cmd[j-1] = lua_tostring(L, -1);
 			lua_pop(L, 1);
@@ -169,14 +176,14 @@ int add_generator (lua_State *L)
 		lua_pop(L, 1);
 	}
 
-	std::vector<Target*> in(luaL_getn(L, 2));
+	std::vector<Target*> in(luaL_getn(L, 1));
 
 	/*** Get Inputs ***/
-	for ( unsigned int i = lua_objlen(L, 2); i >= 1; i-- ) // For each input
+	for ( unsigned int i = lua_objlen(L, 1); i >= 1; i-- ) // For each input
 	{
 		/*** Get the current filename ***/
 		lua_pushnumber(L, i);
-		lua_gettable(L, 2);
+		lua_gettable(L, 1);
 		if (!lua_isstring(L, -1))
 			luaL_error(L, "C.addGenerator was given a source file that is"
 						  "not a string."
@@ -189,11 +196,11 @@ int add_generator (lua_State *L)
 	}
 
 	/*** Get Outputs ***/
-	for ( unsigned int i = lua_objlen(L, 1); i >= 1; i-- ) // For each output
+	for ( unsigned int i = lua_objlen(L, 2); i >= 1; i-- ) // For each output
 	{
 		/*** Get the current filename ***/
 		lua_pushnumber(L, i);
-		lua_gettable(L, 1);
+		lua_gettable(L, 3);
 		if (!lua_isstring(L, -1))
 			luaL_error(L, "C.addGenerator was given an output file this is not a string.");
 
@@ -202,7 +209,8 @@ int add_generator (lua_State *L)
 		free(tpath);
 		lua_pop(L, 1);
 
-		if (lua_objlen(L, 3)) t->addGenerator(gen);
+		t->addGenerator(gen);
+
 		for ( unsigned int i = in.size(); i--; )
 			t->addDependancy(in[i]);
 	}

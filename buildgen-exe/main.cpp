@@ -38,6 +38,7 @@
 #include "lua-init.hpp"
 #include "files.hpp"
 #include "buildgen-xml/save.hpp"
+#include "lua-functions.hpp"
 
 char *findOurPath ( char *a ) // Turn argv[0] into a BuildGen path
 {
@@ -57,21 +58,22 @@ int main ( int argc, char **argv )
 
 	opt::get_options(&argc, &argv);
 
-	files = new Files(opt::src_dir, cmd[0]);
+	Files files(opt::src_dir, cmd[0]);
+	LuaFunctions::files = &files;
 
-	opt::do_options(); // May quit.
+	opt::do_options(&files); // May not return.
 
 	std::set<std::string> runfiles;
 
-	chdir(files->project_root);
-	char *rootFileName = files->normalizeFilename(files->rootfilename);
-	BuildGenLuaEnv lua(rootFileName);
+	chdir(files.project_root);
+	char *rootFileName = files.normalizeFilename(files.rootfilename);
+	BuildGenLuaEnv lua(&files, rootFileName);
 	free(rootFileName);
 
 	Target *regen = Target::newTarget("regen", false);
 	regen->magic = 1;
 
-	cmd[0] = files->normalizeFilename(cmd[0]);
+	cmd[0] = files.normalizeFilename(cmd[0]);
 
 	regen->addGenerator(cmd);
 	regen->generator->addDescription("Regenerating build information");
@@ -79,23 +81,23 @@ int main ( int argc, char **argv )
 	for ( int i = opt::defines.size()-1; i >= 0; i-- )
 		lua.define(opt::defines[i].key, opt::defines[i].value);
 
-	while (files->infofile.size())
+	while (files.infofile.size())
 	{
 		std::pair<std::set<std::string>::iterator,bool> p(
-			runfiles.insert(std::string(files->infofile.front()))
+			runfiles.insert(std::string(files.infofile.front()))
 		);
 		if (p.second) // New file
 		{
-			Target *t = Target::newTarget(files->infofile.front(), false);
+			Target *t = Target::newTarget(files.infofile.front(), false);
 			regen->addDependancy(t);
 
-			lua.runFile(files->infofile.front());
+			lua.runFile(files.infofile.front());
 		}
 
-		files->infofile.pop();
+		files.infofile.pop();
 	}
 
-	fputs(XML::create(Target::targets).c_str(), opt::xml_out);
+	fputs(XML::create(Target::targets, &files).c_str(), opt::xml_out);
 	opt::close_xml_out();
 
 	return 0;

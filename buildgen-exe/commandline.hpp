@@ -28,6 +28,8 @@
 #include <stdio.h>
 #include <vector>
 
+#include "files.hpp"
+
 namespace opt
 {
 	struct Definition {
@@ -46,7 +48,7 @@ namespace opt
 	extern const char *src_dir;
 
 	extern void get_options(int *argc, char ***argv);
-	extern void do_options(void);
+	extern void do_options(Files *files);
 }
 
 #endif
