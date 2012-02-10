@@ -67,7 +67,9 @@ S.cpp.compile("@gen", {
 })
 
 
-C.addGenerator({"@test.cpp"}, {}, {C.path"test.lua", C.path"", C.path"@test.cpp"})
+C.addGenerator({}, {C.path"test.lua", C.path"", C.path"@test.cpp"}, {"@test.cpp"}, {
+	description: "Generatring tests..."
+})
 S.cpp.compile("@test", {
 	"@test.cpp",
 	"commandline.hpp",
