@@ -78,5 +78,8 @@ std::string XML::create(std::set<Target*, Target::comparator> &targets, Files *f
 
 	std::string xml_as_string;
 	print(std::back_inserter(xml_as_string), doc);
+
+	free(timestamp);
+
 	return xml_as_string;
 }

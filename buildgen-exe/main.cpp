@@ -78,6 +78,9 @@ int main ( int argc, char **argv )
 	regen->addGenerator(cmd);
 	regen->generator->addDescription("Regenerating build information");
 
+	for ( int i = cmd.size()-1; i--; )
+		free(cmd[i]);
+
 	for ( int i = opt::defines.size()-1; i >= 0; i-- )
 		lua.define(opt::defines[i].key, opt::defines[i].value);
 
