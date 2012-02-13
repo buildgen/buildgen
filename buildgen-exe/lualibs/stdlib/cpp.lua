@@ -262,6 +262,9 @@ function S.cpp.compileObject ( obj, src, headers )
 	if debug == nil then debug = S.cpp.debug end
 	if debug then                      -- Add the debug flag.
 		S.cpp.addArg(compiler.flags.debug)
+		S.cpp.define{DEBUG=true}
+	else
+		S.cpp.define{NDEBUG=true}
 	end
 	local profile = S.cpp.profileOveride
 	if profile == nil then profile = S.cpp.profile end
