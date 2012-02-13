@@ -115,9 +115,9 @@ end
 function S.cpp.loadState ( data )
 	state = data
 
-	S.cpp.debug        = data.debug
-	S.cpp.optimization = data.optimization
-	S.cpp.profile      = data.profile
+	S.cpp.debugOveride        = data.debugOveride
+	S.cpp.optimizationOveride = data.optimizationOveride
+	S.cpp.profileOveride      = data.profileOveride
 end
 
 if not P.S.cpp.compiler then
@@ -263,7 +263,7 @@ function S.cpp.compileObject ( obj, src, headers )
 	if debug then                      -- Add the debug flag.
 		S.cpp.addArg(compiler.flags.debug)
 		S.cpp.define{DEBUG=true}
-	else
+	else                   -- Add the debug flag.
 		S.cpp.define{NDEBUG=true}
 	end
 	local profile = S.cpp.profileOveride
