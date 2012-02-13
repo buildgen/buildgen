@@ -28,7 +28,7 @@ S.cpp.addInclude "<"
 
 S.cpp.addLib "m"
 
-S.cpp.compile("@gen-makefile", {
+S.cpp.compile({
 	"commandline.hpp",
 	"commandline.cpp",
 	"main.cpp",
@@ -44,7 +44,7 @@ S.cpp.compile("@gen-makefile", {
 
 	"<buildgen-exe/messages.hpp",
 	"<buildgen-exe/messages.cpp",
-})
+}, "@gen-makefile")
 
 S.addToDefault "@gen-makefile"
 

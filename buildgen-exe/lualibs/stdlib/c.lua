@@ -240,10 +240,10 @@ end
 
 --- Compile a source into an object.
 --
--- @param obj The place to put the resulting object file.
 -- @prarm src The file to compile.
 -- @ headers A list of headers that are needed.
-function S.c.compileObject ( obj, src, headers )
+-- @param obj The place to put the resulting object file.
+function S.c.compileObject (src, headers, obj)
 	obj = C.path(obj)
 	src = C.path(src)
 	headers = T.List(headers):map(C.path)
@@ -291,11 +291,11 @@ end
 --- Compile an Executable
 -- Compiles and links a list of files into executables.
 --
--- @param out The file to be created.  ".exe" will be appended if compiling on
---	Windows.
 -- @param sources A list of sources (bot header and source files) that will be
 --	used when compiling the executable.
-function S.c.compile ( out, sources )
+-- @param out The file to be created.  ".exe" will be appended if compiling on
+--	Windows.
+function S.c.compile ( sources, out )
 	out = C.path(out)
 	sources = T.List(sources):map(C.path)
 
@@ -329,11 +329,11 @@ function S.c.compile ( out, sources )
 			                                                     -- the build
 		end                                                      -- dir.
 
-		S.c.compileObject(object, source, h)
+		S.c.compileObject(source, h, object)
 		objects:append(object)
 	end
 
-	S.ld.link(out, objects)
+	S.ld.link(objects, out)
 
 	state.linker = S.ld.swapState(ln) -- Put their linker back.
 end

@@ -140,7 +140,7 @@ end
 --
 -- @param out The location to put the executable.  This is treated as a BuildGen
 --	patg.
-function S.ld.link ( out, objects )
+function S.ld.link ( objects, out )
 	linker = P.S.ld.linker
 
 	local cmd = T.List()

@@ -72,7 +72,7 @@ local sources = T.List{
 files = T.List{"main.cpp"}   -- Compile gen
 files:extend(headers)        --
 files:extend(sources)        --
-S.cpp.compile("@gen", files) --
+S.cpp.compile(files, "@gen") --
 
 files = T.List()  -- Compile the tests
 files:extend(headers)
@@ -81,7 +81,7 @@ C.addGenerator(files, {C.path"test.lua", C.path"", C.path"@test.cpp"}, {"@test.c
 	description = "Generatring tests..."
 })
 files:append("@test.cpp")
-S.cpp.compile("@test", files)
+S.cpp.compile(files, "@test")
 
 S.addToDefault "@gen"
 

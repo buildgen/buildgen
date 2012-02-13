@@ -76,7 +76,7 @@ if not S.prefix then
 	S.prefix = D.prefix
 end
 
---- Add a Terget to the Default Build
+--- Add a Target to the Default Build
 --
 -- Adds <span class="code">path</span> to the default buid.  This means that if
 -- the builder doesn't specify what they want build this will be built.
