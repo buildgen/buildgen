@@ -38,65 +38,50 @@ S.cpp.addLib{"m", "lua"}
 
 S.cpp.addInclude "<"
 
-S.cpp.compile("@gen", {
-	"main.cpp",
+local headers = T.List{
 	"commandline.hpp",
-	"commandline.cpp",
 	"files.hpp",
-	"files.cpp",
 	"globals.hpp",
-	"globals.cpp",
 	"lua-functions.hpp",
-	"lua-functions.cpp",
 	"lua-init.hpp",
-	"lua-init.cpp",
 	"messages.hpp",
-	"messages.cpp",
 	"mystring.hpp",
-	"mystring.cpp",
 
 	"@info.h",
+
+	"<buildgen-xml/common.hpp",
+	"<buildgen-xml/save.hpp",
+	"<buildgen-xml/target.hpp",
+}
+local sources = T.List{
+	"commandline.cpp",
+	"files.cpp",
+	"globals.cpp",
+	"lua-functions.cpp",
+	"lua-init.cpp",
+	"messages.cpp",
+	"mystring.cpp",
+
 	"@info.cpp",
 
 	"<buildgen-xml/common.cpp",
-	"<buildgen-xml/common.hpp",
 	"<buildgen-xml/save.cpp",
-	"<buildgen-xml/save.hpp",
 	"<buildgen-xml/target.cpp",
-	"<buildgen-xml/target.hpp",
+}
+
+files = T.List{"main.cpp"}   -- Compile gen
+files:extend(headers)        --
+files:extend(sources)        --
+S.cpp.compile("@gen", files) --
+
+files = T.List()  -- Compile the tests
+files:extend(headers)
+files:extend(sources)
+C.addGenerator(files, {C.path"test.lua", C.path"", C.path"@test.cpp"}, {"@test.cpp"}, {
+	description = "Generatring tests..."
 })
-
-
-C.addGenerator({}, {C.path"test.lua", C.path"", C.path"@test.cpp"}, {"@test.cpp"}, {
-	description: "Generatring tests..."
-})
-S.cpp.compile("@test", {
-	"@test.cpp",
-	"commandline.hpp",
-	"commandline.cpp",
-	"files.hpp",
-	"files.cpp",
-	"globals.hpp",
-	"globals.cpp",
-	"lua-functions.hpp",
-	"lua-functions.cpp",
-	"lua-init.hpp",
-	"lua-init.cpp",
-	"messages.hpp",
-	"messages.cpp",
-	"mystring.hpp",
-	"mystring.cpp",
-
-	"@info.h",
-	"@info.cpp",
-
-	"<buildgen-xml/common.cpp",
-	"<buildgen-xml/common.hpp",
-	"<buildgen-xml/save.cpp",
-	"<buildgen-xml/save.hpp",
-	"<buildgen-xml/target.cpp",
-	"<buildgen-xml/target.hpp",
-})
+files:append("@test.cpp")
+S.cpp.compile("@test", files)
 
 S.addToDefault "@gen"
 

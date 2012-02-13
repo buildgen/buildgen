@@ -99,6 +99,7 @@ public:
 	static char *prettyPath(char *path);
 };
 
+void _TEST_Files_normalizeFilename ( Files *f );
 void _TEST_Files_prettyPath(void);
 
 #endif

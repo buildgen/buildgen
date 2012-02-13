@@ -273,6 +273,96 @@ char *Files::normalizeFilename( const char *path )
 
 	return prettyPath(n);
 }
+#ifdef DEBUG
+void _TEST_Files_normalizeFilename ( Files *of )
+{
+	Files f(*of);
+
+	f.project_root = "/test/src/";
+	f.out_root = "/test/build/";
+
+	char *s, *e, *r;
+
+	chdir("/home/");
+
+	s = "/this/is/a/test/";
+	e = "/this/is/a/test/";
+	r = f.normalizeFilename(s);
+	//printf("%s\n", r);
+	assert( strcmp(r, e) == 0 );
+	free(r);
+
+	s = "!/this/is/a/test/";
+	e = "/home/this/is/a/test/";
+	r = f.normalizeFilename(s);
+	//printf("%s\n", r);
+	assert( strcmp(r, e) == 0 );
+	free(r);
+
+	s = "!!!/this/is/../is/a/test/";
+	e = "/home/!!/this/is/a/test/";
+	r = f.normalizeFilename(s);
+	//printf("%s\n", r);
+	assert( strcmp(r, e) == 0 );
+	free(r);
+
+	s = "*ls";
+	e = "/bin/ls";
+	r = f.normalizeFilename(s);
+	//printf("%s\n", r);
+	assert( strcmp(r, e) == 0 );
+	free(r);
+
+	s = "*env";
+	e = "/usr/bin/env";
+	r = f.normalizeFilename(s);
+	//printf("%s\n", r);
+	assert( strcmp(r, e) == 0 );
+	free(r);
+
+	s = ">file";
+	e = "/test/build/file";
+	r = f.normalizeFilename(s);
+	//printf("%s\n", r);
+	assert( strcmp(r, e) == 0 );
+	free(r);
+
+	s = ">dir/";
+	e = "/test/build/dir/";
+	r = f.normalizeFilename(s);
+	//printf("%s\n", r);
+	assert( strcmp(r, e) == 0 );
+	free(r);
+
+	s = ">dir/file";
+	e = "/test/build/dir/file";
+	r = f.normalizeFilename(s);
+	//printf("%s\n", r);
+	assert( strcmp(r, e) == 0 );
+	free(r);
+
+	s = "<file";
+	e = "/test/src/file";
+	r = f.normalizeFilename(s);
+	//printf("%s\n", r);
+	assert( strcmp(r, e) == 0 );
+	free(r);
+
+	s = "<dir/";
+	e = "/test/src/dir/";
+	r = f.normalizeFilename(s);
+	//printf("%s\n", r);
+	assert( strcmp(r, e) == 0 );
+	free(r);
+
+	s = "<dir/file";
+	e = "/test/src/dir/file";
+	r = f.normalizeFilename(s);
+	//printf("%s\n", r);
+	assert( strcmp(r, e) == 0 );
+	free(r);
+}
+#endif
 
 char *Files::prettyPath ( char *path )
 {
@@ -318,6 +408,7 @@ char *Files::prettyPath ( char *path )
 
 	return path;
 }
+#ifdef DEBUG
 void _TEST_Files_prettyPath ( void )
 {
 	char *s, *r;
@@ -351,3 +442,4 @@ void _TEST_Files_prettyPath ( void )
 
 
 }
+#endif
