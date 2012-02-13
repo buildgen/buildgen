@@ -299,8 +299,8 @@ end
 -- @param out The file to be created.  ".exe" will be appended if compiling on
 --	Windows.
 function S.cpp.compile ( sources, out )
-	out = C.path(out)
 	sources = T.List(sources):map(C.path)
+	out = C.path(out)
 
 	local ln = S.ld.swapState(state.linker) -- Use our linker
 
