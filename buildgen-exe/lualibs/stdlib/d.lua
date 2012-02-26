@@ -59,6 +59,12 @@ if D.debug then S.d.profile = true end
 S.d.debug = false
 if D.debug then S.d.debug = true end
 
+--- Whether to produce unittests.
+-- If true unittests will be compiled into the executable. This
+-- value defaults to true if D.debug is set otherwise false.
+S.d.unittest = false
+if D.unittest then S.d.unittest = true end
+
 --- Create new cpp state
 -- Creates and returns an opaque state.  This state is a table and is therefore
 -- passed by refrence.
@@ -94,9 +100,10 @@ end
 function S.d.swapState ( new )
 	local old = state
 
-	old.debug        = S.d.debugOveride
-	old.optimization = S.d.optimizationOveride
-	old.profile      = S.d.profileOveride
+	old.debugOveride        = S.d.debugOveride
+	old.optimizationOveride = S.d.optimizationOveride
+	old.profileOveride      = S.d.profileOveride
+	old.unittestOveride     = S.d.unittestOveride
 
 	S.d.loadState(new)
 
@@ -113,22 +120,25 @@ function S.d.loadState ( data )
 	S.d.debugOveride        = data.debugOveride
 	S.d.optimizationOveride = data.optimizationOveride
 	S.d.profileOveride      = data.profileOveride
+	S.d.unittestOveride     = data.unittestOveride
 end
 
 if not P.S.d.compiler then
 	local compilers = {
 		{	name = "ldc2", -- Name of the executable
 			flags = {
-				compile   = {"-c", "-output-bc"},
-				link      = {},
-				linkAsLib = ,
-				output    = {"-of", "%s"}, -- the option to set the output file name.
-				debug     = "-g",         -- the option to enable debug mode.
-				profile   = "-p",         -- the option to enable profiling.
-				define    = {"-D%s=%s"},  -- the option to define a macro.
-				lib       = {"-l%s"},     -- the option to link a library.
-				include   = {"-I", "%s"}, -- the option to add an include directory.
-				optimize  = {             -- Flags for different levels of optimization.
+				compile    = {"-c", "-output-bc"},
+				link       = {},
+				linkShared = "-shared",
+				linkStatic = "-lib",
+				output     = {"-of", "%s"}, -- the option to set the output file name.
+				debug      = "-g",          -- the option to enable debug mode.
+				unittest   = "-unittest",   -- the option to enable unittest.
+				profile    = {},            -- the option to enable profiling.
+				define     = {"-D%s=%s"},   -- the option to define a macro.
+				lib        = {"-l%s"},      -- the option to link a library.
+				include    = {"-I", "%s"},  -- the option to add an include directory.
+				optimize   = {              -- Flags for different levels of optimization.
 					none    = "-O0",
 					quick   = "-O",
 					regular = "-O",     -- Default optimazation.
@@ -169,6 +179,9 @@ S.d.profileOveride = S.d.profileOveride
 
 -- Overide the default profile setting.
 S.d.debugOveride = S.d.debugOveride
+
+-- Overide the default unittest setting.
+S.d.unittestOveride = S.d.unittestOveride
 
 --- Add an argrment to the linker.
 -- Add an argument to the linker command line.  Please try to avoid using this
@@ -281,6 +294,14 @@ function S.d.compileObject ( src, obj )
 	else                   -- Add the debug flag.
 		--S.d.define{NDEBUG=true}
 	end
+	local unittest = S.d.unittestOveride
+	if unittest == nil then unittest = S.d.unittest end
+	if unittest then                      -- Add the debug flag.
+		S.d.addArg(compiler.flags.unittest)
+		--S.d.define{DEBUG=true}
+	else                   -- Add the debug flag.
+		--S.d.define{NDEBUG=true}
+	end
 	local profile = S.d.profileOveride
 	if profile == nil then profile = S.d.profile end
 	if profile then                    -- Add the profile flag.
@@ -294,7 +315,7 @@ function S.d.compileObject ( src, obj )
 	end                                             --
 
 	for i in T.List(compiler.flags.output):iter() do -- Add the desired output file to
-		S.d.addArg(i:format(obj))                  -- the command line.
+		S.d.addArg(i:format(obj))                    -- the command line.
 	end                                              --
 
 	S.d.addArg(src)
@@ -342,7 +363,7 @@ end
 --
 -- @param objects A list of objects that will be used to compile the library.
 -- @param out The file to be created.  An appropriate extension will be added.
-function S.d.link(objects, out)
+function S.d.linkShared(objects, out)
 	objects = T.List(objects):map(C.path)
 	out = C.path(out)
 
@@ -354,7 +375,7 @@ function S.d.link(objects, out)
 	S.d.addLinkArg(compiler.name)
 	S.d.addLinkArg(compiler.flags.link)
 
-	S.d.addLinkArg(compiler.flags.linkAsLib)
+	S.d.addLinkArg(compiler.flags.linkShared)
 
 	S.d.addLinkArg(oldarguments)                                       --
 
@@ -408,12 +429,12 @@ function S.d.compile ( sources, out )
 	S.d.link(objects, out)
 end
 
---- Compile a Library
--- Compiles and links a list of files into a lirary.
+--- Compile a Shared Library
+-- Compiles and links a list of files into a shared library.
 --
 -- @param sources A list of sources that will be used to compile the library.
 -- @param out The file to be created.  An appropriate extension will be added.
-function S.d.compileLib ( sources, out )
+function S.d.compileShared ( sources, out )
 	sources = T.List(sources):map(C.path)
 	out = C.path(out)
 
@@ -440,7 +461,7 @@ function S.d.compileLib ( sources, out )
 		objects:append(object)
 	end
 
-	S.d.linkLib(objects, out)
+	S.d.linkShared(objects, out)
 end
 
 S.d.swapState(S.d.newState())
