@@ -29,7 +29,7 @@ T = {}
 
 require "lfs"
 
-T.List = require "pl.list".List
+T.List = require "pl.List"
 T.class = require "pl.class"
 T.Map = require "pl.Map"
 T.Set = require "pl.Set"
