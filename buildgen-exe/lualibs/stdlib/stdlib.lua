@@ -27,17 +27,16 @@ S.imported = true
 --- Import Penlight
 T = {}
 
+require "lfs"
+
 T.List = require "pl.list".List
 T.class = require "pl.class"
-T.Map = T.class.Map
-T.Set = T.class.Set
-T.class = T.class.class
+T.Map = require "pl.Map"
+T.Set = require "pl.Set"
 
-T.classx = require "pl.classx"
-T.OrderedMap = T.classx.OrderedMap
-T.MultiMap = T.classx.MultiMap
-T.TypedList = T.classx.TypedList
-T.classx = nil
+T.OrderedMap = require "pl.OrderedMap"
+T.MultiMap = require "pl.MultiMap"
+--T.TypedList = require "pl.TypedList"
 
 T.app = require "pl.app"
 T.array2d = require "pl.array2d"
