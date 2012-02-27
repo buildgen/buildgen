@@ -276,11 +276,12 @@ end
 --- Compile a source into an object.
 --
 -- @prarm src The file to compile.
--- @ headers A list of headers that are needed.
+-- @param depends A list of files the object depends on (specificly templates).
 -- @param obj The place to put the resulting object file.
-function S.d.compileObject ( src, obj )
-	obj = C.path(obj)
+function S.d.compileObject ( src, depends, obj )
 	src = C.path(src)
+	depends = T.List(depends):map(C.path):append(src)
+	obj = C.path(obj)
 
 	local compiler = P.S.d.compiler
 
@@ -328,7 +329,7 @@ function S.d.compileObject ( src, obj )
 
 	S.d.addArg(src)
 
-	C.addGenerator({src}, state.arguments, {obj}, {
+	C.addGenerator(depends, state.arguments, {obj}, {
 		description = "Compiling "..obj
 	})
 
@@ -442,7 +443,7 @@ function S.d.compile ( sources, out )
 			                                                     -- the build
 		end                                                      -- dir.
 
-		S.d.compileObject(source, object)
+		S.d.compileObject(source, sources, object)
 		objects:append(object)
 	end
 
