@@ -63,7 +63,12 @@ if D.debug then S.d.debug = true end
 -- If true unittests will be compiled into the executable. This
 -- value defaults to true if D.debug is set otherwise false.
 S.d.unittest = false
-if D.unittest then S.d.unittest = true end
+if D.debug then S.d.unittest = true end
+
+--- Enable compiler warnings.
+-- If true warnings will be enabled.
+S.d.warnings = false
+if D.debug then S.d.warnings = true end
 
 --- Create new cpp state
 -- Creates and returns an opaque state.  This state is a table and is therefore
@@ -127,7 +132,7 @@ if not P.S.d.compiler then
 	local compilers = {
 		{	name = "ldc2", -- Name of the executable
 			flags = {
-				compile    = {"-c", "-output-bc"},
+				compile    = {"-c"},--, "-output-bc"},
 				link       = {},
 				linkShared = "-shared",
 				linkStatic = "-lib",
@@ -135,6 +140,7 @@ if not P.S.d.compiler then
 				debug      = "-g",          -- the option to enable debug mode.
 				unittest   = "-unittest",   -- the option to enable unittest.
 				profile    = {},            -- the option to enable profiling.
+				warnings   = {"-w"},        -- Enable compiler warnings.
 				define     = {"-D%s=%s"},   -- the option to define a macro.
 				lib        = {"-l%s"},      -- the option to link a library.
 				include    = {"-I", "%s"},  -- the option to add an include directory.
@@ -286,6 +292,11 @@ function S.d.compileObject ( src, obj )
 
 	S.d.addArg(oldarguments)
 
+	local warnings = S.d.warningsOveride
+	if warnings == nil then warnings = S.d.warnings end
+	if warnings then                      -- Add the warning flag
+		S.d.addArg(compiler.flags.warnings)
+	end
 	local debug = S.d.debugOveride
 	if debug == nil then debug = S.d.debug end
 	if debug then                      -- Add the debug flag.
@@ -296,11 +307,8 @@ function S.d.compileObject ( src, obj )
 	end
 	local unittest = S.d.unittestOveride
 	if unittest == nil then unittest = S.d.unittest end
-	if unittest then                      -- Add the debug flag.
+	if unittest then                      -- Add the unittest flag.
 		S.d.addArg(compiler.flags.unittest)
-		--S.d.define{DEBUG=true}
-	else                   -- Add the debug flag.
-		--S.d.define{NDEBUG=true}
 	end
 	local profile = S.d.profileOveride
 	if profile == nil then profile = S.d.profile end
@@ -343,7 +351,13 @@ function S.d.link(objects, out)
 	S.d.addLinkArg(compiler.name)
 	S.d.addLinkArg(compiler.flags.link)
 
-	S.d.addLinkArg(oldarguments)                                       --
+	S.d.addLinkArg(oldarguments)
+
+	local warnings = S.d.warningsOveride
+	if warnings == nil then warnings = S.d.warnings end
+	if warnings then                      -- Add the warning flag
+		S.d.addLinkArg(compiler.flags.warnings)
+	end                                     --
 
 	for i in T.List(compiler.flags.output):iter() do -- Add the desired output file to
 		S.d.addLinkArg(i:format(out))                -- the command line.
@@ -377,7 +391,13 @@ function S.d.linkShared(objects, out)
 
 	S.d.addLinkArg(compiler.flags.linkShared)
 
-	S.d.addLinkArg(oldarguments)                                       --
+	S.d.addLinkArg(oldarguments)
+
+	local warnings = S.d.warningsOveride
+	if warnings == nil then warnings = S.d.warnings end
+	if warnings then                      -- Add the warning flag
+		S.d.addLinkArg(compiler.flags.warnings)
+	end                                            --
 
 	for i in T.List(compiler.flags.output):iter() do -- Add the desired output file to
 		S.d.addLinkArg(i:format(out))                -- the command line.
