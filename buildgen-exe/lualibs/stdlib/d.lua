@@ -130,6 +130,29 @@ end
 
 if not P.S.d.compiler then
 	local compilers = {
+		{	name = "dmd", -- Name of the executable
+			flags = {
+				compile    = {"-c"},--, "-output-bc"},
+				link       = {},
+				linkShared = "-shared",
+				linkStatic = "-lib",
+				output     = {"-of%s"}, -- the option to set the output file name.
+				debug      = "-g",          -- the option to enable debug mode.
+				unittest   = "-unittest",   -- the option to enable unittest.
+				profile    = {},            -- the option to enable profiling.
+				warnings   = {"-w"},        -- Enable compiler warnings.
+				define     = {"-D%s=%s"},   -- the option to define a macro.
+				lib        = {"-l%s"},      -- the option to link a library.
+				include    = {"-I%s"},  -- the option to add an include directory.
+				optimize   = {              -- Flags for different levels of optimization.
+					none    = {},
+					quick   = {},
+					regular = "-O",     -- Default optimazation.
+					full    = "-O",
+					max     = {"-O"}      -- Highest possoble (possibly exparemental)
+				}
+			}
+		},
 		{	name = "ldc2", -- Name of the executable
 			flags = {
 				compile    = {"-c"},--, "-output-bc"},
