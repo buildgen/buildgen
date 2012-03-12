@@ -79,6 +79,7 @@ if not P.S.ld.linker then
 		{	name="cc", -- Name of the executable
 			flags = {
 				link = {}, -- commands that need to be present.
+				shared = {"-shared"},
 				out  = {"-o", "%s"},
 				lib  = {"-l", "%s"}
 			}
@@ -117,7 +118,7 @@ function S.ld.addArg ( arg )
 	state.arguments:extend(arg)
 end
 
---- Link a Library
+--- Link in a Library
 -- Link the library to the executable.
 --
 -- @param The name of the library to link.
@@ -139,7 +140,8 @@ end
 -- Links object files into an executable.
 --
 -- @param out The location to put the executable.  This is treated as a BuildGen
---	patg.
+--	path.  This is only the base name and it will be modified to fit the platform.
+--  For example, on windows ##.exe## will be added.
 function S.ld.link ( objects, out )
 	linker = P.S.ld.linker
 
@@ -162,6 +164,41 @@ function S.ld.link ( objects, out )
 	C.addGenerator(objects, cmd, {out}, {
 		description = "Linking "..out
 	})
+
+	return out
+end
+
+--- Link a Shared library.
+-- Links object files into a shared library.
+--
+-- @param out The location to put the library.  This is treated as a BuildGen
+--	path.  This is only the base name and it will be modified to fit the operating
+--  system.
+function S.ld.linkShared ( objects, out )
+	out = C.path(out)
+	local dir, base = T.path.splitpath(out)
+	
+	out = T.path.join(dir, "lib"..base..".so") -- If unix.
+	
+	linker = P.S.ld.linker
+	
+	local cmd = T.List()
+	cmd:append(linker.name)
+
+	cmd:extend(linker.flags.shared)
+
+	for i in T.List(linker.flags.out):iter() do -- Add the desired output file
+		cmd:append(i:format(out))               -- to the command line.
+	end
+
+	cmd:extend(state.arguments)
+	cmd:extend(objects)
+
+	C.addGenerator(objects, cmd, {out}, {
+		description = "Linking "..out
+	})
+
+	return out
 end
 
 end

@@ -292,9 +292,10 @@ end
 -- Compiles and links a list of files into executables.
 --
 -- @param sources A list of sources (bot header and source files) that will be
---	used when compiling the executable.
+--   used when compiling the executable.
 -- @param out The file to be created.  ".exe" will be appended if compiling on
---	Windows.
+--   Windows.
+-- @returns The actual path of the created executable.
 function S.c.compile ( sources, out )
 	out = C.path(out)
 	sources = T.List(sources):map(C.path)
@@ -333,9 +334,63 @@ function S.c.compile ( sources, out )
 		objects:append(object)
 	end
 
-	S.ld.link(objects, out)
+	out = S.ld.link(objects, out)
 
 	state.linker = S.ld.swapState(ln) -- Put their linker back.
+
+	return out
+end
+
+--- Compile a Shared Library
+-- Compiles and links a list of files into a shared library.
+--
+-- @param sources A list of sources (bot header and source files) that
+--   will be used when compiling the library.
+-- @param out The file to be created.  This is just the basename, 
+-- @returns The actual path used for the output executable.
+function S.c.compileShared ( sources, out )
+	out = C.path(out)
+	sources = T.List(sources):map(C.path)
+
+	local ln = S.ld.swapState(state.linker) -- Use our linker
+
+	local projectRoot = C.path("<") -- Cache this.
+	local outRoot     = C.path(">") --
+
+	local h, s = T.List(), T.List()
+	for source in sources:iter() do
+		if source:match("\.[^\.]*[Hh][^\.]*$") then
+			h:append(source)
+		else
+			s:append(source)
+		end
+	end
+
+	local objects = T.List()
+
+	for source in s:iter() do
+		source = C.path(source)
+
+		local object = nil; -- Get path to put object file.
+
+		if source:sub(0, #projectRoot) == projectRoot then
+			object = C.path(">"..source:sub(#projectRoot)..".o")
+		elseif source:sub(0, #outRoot) == outRoot then
+			object = C.path(source..".o") -- Already in the out dir.
+		else
+			object = C.path("@"..source:sub(#projectRoot)..".o") -- Put inside
+			                                                     -- the build
+		end                                                      -- dir.
+
+		S.c.compileObject(source, h, object)
+		objects:append(object)
+	end
+
+	out = S.ld.linkShared(objects, out)
+
+	state.linker = S.ld.swapState(ln) -- Put their linker back.
+
+	return out
 end
 
 --- Create a header file with definitions.
