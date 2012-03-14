@@ -298,6 +298,7 @@ end
 --	used when compiling the executable.
 -- @param out The file to be created.  ".exe" will be appended if compiling on
 --	Windows.
+-- @returns The actual output name used.
 function S.cpp.compile ( sources, out )
 	sources = T.List(sources):map(C.path)
 	out = C.path(out)
@@ -339,6 +340,8 @@ function S.cpp.compile ( sources, out )
 	S.ld.link(objects, out)
 
 	state.linker = S.ld.swapState(ln) -- Put their linker back.
+
+	return out
 end
 
 S.cpp.swapState(S.cpp.newState())
