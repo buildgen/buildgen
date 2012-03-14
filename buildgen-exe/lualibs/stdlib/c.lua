@@ -247,6 +247,7 @@ function S.c.compileObject (src, headers, obj)
 	obj = C.path(obj)
 	src = C.path(src)
 	headers = T.List(headers):map(C.path)
+	headers:append(src) -- We depend on the source file too.
 
 	local compiler = P.S.c.compiler
 
