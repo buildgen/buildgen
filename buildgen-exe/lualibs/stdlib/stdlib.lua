@@ -82,7 +82,15 @@ end
 --
 -- @param path The path of the target.
 function S.addToDefault ( path )
-	C.addDependancy("all", path, { magic = true })
+	S.addToTarget("all", path)
+end
+
+--- Add a target to a magic target.
+--
+-- @param target The name of the magic target.
+-- @param path The path to add.  This is a BuildGen path.
+function S.addToTarget ( target, path )
+	C.addDependancy(target, path, { magic = true })
 end
 
 --- Find the path to an executable.
