@@ -351,7 +351,7 @@ end
 -- @param out The file to be created.  This is only the basename.  For example,
 --   a path ending with "foo" will be called "libfoo.so" on Posix platforms.
 -- @returns The actual output name used.
-function S.cpp.compile ( sources, out )
+function S.cpp.compileShared ( sources, out )
 	sources = T.List(sources):map(C.path)
 	out = C.path(out)
 
