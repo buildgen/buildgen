@@ -289,6 +289,55 @@ function S.c.compileObject (src, headers, obj)
 	state.arguments = oldarguments;
 end
 
+local function compile ( linkfunc, sources, out )
+	out = C.path(out)
+	sources = T.List(sources):map(C.path)
+
+	local ln = S.ld.swapState(state.linker) -- Use our linker
+
+	local projectRoot = C.path("<") -- Cache this.
+	local outRoot     = C.path(">") --
+
+	local h, s = T.List(), T.List()
+	local objects = T.List()
+
+	for source in sources:iter() do
+		if source:match"\.[Hh]$" then
+			h:append(source)
+		elseif source:match"\.a$" then
+			objects:append(source)
+		elseif source:match"\.o$" then
+			objects:append(source)
+		else
+			s:append(source)
+		end
+	end
+
+	for source in s:iter() do
+		source = C.path(source)
+
+		local object = nil; -- Get path to put object file.
+
+		if source:sub(0, #projectRoot) == projectRoot then
+			object = C.path(">"..source:sub(#projectRoot)..".o")
+		elseif source:sub(0, #outRoot) == outRoot then
+			object = C.path(source..".o") -- Already in the out dir.
+		else
+			object = C.path("@"..source:sub(#projectRoot)..".o") -- Put inside
+			                                                     -- the build
+		end                                                      -- dir.
+
+		S.c.compileObject(source, h, object)
+		objects:append(object)
+	end
+
+	out = linkfunc(objects, out)
+
+	state.linker = S.ld.swapState(ln) -- Put their linker back.
+
+	return out
+end
+
 --- Compile an Executable
 -- Compiles and links a list of files into executables.
 --
@@ -298,48 +347,18 @@ end
 --   Windows.
 -- @returns The actual path of the created executable.
 function S.c.compile ( sources, out )
-	out = C.path(out)
-	sources = T.List(sources):map(C.path)
+	return compile(S.ld.link, sources, out)
+end
 
-	local ln = S.ld.swapState(state.linker) -- Use our linker
-
-	local projectRoot = C.path("<") -- Cache this.
-	local outRoot     = C.path(">") --
-
-	local h, s = T.List(), T.List()
-	for source in sources:iter() do
-		if source:match("\.[^\.]*[Hh][^\.]*$") then
-			h:append(source)
-		else
-			s:append(source)
-		end
-	end
-
-	local objects = T.List()
-
-	for source in s:iter() do
-		source = C.path(source)
-
-		local object = nil; -- Get path to put object file.
-
-		if source:sub(0, #projectRoot) == projectRoot then
-			object = C.path(">"..source:sub(#projectRoot)..".o")
-		elseif source:sub(0, #outRoot) == outRoot then
-			object = C.path(source..".o") -- Already in the out dir.
-		else
-			object = C.path("@"..source:sub(#projectRoot)..".o") -- Put inside
-			                                                     -- the build
-		end                                                      -- dir.
-
-		S.c.compileObject(source, h, object)
-		objects:append(object)
-	end
-
-	out = S.ld.link(objects, out)
-
-	state.linker = S.ld.swapState(ln) -- Put their linker back.
-
-	return out
+--- Compile a Static Library
+-- Compiles and links a list of files into a static library.
+--
+-- @param sources A list of sources (bot header and source files) that
+--   will be used when compiling the library.
+-- @param out The file to be created.  This is just the basename,
+-- @returns The actual path used for the output executable.
+function S.c.compileStatic ( sources, out )
+	return compile(S.ld.linkStatic, sources, out)
 end
 
 --- Compile a Shared Library
@@ -347,51 +366,10 @@ end
 --
 -- @param sources A list of sources (bot header and source files) that
 --   will be used when compiling the library.
--- @param out The file to be created.  This is just the basename, 
+-- @param out The file to be created.  This is just the basename,
 -- @returns The actual path used for the output executable.
 function S.c.compileShared ( sources, out )
-	out = C.path(out)
-	sources = T.List(sources):map(C.path)
-
-	local ln = S.ld.swapState(state.linker) -- Use our linker
-
-	local projectRoot = C.path("<") -- Cache this.
-	local outRoot     = C.path(">") --
-
-	local h, s = T.List(), T.List()
-	for source in sources:iter() do
-		if source:match("\.[^\.]*[Hh][^\.]*$") then
-			h:append(source)
-		else
-			s:append(source)
-		end
-	end
-
-	local objects = T.List()
-
-	for source in s:iter() do
-		source = C.path(source)
-
-		local object = nil; -- Get path to put object file.
-
-		if source:sub(0, #projectRoot) == projectRoot then
-			object = C.path(">"..source:sub(#projectRoot)..".o")
-		elseif source:sub(0, #outRoot) == outRoot then
-			object = C.path(source..".o") -- Already in the out dir.
-		else
-			object = C.path("@"..source:sub(#projectRoot)..".o") -- Put inside
-			                                                     -- the build
-		end                                                      -- dir.
-
-		S.c.compileObject(source, h, object)
-		objects:append(object)
-	end
-
-	out = S.ld.linkShared(objects, out)
-
-	state.linker = S.ld.swapState(ln) -- Put their linker back.
-
-	return out
+	return compile(S.ld.linkShared, sources, out)
 end
 
 --- Create a header file with definitions.

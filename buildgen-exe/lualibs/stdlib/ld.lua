@@ -168,6 +168,28 @@ function S.ld.link ( objects, out )
 	return out
 end
 
+--- Link a Static library.
+-- Links object files into a static library.
+--
+-- @param out The location to put the library.  This is treated as a BuildGen
+--	path.  This is only the base name and it will be modified to fit the operating
+--  system.
+function S.ld.linkStatic ( objects, out )
+	out = C.path(out)
+	local dir, base = T.path.splitpath(out)
+
+	out = T.path.join(dir, base..".a") -- If unix.
+
+	local cmd = T.List{"*ar", "-cvq", out}
+	cmd:extend(objects)
+
+	C.addGenerator(objects, cmd, {out}, {
+		description = "Creating static library "..out
+	})
+
+	return out
+end
+
 --- Link a Shared library.
 -- Links object files into a shared library.
 --
@@ -177,11 +199,11 @@ end
 function S.ld.linkShared ( objects, out )
 	out = C.path(out)
 	local dir, base = T.path.splitpath(out)
-	
+
 	out = T.path.join(dir, "lib"..base..".so") -- If unix.
-	
+
 	linker = P.S.ld.linker
-	
+
 	local cmd = T.List()
 	cmd:append(linker.name)
 

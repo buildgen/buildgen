@@ -24,6 +24,7 @@
 
 S.import "c"
 S.import "cpp"
+S.import "lua"
 
 lualibsdir = "lib/"..name.."/"
 
@@ -69,10 +70,10 @@ local sources = T.List{
 	"<buildgen-xml/target.cpp",
 }
 
-files = T.List{"main.cpp"}   -- Compile gen
-files:extend(headers)        --
-files:extend(sources)        --
-S.cpp.compile(files, "@gen") --
+files = T.List{"main.cpp"}               -- Compile gen
+files:extend(headers)                    --
+files:extend(sources)                    --
+local gen = S.cpp.compile(files, "@gen") --
 
 files = T.List()  -- Compile the tests
 files:extend(headers)
@@ -81,9 +82,11 @@ C.addGenerator(files, {C.path"test.lua", C.path"", C.path"@test.cpp"}, {"@test.c
 	description = "Generatring tests..."
 })
 files:append("@test.cpp")
-S.cpp.compile(files, "@test")
+local test = S.cpp.compile(files, "@test")
+S.addToTarget("test", test)
 
-S.addToDefault "@gen"
+S.addToDefault(gen)
 
-S.install("@gen", "bin/")
+S.install(gen, "bin/")
 S.install("lualibs/", lualibsdir)
+
