@@ -298,14 +298,14 @@ local function compile ( linkfunc, sources, out )
 	local projectRoot = C.path("<") -- Cache this.
 	local outRoot     = C.path(">") --
 
-	local h, s = T.List(), T.List()
+	local h, s, l = T.List(), T.List(), T.List()
 	local objects = T.List()
 
 	for source in sources:iter() do
 		if source:match"\.[Hh]$" then
 			h:append(source)
 		elseif source:match"\.a$" then
-			objects:append(source)
+			l:append(source)
 		elseif source:match"\.o$" then
 			objects:append(source)
 		else
@@ -330,6 +330,7 @@ local function compile ( linkfunc, sources, out )
 		S.c.compileObject(source, h, object)
 		objects:append(object)
 	end
+	objects:extend(l)
 
 	out = linkfunc(objects, out)
 

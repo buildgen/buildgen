@@ -178,7 +178,7 @@ function S.ld.linkStatic ( objects, out )
 	out = C.path(out)
 	local dir, base = T.path.splitpath(out)
 
-	out = T.path.join(dir, base..".a") -- If unix.
+	out = T.path.join(dir, "lib"..base..".a") -- If unix.
 
 	local cmd = T.List{"*ar", "-cvq", out}
 	cmd:extend(objects)
