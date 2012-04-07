@@ -144,7 +144,7 @@ function S.install ( path, to )
 
 		for root, dirs, files in T.dir.walk(apath) do
 			for f in T.List(files):iter() do
-				t = to..dirname..string.sub(root, #apath).."/"..f
+				t = to..dirname..root:sub(#apath+1).."/"..f
 
 				S.util.install(root.."/"..f, t)
 				C.addDependancy("install", t, { magic = true })
@@ -158,7 +158,7 @@ function S.install ( path, to )
 
 		S.util.install(path, to)
 		C.addDependancy("install", to, { magic = true })
-    end
+	end
 end
 
 do
