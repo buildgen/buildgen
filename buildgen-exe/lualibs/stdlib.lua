@@ -26,8 +26,9 @@
 --- The Standard library namespace.
 
 S = {} -- Standard libraries
-S.imported = false
 L = {} -- User libraries
+S.imported = {}
+L.imported = {}
 
 if not P.S then P.S = {} end --
 if not P.L then P.L = {} end --
@@ -63,13 +64,15 @@ S.os = _G.S.os
 --
 -- @param name The name of the library to load.
 function S.import ( name )
-	if not S.imported
-	then
+	if not S.imported["stdlib"] then
 		dofile(S.lualibsRoot.."stdlib.lua")
+		S.imported["stdlib"] = true
 	end
 
-	if not S[name] and name ~= "stdlib"
-	then
+	if not S.imported[name] then
+		S.imported[name] = true
+
+		name:gsub("%.", "/") -- Make into a path.
 		dofile(S.lualibsRoot..name..".lua")
 	end
 end
@@ -96,8 +99,11 @@ function L.import ( name )
 		lname = name
 	end
 
-	if not L[lname]	then
+	if not L.imported[lname] then
+		L.imported[name] = true
+		print("NAME: "..name.."     GLOBAL: ", global)
 		if global then
+			name = name:gsub("%.", "/") -- Make into a path.
 			dofile(L.lualibsRoot..name..".lua")
 		else
 			dofile(C.path(name))
