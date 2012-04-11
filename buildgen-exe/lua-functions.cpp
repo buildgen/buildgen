@@ -59,7 +59,7 @@ int add_depandancy (lua_State *L)
 		lua_newtable(L);
 	luaL_checktype(L, 3, LUA_TTABLE); // Options
 
-	int magic = 0; // Check to see if this is a magic path.
+	unsigned int magic = 0; // Check to see if this is a magic path.
 	lua_pushstring(L, "magic"); // If the path to add to is magic.
 	lua_gettable(L, 3);
 	if ( lua_isboolean(L, -1) && lua_toboolean(L, -1))
@@ -69,7 +69,7 @@ int add_depandancy (lua_State *L)
 	lua_pushstring(L, "magicsrc"); // If the path being added is magic.
 	lua_gettable(L, 3);
 	if ( lua_isboolean(L, -1) && lua_toboolean(L, -1))
-		magic &= 0x02;
+		magic |= 0x02;
 	lua_pop(L, 1);
 
 	char *targ = NULL;
@@ -82,7 +82,7 @@ int add_depandancy (lua_State *L)
 	Target *t = Target::newTarget(targ);
 	Target *d = Target::newTarget(dep);
 	if ( magic & 0x01 ) t->magic = 1;
-	if ( magic & 0x02 ) t->magic = 1;
+	if ( magic & 0x02 ) d->magic = 1;
 	t->addDependancy(d);
 
 	free(targ);
@@ -141,6 +141,19 @@ int add_generator (lua_State *L)
 		desc = lua_tostring(L, -1);
 	lua_pop(L, 1);
 
+	unsigned int magic = 0; // Check to see if this is a magic path.
+	lua_pushstring(L, "magic"); // If the path to add to is magic.
+	lua_gettable(L, 4);
+	if ( lua_isboolean(L, -1) && lua_toboolean(L, -1))
+		magic = 1;
+	lua_pop(L, 1);
+
+	lua_pushstring(L, "magicsrc"); // If the path being added is magic.
+	lua_gettable(L, 4);
+	if ( lua_isboolean(L, -1) && lua_toboolean(L, -1))
+		magic |= 0x02;
+	lua_pop(L, 1);
+
 	if ( desc != NULL ) gen->addDescription(desc);
 
 	/*** Get Command ***/
@@ -185,12 +198,17 @@ int add_generator (lua_State *L)
 		lua_pushnumber(L, i);
 		lua_gettable(L, 1);
 		if (!lua_isstring(L, -1))
-			luaL_error(L, "C.addGenerator was given a source file that is"
-						  "not a string."
-					   );
+			luaL_error(L, "C.addGenerator was given a source file that is "
+			              "not a string."
+			          );
 
-		char *t = files->normalizeFilename(lua_tostring(L, -1));
+		char *t;
+		if (!(magic & 0x02)) t = files->normalizeFilename(lua_tostring(L, -1));
+		else                 t = mstrdup(lua_tostring(L, -1));
+
 		in[i-1] = Target::newTarget(t);
+		if (magic & 0x02) in[i-1]->magic = 1;
+
 		free(t);
 		lua_pop(L, 1);
 	}
@@ -204,8 +222,13 @@ int add_generator (lua_State *L)
 		if (!lua_isstring(L, -1))
 			luaL_error(L, "C.addGenerator was given an output file this is not a string.");
 
-		char *tpath = files->normalizeFilename(lua_tostring(L, -1));
+		char *tpath;
+		if (!(magic & 0x01)) tpath = files->normalizeFilename(lua_tostring(L, -1));
+		else                 tpath = mstrdup(lua_tostring(L, -1));
+
 		Target *t = Target::newTarget(tpath);
+		if (magic & 0x01) t->magic = 1;
+
 		free(tpath);
 		lua_pop(L, 1);
 

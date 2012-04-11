@@ -34,7 +34,15 @@
 --	supported.
 --	<ul><li>
 --		description: A description of what the command is doing.
--- </li><ul>
+--	</li><li>
+--		magic: If true target will be treated as a
+--		<a href="https://gitorious.org/buildgen/pages/UserDocs_Targets">magic
+--		target</a>.
+--	</li><li>
+--		magicsrc: If true dependency will be treated as a
+--		<a href="https://gitorious.org/buildgen/pages/UserDocs_Targets">magic
+--		target</a>.
+--	</li><ul>
 --
 -- @class function
 -- @name C.addGenerator

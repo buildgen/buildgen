@@ -234,8 +234,6 @@ char *Files::normalizeFilename( const char *path )
 				FILE *e = fopen(exename, "r");
 				if (e) // Found it.
 				{
-					unsigned int dlen = strlen(pathdir);
-					unsigned int flen = strlen(exename);
 					char *n = mstrcat(pathdir, '/', exename);
 
 					fchdir(dirfd(cwd));
