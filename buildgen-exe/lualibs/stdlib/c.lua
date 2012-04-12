@@ -210,17 +210,17 @@ end
 -- @param map A table of key/value pairs to be defined during compilation.
 function S.c.define ( map )
 	if type(map) ~= "table" then
-		dir = {tostring(map)}
+		map = {tostring(map)}
 	end
 
 	for k, v in pairs(map) do
-		if type(value) ~= "string" then
-			value = ""
+		if type(v) ~= "string" then
+			v = ""
 		else
-			value = "="..value
+			v = "="..v
 		end
-		for l, w in pairs(P.S.c.compiler.flags.define) do
-			S.c.addArg(w:format(v))
+		for l, w in pairs(P.L.avr.cpp.compiler.flags.define) do
+			L.avr.cpp.addArg(w:format(k..v))
 		end
 	end
 end

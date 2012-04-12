@@ -23,6 +23,7 @@
 *******************************************************************************/
 
 #include <stdlib.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <locale.h>
 #include <sysexits.h> // BSD recomended exit stati
