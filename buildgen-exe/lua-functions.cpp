@@ -126,6 +126,8 @@ int add_generator (lua_State *L)
 
 	luaL_checktype(L, 4, LUA_TTABLE); // Options
 
+	lua_settop(L, 4);
+
 	lua_Debug ar;
 	lua_getstack(L, 1, &ar);
 	lua_getinfo(L, "l", &ar);
@@ -155,6 +157,8 @@ int add_generator (lua_State *L)
 	lua_pop(L, 1);
 
 	if ( desc != NULL ) gen->addDescription(desc);
+
+	lua_settop(L, 4);
 
 	/*** Get Command ***/
 	std::vector<const char*> cmd;
@@ -189,6 +193,8 @@ int add_generator (lua_State *L)
 		lua_pop(L, 1);
 	}
 
+	lua_settop(L, 4);
+
 	std::vector<Target*> in(luaL_getn(L, 1));
 
 	/*** Get Inputs ***/
@@ -197,6 +203,7 @@ int add_generator (lua_State *L)
 		/*** Get the current filename ***/
 		lua_pushnumber(L, i);
 		lua_gettable(L, 1);
+
 		if (!lua_isstring(L, -1))
 			luaL_error(L, "C.addGenerator was given a source file that is "
 			              "not a string."
@@ -213,14 +220,16 @@ int add_generator (lua_State *L)
 		lua_pop(L, 1);
 	}
 
+	lua_settop(L, 4);
+
 	/*** Get Outputs ***/
-	for ( unsigned int i = lua_objlen(L, 2); i >= 1; i-- ) // For each output
+	for ( unsigned int i = lua_objlen(L, 3); i >= 1; i-- ) // For each output
 	{
 		/*** Get the current filename ***/
 		lua_pushnumber(L, i);
 		lua_gettable(L, 3);
 		if (!lua_isstring(L, -1))
-			luaL_error(L, "C.addGenerator was given an output file this is not a string.");
+			luaL_error(L, "C.addGenerator was given an output file that is not a string.");
 
 		char *tpath;
 		if (!(magic & 0x01)) tpath = files->normalizeFilename(lua_tostring(L, -1));
@@ -237,6 +246,8 @@ int add_generator (lua_State *L)
 		for ( unsigned int i = in.size(); i--; )
 			t->addDependancy(in[i]);
 	}
+
+	lua_settop(L, 4);
 
 	free(generatorCmd);
 
