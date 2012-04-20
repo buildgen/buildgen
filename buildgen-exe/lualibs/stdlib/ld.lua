@@ -183,7 +183,10 @@ function S.ld.linkStatic ( objects, out )
 	local cmd = T.List{"*ar", "-cvq", out}
 	cmd:extend(objects)
 
-	C.addGenerator(objects, cmd, {out}, {
+	C.addGenerator(objects, {
+		{"*rm", "-f", out},
+		cmd
+	}, {out}, {
 		description = "Creating static library "..out
 	})
 
