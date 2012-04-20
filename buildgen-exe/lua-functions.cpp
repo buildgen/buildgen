@@ -162,7 +162,7 @@ int add_generator (lua_State *L)
 
 	/*** Get Command ***/
 	std::vector<const char*> cmd;
-	for ( unsigned int i = lua_objlen(L, 2); i >= 1; i-- )
+	for ( unsigned int i = 1; i <= lua_objlen(L, 2); i++ )
 	{
 		lua_pushnumber(L, i);
 		lua_gettable(L, 2);
@@ -228,6 +228,7 @@ int add_generator (lua_State *L)
 		/*** Get the current filename ***/
 		lua_pushnumber(L, i);
 		lua_gettable(L, 3);
+
 		if (!lua_isstring(L, -1))
 			luaL_error(L, "C.addGenerator was given an output file that is not a string.");
 
