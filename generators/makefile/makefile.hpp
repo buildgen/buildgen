@@ -32,8 +32,8 @@
 
 class Makefile
 {
-	const char *cwd;
-	const unsigned int cwdlen;
+	char *cwd;
+	unsigned int cwdlen;
 
 	std::set<Target*, Target::comparator> *targets;
 	std::list<Target*> generated;

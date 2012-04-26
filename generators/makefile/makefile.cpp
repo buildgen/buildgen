@@ -27,13 +27,16 @@
 #include "makefile.hpp"
 
 #include <algorithm>
+#include <unistd.h>
 
 Makefile::Makefile ( std::set<Target *, Target::comparator> *targets ):
 	cwd(getcwd(NULL, 0)),
-	cwdlen(strlen(cwd)+1), // The one is to mimic the trailing slash
+	cwdlen(strlen(cwd)), // The one is for the trailing slash
 	targets(targets)
 {
-
+	cwd = (char*)realloc(cwd, cwdlen*sizeof(char));
+	cwd[cwdlen++] = '/';
+	cwd[cwdlen]   = '\0';
 }
 
 std::string Makefile::relitiveName(std::string path)
