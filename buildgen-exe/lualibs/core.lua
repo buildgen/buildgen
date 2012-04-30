@@ -108,7 +108,7 @@ function D.resolvePath ( path , default )
 
 	if not D[path] then return end -- If the default was nil.
 
-	if D[path]:find("/", 1, true) > 1 then -- Doesn't start with a slash.
+	if D[path]:sub(0,1) ~= "/" then -- Doesn't start with a slash.
 		D[path] = C.path(">"..D[path])
 	end
 end

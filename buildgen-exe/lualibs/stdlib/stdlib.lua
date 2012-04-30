@@ -75,7 +75,7 @@ end
 
 --- Add a Target to the Default Build
 --
--- Adds <span class="code">path</span> to the default buid.  This means that if
+-- Adds <span class="code">path</span> to the default build.  This means that if
 -- the builder doesn't specify what they want build this will be built.
 --
 -- @param path The path of the target.
@@ -131,7 +131,8 @@ end
 --	is treated as an absolute path.
 function S.install ( path, to )
 	S.import "util"
-	if string.find(to, "/", 1, true) ~= 1 then
+
+	if to:sub(0,1) ~= "/" then
 		to = S.prefix..to.."/"
 	end
 	local apath = C.path(path)
