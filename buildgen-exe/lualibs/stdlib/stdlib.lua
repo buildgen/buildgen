@@ -83,12 +83,20 @@ function S.addToDefault ( path )
 	S.addToTarget("all", path)
 end
 
---- Add a target to a magic target.
+--- Add a path to a magic target.
 --
 -- @param target The name of the magic target.
 -- @param path The path to add.  This is a BuildGen path.
 function S.addToTarget ( target, path )
 	C.addDependancy(target, path, { magic = true })
+end
+
+--- Add a target to a magic target.
+--
+-- @param target The name of the magic target.
+-- @param path The path to add.  This is a BuildGen path.
+function S.addTargetToTarget ( target, deptarget )
+	C.addDependancy(target, deptarget, { magic = true, magicsrc = true })
 end
 
 --- Find the path to an executable.
