@@ -220,8 +220,8 @@ function S.cpp.define ( map )
 		else
 			v = "="..v
 		end
-		for l, w in pairs(P.L.avr.cpp.compiler.flags.define) do
-			L.avr.cpp.addArg(w:format(k..v))
+		for l, w in pairs(P.S.cpp.compiler.flags.define) do
+			S.addArg(w:format(k..v))
 		end
 	end
 end
