@@ -1,5 +1,9 @@
 # Add whatever you want to this file
 
+# Build directories.
+b/
+build/
+
 # QtCreator
 CMakeLists.txt.user
 
