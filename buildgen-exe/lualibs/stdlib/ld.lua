@@ -81,7 +81,7 @@ if not P.S.ld.linker then
 				link = {}, -- commands that need to be present.
 				shared = {"-shared"},
 				out  = {"-o", "%s"},
-				lib  = {"-l", "%s"}
+				lib  = {"-l%s"}
 			}
 		},
 	}
@@ -158,8 +158,8 @@ function S.ld.link ( objects, out )
 		cmd:append(i:format(out))               -- to the command line.
 	end
 
-	cmd:extend(state.arguments)
 	cmd:extend(objects)
+	cmd:extend(state.arguments) -- Add the libraries after the objects.
 
 	C.addGenerator(objects, cmd, {out}, {
 		description = "Linking "..out
