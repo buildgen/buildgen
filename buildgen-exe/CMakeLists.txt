@@ -46,12 +46,12 @@ SET(xml_headers
 	SET(CMAKE_COLOR_MAKEFILE ON)
 	SET(CMAKE_VERBOSE_MAKEFILE ON)
 
-	ADD_DEFINITIONS(-g -Wall -p -pg)
+	ADD_DEFINITIONS(-g -Wall)# -p -pg)
 	#ADD_DEFINITIONS(-Weffc++) # If you feel brave. (You will get lots of output from the Qt libaries)
 	ADD_DEFINITIONS(-DDEBUG)
 #else ()
 #	ADD_DEFINITIONS(-O4 -fexpensive-optimizations -s)
-#	ADD_DEFINITIONS(-UDEBUG)
+#	ADD_DEFINITIONS(-DNDEBUG)
 #endif ()
 
 SET(lualibs_root "lib/buildgen/lualibs/")

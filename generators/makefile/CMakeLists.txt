@@ -46,7 +46,7 @@ SET(xml_headers
 	SET(CMAKE_COLOR_MAKEFILE ON)
 	SET(CMAKE_VERBOSE_MAKEFILE ON)
 
-	ADD_DEFINITIONS(-ggdb -Wall -p -pg)
+	ADD_DEFINITIONS(-ggdb -Wall)# -p -pg)
 	#ADD_DEFINITIONS(-Weffc++) # If you feel brave. (You will get lots of output from the Qt libaries)
 	ADD_DEFINITIONS(-DDEBUG)
 #else ()
