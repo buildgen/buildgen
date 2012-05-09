@@ -53,11 +53,16 @@
 	const char *OS_STYLE = "win32";
 	const char *OS_COMPLIANCE = "win32";
 	const char *OS_KERNEL = "win32";
+#elif defined(__CYGWIN__)
+	const char *OS_STYLE = "win32";
+	const char *OS_COMPLIANCE = "posix";
+	const char *OS_KERNEL = "win32";
 #elif defined(__APPLE__)
 	const char *OS_STYLE = "mac";
 	const char *OS_COMPLIANCE = "mac";
 	const char *OS_KERNEL = "darwin";
 #else
+	const char *OS_STYLE = "unknown";
 	const char *OS_COMPLIANCE = "unknown";
 	const char *OS_KERNEL = "unknown";
 #endif
