@@ -128,7 +128,7 @@ if not P.S.cpp.compiler then
 				output   = {"-o", "%s"}, -- the option to set the output file name.
 				debug    = "-g",         -- the option to enable debug mode.
 				profile  = "-p",         -- the option to enable profiling.
-				define   = {"-D%s=%s"},  -- the option to define a macro.
+				define   = {"-D%s"},     -- the option to define a macro.
 				include  = {"-I", "%s"}, -- the option to add an include directory.
 				optimize = {             -- Flags for different levels of optimization.
 					none    = {},
@@ -221,7 +221,7 @@ function S.cpp.define ( map )
 			v = "="..v
 		end
 		for l, w in pairs(P.S.cpp.compiler.flags.define) do
-			S.addArg(w:format(k..v))
+			S.cpp.addArg(w:format(k..v))
 		end
 	end
 end
