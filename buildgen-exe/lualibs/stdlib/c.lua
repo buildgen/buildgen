@@ -56,6 +56,7 @@ if D.debug then S.c.optimization = "none" end
 -- value defaults to true if D.debug is set otherwise false.
 S.c.profile = false
 if D.debug then S.c.profile = true end
+if S.os.toolset == "cygwin" then S.c.profile = false end -- Doesn't work.  Linker errors.
 
 --- Whether to produce debugging symbols.
 -- If true debugging symbols will be produced in the resulting executable. This

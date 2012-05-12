@@ -145,9 +145,8 @@ end
 function S.ld.link ( objects, out )
 	linker = P.S.ld.linker
 
-	local cmd = T.List()
-	cmd:append(linker.name)
-
+	local cmd = T.List{linker.name}
+	
 	if type(linker.flags.link) == "table" then
 		cmd:extend(linker.flags.link)
 	else
@@ -207,9 +206,7 @@ function S.ld.linkShared ( objects, out )
 
 	linker = P.S.ld.linker
 
-	local cmd = T.List()
-	cmd:append(linker.name)
-
+	local cmd = T.List{linker.name}
 	cmd:extend(linker.flags.shared)
 
 	for i in T.List(linker.flags.out):iter() do -- Add the desired output file

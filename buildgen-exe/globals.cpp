@@ -37,6 +37,7 @@
 	const char *OS_STYLE = "linux";
 	const char *OS_COMPLIANCE = "posix";
 	const char *OS_KERNEL = "linux";
+	const char *OS_TOOLSET = "GNU";
 #elif defined(BSD)
 	const char *OS_STYLE = "BSD";
 	const char *OS_COMPLIANCE = "posix";
@@ -49,22 +50,27 @@
 	#elif defined(__DragonFly__)
 		const char *OS_KERNEL = "DragonFly";
 	#endif
+	const char *OS_TOOLSET = "GNU";
 #elif defined(_WIN32)
 	const char *OS_STYLE = "win32";
 	const char *OS_COMPLIANCE = "win32";
 	const char *OS_KERNEL = "win32";
+	const char *OS_TOOLSET = "microsoft";
 #elif defined(__CYGWIN__)
 	const char *OS_STYLE = "win32";
 	const char *OS_COMPLIANCE = "posix";
 	const char *OS_KERNEL = "win32";
+	const char *OS_TOOLSET = "cygwin";
 #elif defined(__APPLE__)
 	const char *OS_STYLE = "mac";
 	const char *OS_COMPLIANCE = "mac";
 	const char *OS_KERNEL = "darwin";
+	const char *OS_TOOLSET = "GNU";
 #else
 	const char *OS_STYLE = "unknown";
 	const char *OS_COMPLIANCE = "unknown";
 	const char *OS_KERNEL = "unknown";
+	const char *OS_TOOLSET = "unknown";
 #endif
 
 void checkAlloc ( void *p )
