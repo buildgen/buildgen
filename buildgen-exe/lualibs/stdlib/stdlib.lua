@@ -114,10 +114,20 @@ function S.findExecutable ( name )
 		return false
 	end
 
-	for k, v in pairs(S.path) do
-		local p = T.path.join(v, name);
+	for d in S.path:iter() do
+		local p = T.path.join(d, name);
+		
 		if T.path.isfile(p) then
 			return p
+		end
+		
+		if S.style == "win32" then
+			for e in S.pathext:iter() do
+				local f = T.path.join(p, e);
+				if T.path.isfile(p) then
+					return p
+				end
+			end
 		end
 	end
 
@@ -187,7 +197,11 @@ do
 	end
 
 	if seperator then
-		S.path = ospath:split(seperator)
+		S.path = T.List(ospath:split(seperator))
+	end
+	
+	if S.style == "win32" then
+		S.pathext =  T.List(os.getenv("PATH"):split(";"))
 	end
 end
 
