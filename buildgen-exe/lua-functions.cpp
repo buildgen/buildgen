@@ -42,6 +42,72 @@
 #include "buildgen-xml/target.hpp"
 #include "lua-init.hpp"
 
+#ifdef __CYGWIN__
+
+	#include <sys/cygwin.h>
+	
+	static char *toWindowsPath ( const char *path, bool freep = false )
+	{
+		msg::debug("Converting: %s\n", path);
+		
+		size_t size = cygwin_conv_path(CCP_POSIX_TO_WIN_A, path, NULL, 0);
+		if ( size < 0 )
+		{
+			msg::error("Error cygwin_conv_path failed (%d).", size);
+			exit(EX_OSERR);
+		}
+		char *winpath = (char*)malloc(size);
+		checkAlloc(winpath);
+		
+		if (cygwin_conv_path(CCP_POSIX_TO_WIN_A, path, winpath, size))
+		{
+			msg::error("Error cygwin_conv_path failed.");
+			exit(EX_OSERR);
+		}
+
+		if (freep) free(const_cast<char*>(path));
+		
+		msg::debug("Converted: %s\n", winpath);
+		return winpath;
+	}
+	static char *toUnixPath ( const char *path, bool freep = false )
+	{
+		msg::debug("Converting back: %s\n", path);
+		
+		size_t size = cygwin_conv_path(CCP_WIN_A_TO_POSIX|CCP_RELATIVE, path, NULL, 0);
+		if ( size < 0 )
+		{
+			msg::error("Error cygwin_conv_path failed (%d).", size);
+			exit(EX_OSERR);
+		}
+		char *upath = (char*)malloc(size);
+		checkAlloc(upath);
+		
+		if (cygwin_conv_path(CCP_WIN_A_TO_POSIX|CCP_RELATIVE, path, upath, size))
+		{
+			msg::error("Error cygwin_conv_path failed.");
+			exit(EX_OSERR);
+		}
+
+		if (freep) free(const_cast<char*>(path));
+		
+		msg::debug("Converted: %s\n", upath);
+		return upath;
+	}
+	
+	#define WINP(x)    toWindowsPath(x, false)
+	#define WINPF(x)   toWindowsPath(x, true)
+	#define UNIXP(x)   toUnixPath(x, false)
+	#define UNIXPF(x)  toUnixPath(x, true)
+	#define CYGFREE(x) free(const_cast<char*>(x))
+#else
+	#define WINP(x)    (x)
+	#define WINPF(x)   (x)
+	#define UNIXP(x)   (x)
+	#define UNIXPF(x)  (x)
+	#define CYGFREE(x) (x)
+#endif
+
 namespace LuaFunctions
 {
 	Files *files;
@@ -74,10 +140,20 @@ int add_depandancy (lua_State *L)
 
 	char *targ = NULL;
 	char *dep = NULL;
-	if (!(magic & 0x01)) targ = files->normalizeFilename(lua_tostring(L, 1));
-	else                 targ = mstrdup(lua_tostring(L, 1));
-	if (!(magic & 0x02)) dep  = files->normalizeFilename(lua_tostring(L, 2));
-	else                 dep  = mstrdup(lua_tostring(L, 2));
+	if (!(magic & 0x01))
+	{
+		char *t = UNIXP(lua_tostring(L, 1));
+		targ = files->normalizeFilename(t);
+		CYGFREE(t);
+	}
+	else targ = mstrdup(lua_tostring(L, 1));
+	if (!(magic & 0x02))
+	{
+		char *t = UNIXP(lua_tostring(L, 1));
+		dep = files->normalizeFilename(t);
+		CYGFREE(t);
+	}
+	else                 dep = mstrdup(lua_tostring(L, 2));
 
 	Target *t = Target::newTarget(targ);
 	Target *d = Target::newTarget(dep);
@@ -185,8 +261,9 @@ int add_generator (lua_State *L)
 		}
 		if (lua_objlen(L, curcmd))
 		{
-			generatorCmd = files->normalizeFilename(cmd[0]);
-			cmd[0]       = generatorCmd;
+			char *t = UNIXP(cmd[0]);
+			cmd[0] = generatorCmd = files->normalizeFilename(t);
+			CYGFREE(t);
 		}
 
 		gen->addCommand(cmd);
@@ -210,8 +287,13 @@ int add_generator (lua_State *L)
 			          );
 
 		char *t;
-		if (!(magic & 0x02)) t = files->normalizeFilename(lua_tostring(L, -1));
-		else                 t = mstrdup(lua_tostring(L, -1));
+		if (!(magic & 0x02))
+		{
+			const char *tmp = UNIXP(lua_tostring(L, -1));
+			t = files->normalizeFilename(tmp);
+			CYGFREE(tmp);
+		}
+		else t = mstrdup(lua_tostring(L, -1));
 
 		in[i-1] = Target::newTarget(t);
 		if (magic & 0x02) in[i-1]->magic = 1;
@@ -233,8 +315,13 @@ int add_generator (lua_State *L)
 			luaL_error(L, "C.addGenerator was given an output file that is not a string.");
 
 		char *tpath;
-		if (!(magic & 0x01)) tpath = files->normalizeFilename(lua_tostring(L, -1));
-		else                 tpath = mstrdup(lua_tostring(L, -1));
+		if (!(magic & 0x01))
+		{
+			const char *t = UNIXP(lua_tostring(L, -1));
+			tpath = files->normalizeFilename(t);
+			CYGFREE(t);
+		}
+		else tpath = mstrdup(lua_tostring(L, -1));
 
 		Target *t = Target::newTarget(tpath);
 		if (magic & 0x01) t->magic = 1;
@@ -260,10 +347,13 @@ int path (lua_State *L)
 	if (!lua_isstring(L, 1))
 		luaL_error(L, "path was asked to convert a path that is not a string");
 
-	char *p = files->normalizeFilename(lua_tostring(L, 1));
-	files->prettyPath(p);
-	lua_pushstring(L, p); // Push our result.
-	free(p);
+	const char *p1 = UNIXP(lua_tostring(L, 1));
+	char *p2 = files->normalizeFilename(p1);
+	files->prettyPath(p2);
+	p2 = WINPF(p2);
+	lua_pushstring(L, p2); // Push our result.
+	CYGFREE(p1);
+	free(p2);
 
 	return 1;
 }

@@ -25,6 +25,10 @@
 --- Import Penlight
 T = {}
 
+if S.os.style == "win32" then
+	package.config = "\\"..package.config:sub(2)
+end
+
 require "lfs"
 
 T.List = require "pl.List"
@@ -106,7 +110,7 @@ end
 --
 -- @param name The path of the executable.
 function S.findExecutable ( name )
-	if name:find("/", 1, true) == 1 then
+	if T.path.isabs(name) then -- Absolute path.
 		if T.path.isfile(name) then
 			return name
 		end
@@ -150,30 +154,24 @@ end
 function S.install ( path, to )
 	S.import "util"
 
-	if to:sub(0,1) ~= "/" then
-		to = S.prefix..to.."/"
+	if T.path.isabs(to) then
+		to = T.path.join(S.prefix, to)
 	end
 	local apath = C.path(path)
 
 	if T.path.isdir(apath) then
-		local i = string.find(string.sub(string.reverse(apath), 2), "/", 1, true)
-		if i then
-			dirname = apath:sub(-i)
-		end
+		dirname = T.path.dirname(apath)
 
 		for root, dirs, files in T.dir.walk(apath) do
 			for f in T.List(files):iter() do
-				t = to..dirname..root:sub(#apath+1).."/"..f
+				t = T.path.join(to, dirname, root:sub(#apath+1), f)
 
-				S.util.install(root.."/"..f, t)
+				S.util.install(T.path.join(root, f), t)
 				C.addDependancy("install", t, { magic = true })
 			end
 		end
 	else
-		local i = string.find(string.reverse(apath), "/", 1, true)
-		if i then
-			to = to.."/"..string.sub(apath, -i)
-		end
+		dirname = T.path.dirname(apath)
 
 		S.util.install(path, to)
 		C.addDependancy("install", to, { magic = true })
