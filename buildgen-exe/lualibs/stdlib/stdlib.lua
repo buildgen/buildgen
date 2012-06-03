@@ -81,11 +81,7 @@ T.stringx.import()
 function D.resolvePath ( path , default )
 	if not D[path] then
 		D[path] = default
-	end
-
-	if not D[path] then return end -- If the default was nil.
-
-	if T.path.isabs(D[path]) then
+	elseif not T.path.isabs(D[path]) then
 		D[path] = C.path(">"..D[path])
 	end
 end
@@ -131,14 +127,15 @@ end
 -- Look for the program in the location(s) appropriate to the system.  For
 -- example in UNIX-style os's it will search your path.
 --
--- @param name The path of the executable.
+-- @param  name The name of the executable.
+-- @return The path of the executable or ``false`` if not found.
 function S.findExecutable ( name )
 	if T.path.isabs(name) then -- Absolute path.
 		if T.path.isfile(name) then
 			return name
+		else
+			return false
 		end
-
-		return false
 	end
 
 	for d in S.path:iter() do
@@ -163,42 +160,39 @@ end
 
 --- Add a Target to the Install Target
 --
--- Installs <span class="code">path</span>.  If <span class="code">path</span>
--- is a directory it will be installed recursivly.  Please note that the
--- directory will be installed, not it's contents.  Example:
--- <span class="code">S.install("foo/", "bar/")</span> will result in
--- <span class="code">bar/foo/</span> not <span class="code">bar/{foo_contents}
--- </span>.
+-- Installs ``path``.  If ``path`` is a directory it will be installed
+-- recursivly.  Please note that the directory will be installed, not it's
+-- contents.  Example: ``S.install("foo/", "bar/")`` will result in ``bar/foo/``
+-- ``bar/{foo_contents}``.
 --
 -- @param path The path of the target.
--- @param to Where to install the file.  This is treated as relative to the
---	install prefix (S.prefix) unless it is prefixed by a ‘/’ in which case it
---	is treated as an absolute path.
+-- @param to The directory to install the file.  This is treated as relative to the
+--	install prefix (S.prefix) if it is not absolute.
+-- @return A List of files that will be installed.
 function S.install ( path, to )
 	S.import "util"
 
-	if T.path.isabs(to) then
-		to = T.path.join(S.prefix, to)
-	end
 	local apath = C.path(path)
+	local bname = T.path.basename(apath)
+	to = T.path.join(S.prefix, to or "", bname)
+
+	local installed = T.List()
 
 	if T.path.isdir(apath) then
-		dirname = T.path.dirname(apath)
-
-		for root, dirs, files in T.dir.walk(apath) do
-			for f in T.List(files):iter() do
-				t = T.path.join(to, dirname, root:sub(#apath+1), f)
-
-				S.util.install(T.path.join(root, f), t)
-				C.addDependancy("install", t, { magic = true })
-			end
+		for f in T.List(T.dir.getallfiles(path)):iter() do
+			local fto = T.path.join(to, f)
+			S.util.install(f, fto)
+			C.addDependancy("install", fto, { magic = true })
+			installed:append(fto)
 		end
 	else
-		dirname = T.path.dirname(apath)
-
-		S.util.install(path, to)
-		C.addDependancy("install", to, { magic = true })
+		local fto = T.path.join(to, bname)
+		S.util.install(apath, fto)
+		C.addDependancy("install", fto, { magic = true })
+		installed:append(fto)
 	end
+
+	return installed
 end
 
 do
