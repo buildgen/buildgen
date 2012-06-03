@@ -149,11 +149,11 @@ int add_depandancy (lua_State *L)
 	else targ = mstrdup(lua_tostring(L, 1));
 	if (!(magic & 0x02))
 	{
-		const char *t = UNIXP(lua_tostring(L, 1));
+		const char *t = UNIXP(lua_tostring(L, 2));
 		dep = files->normalizeFilename(t);
 		CYGFREE(t);
 	}
-	else                 dep = mstrdup(lua_tostring(L, 2));
+	else dep = mstrdup(lua_tostring(L, 2));
 
 	Target *t = Target::newTarget(targ);
 	Target *d = Target::newTarget(dep);
@@ -228,7 +228,7 @@ int add_generator (lua_State *L)
 
 	lua_pushstring(L, "magicsrc"); // If the path being added is magic.
 	lua_gettable(L, 4);
-	if ( lua_isboolean(L, -1) && lua_toboolean(L, -1))
+	if ( lua_isboolean(L, -1) && lua_toboolean(L, -1) )
 		magic |= 0x02;
 	lua_pop(L, 1);
 
