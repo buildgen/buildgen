@@ -45,11 +45,11 @@
 #ifdef __CYGWIN__
 
 	#include <sys/cygwin.h>
-	
+
 	static char *toWindowsPath ( const char *path, bool freep = false )
 	{
 		msg::debug("Converting: %s\n", path);
-		
+
 		size_t size = cygwin_conv_path(CCP_POSIX_TO_WIN_A, path, NULL, 0);
 		if ( size < 0 )
 		{
@@ -58,7 +58,7 @@
 		}
 		char *winpath = (char*)malloc(size);
 		checkAlloc(winpath);
-		
+
 		if (cygwin_conv_path(CCP_POSIX_TO_WIN_A, path, winpath, size))
 		{
 			msg::error("Error cygwin_conv_path failed.");
@@ -66,14 +66,14 @@
 		}
 
 		if (freep) free(const_cast<char*>(path));
-		
+
 		msg::debug("Converted: %s\n", winpath);
 		return winpath;
 	}
 	static char *toUnixPath ( const char *path, bool freep = false )
 	{
 		msg::debug("Converting back: %s\n", path);
-		
+
 		size_t size = cygwin_conv_path(CCP_WIN_A_TO_POSIX|CCP_RELATIVE, path, NULL, 0);
 		if ( size < 0 )
 		{
@@ -82,7 +82,7 @@
 		}
 		char *upath = (char*)malloc(size);
 		checkAlloc(upath);
-		
+
 		if (cygwin_conv_path(CCP_WIN_A_TO_POSIX|CCP_RELATIVE, path, upath, size))
 		{
 			msg::error("Error cygwin_conv_path failed.");
@@ -90,11 +90,11 @@
 		}
 
 		if (freep) free(const_cast<char*>(path));
-		
+
 		msg::debug("Converted: %s\n", upath);
 		return upath;
 	}
-	
+
 	#define WINP(x)    toWindowsPath(x, false)
 	#define WINPF(x)   toWindowsPath(x, true)
 	#define UNIXP(x)   toUnixPath(x, false)
@@ -142,14 +142,14 @@ int add_depandancy (lua_State *L)
 	char *dep = NULL;
 	if (!(magic & 0x01))
 	{
-		char *t = UNIXP(lua_tostring(L, 1));
+		const char *t = UNIXP(lua_tostring(L, 1));
 		targ = files->normalizeFilename(t);
 		CYGFREE(t);
 	}
 	else targ = mstrdup(lua_tostring(L, 1));
 	if (!(magic & 0x02))
 	{
-		char *t = UNIXP(lua_tostring(L, 1));
+		const char *t = UNIXP(lua_tostring(L, 1));
 		dep = files->normalizeFilename(t);
 		CYGFREE(t);
 	}
@@ -261,7 +261,7 @@ int add_generator (lua_State *L)
 		}
 		if (lua_objlen(L, curcmd))
 		{
-			char *t = UNIXP(cmd[0]);
+			const char *t = UNIXP(cmd[0]);
 			cmd[0] = generatorCmd = files->normalizeFilename(t);
 			CYGFREE(t);
 		}
