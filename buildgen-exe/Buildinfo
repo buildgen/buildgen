@@ -22,9 +22,12 @@
 [                                                                              ]
 [-----------------------------------------------------------------------------]]
 
+S.import "util"
 S.import "c"
 S.import "cpp"
 S.import "lua"
+
+----- Executables -----
 
 lualibsdir = "lib/"..name.."/"
 
@@ -88,5 +91,18 @@ S.addToTarget("test", test)
 S.addToDefault(gen)
 
 S.install(gen, "bin/")
-S.install("lualibs/", lualibsdir)
+
+----- Lua Libraries -----
+llibs =T.List(T.dir.getallfiles("lualibs/", "*.lua"))
+for f in llibs:iter() do
+	local lua = C.path("@"..f)
+	local luo =  C.path("@"..T.path.splitext(f)..".luo")
+	local tdir = T.path.join(lualibsdir, T.path.dirname(f))
+
+	S.lua.compile(f, luo) -- Precompile.
+	S.util.cp(f, lua)     -- Copy the source.
+
+	S.install(lua, tdir)
+	S.install(luo, tdir)
+end
 
