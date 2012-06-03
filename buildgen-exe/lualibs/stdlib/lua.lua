@@ -29,4 +29,6 @@ function S.lua.compile ( source, out )
 	out    = C.path(out)
 
 	C.addGenerator({source}, {"*luac", "-o", out, source}, {out})
+
+	return out
 end
