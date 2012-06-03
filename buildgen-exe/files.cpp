@@ -192,19 +192,42 @@ char *Files::normalizeFilename( const char *path )
 		}
 	case '@': // Auto path
 		{
+			/***** Expand the path *****/
 			char *p = mstrdup(path);
-			p[0] = '!';
+			char *pf = p;
+			if ( p[1] != '/' ) p[0] = '!';
+			else               p++;
 			char *b = normalizeFilename(p);
-			free(p);
-			char *n = myalloc(  strlen(b)
-			                  - strlen(project_root)
-			                  + strlen(out_root)
-			                  + 1
-			                 );
-			strcpy(n, out_root);
-			strcat(n, b+strlen(project_root)); // -1 is to include the slash.
+			free(pf);
 
-			free(b);
+			char *n = NULL;
+
+			size_t olen = strlen(out_root);
+			size_t plen = strlen(project_root);
+			size_t blen = strlen(b);
+
+			if (!strncmp(b, out_root, olen))
+			{
+				n = b; // Already in the out directory.
+			}
+			else if (!strncmp(b, project_root, plen))
+			{
+				n = myalloc(blen - plen + olen + 1);
+
+				strcpy(n,      out_root);
+				strcpy(n+olen, b+plen);
+
+				free(b);
+			}
+			else // Outside of our directories
+			{
+				n = myalloc(olen + blen + 1);
+
+				strcpy(n,      out_root);
+				strcpy(n+olen, b);
+
+				free(b);
+			}
 
 			return prettyPath(n);
 		}

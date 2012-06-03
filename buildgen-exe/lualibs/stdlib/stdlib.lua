@@ -67,6 +67,29 @@ T.utils = require "pl.utils"
 
 T.stringx.import()
 
+--- Resolve a path passed as a define.
+--
+-- Replaces the value in the D prefix with an abosolute path.  The path is
+-- treated as relitive to the directory form which BuildGen was called.  This
+-- should be used whenever trating a value defined on the command line as a
+-- path.  If this is not used relitave paths will not be relitive to the
+-- direcotory the caller expects.
+--
+-- @param path The key of the defined value.
+-- @param default The value to be put if the value is not defined.  Defaults to
+--	nil.
+function D.resolvePath ( path , default )
+	if not D[path] then
+		D[path] = default
+	end
+
+	if not D[path] then return end -- If the default was nil.
+
+	if T.path.isabs(D[path]) then
+		D[path] = C.path(">"..D[path])
+	end
+end
+
 if not S.prefix then
 	if S.os.compliance == "win32" then
 		D.resolvePath("prefix", "C:/Program Files/")
@@ -120,11 +143,11 @@ function S.findExecutable ( name )
 
 	for d in S.path:iter() do
 		local p = T.path.join(d, name);
-		
+
 		if T.path.isfile(p) then
 			return p
 		end
-		
+
 		if S.style == "win32" then
 			for e in S.pathext:iter() do
 				local f = T.path.join(p, e);
@@ -197,7 +220,7 @@ do
 	if seperator then
 		S.path = T.List(ospath:split(seperator))
 	end
-	
+
 	if S.style == "win32" then
 		S.pathext =  T.List(os.getenv("PATH"):split(";"))
 	end

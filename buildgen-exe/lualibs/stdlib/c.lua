@@ -316,16 +316,7 @@ local function compile ( linkfunc, sources, out )
 	for source in s:iter() do
 		source = C.path(source)
 
-		local object = nil; -- Get path to put object file.
-
-		if source:sub(0, #projectRoot) == projectRoot then
-			object = C.path(">"..source:sub(#projectRoot)..".o")
-		elseif source:sub(0, #outRoot) == outRoot then
-			object = C.path(source..".o") -- Already in the out dir.
-		else
-			object = C.path("@"..source:sub(#projectRoot)..".o") -- Put inside
-			                                                     -- the build
-		end                                                      -- dir.
+		local object = C.path("@"..source..".o")
 
 		S.c.compileObject(source, h, object)
 		objects:append(object)

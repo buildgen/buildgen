@@ -90,27 +90,4 @@
 -- @class function
 -- @name C.path
 
---- Resolve a path passed as a define.
---
--- Replaces the value in the D prefix with an abosolute path.  The path is
--- treated as relitive to the directory form which BuildGen was called.  This
--- should be used whenever trating a value defined on the command line as a
--- path.  If this is not used relitave paths will not be relitive to the
--- direcotory the caller expects.
---
--- @param path The key of the defined value.
--- @param default The value to be put if the value is not defined.  Defaults to
---	nil.
-function D.resolvePath ( path , default )
-	if not D[path] then
-		D[path] = default
-	end
-
-	if not D[path] then return end -- If the default was nil.
-
-	if D[path]:sub(0,1) ~= "/" then -- Doesn't start with a slash.
-		D[path] = C.path(">"..D[path])
-	end
-end
-
 dofile(S.lualibsRoot.."stdlib.lua")

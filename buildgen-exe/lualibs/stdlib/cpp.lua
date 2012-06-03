@@ -241,8 +241,8 @@ end
 
 --- Compile a source into an object.
 --
--- @prarm src The file to compile.
--- @ headers A list of headers that are needed.
+-- @param src The file to compile.
+-- @param headers A list of headers that are needed.
 -- @param obj The place to put the resulting object file.
 function S.cpp.compileObject ( src, headers, obj )
 	obj = C.path(obj)
@@ -262,7 +262,7 @@ function S.cpp.compileObject ( src, headers, obj )
 
 	local debug = S.cpp.debugOveride
 	if debug == nil then debug = S.cpp.debug end
-	if debug then                      -- Add the debug flag.
+	if debug then -- Add the debug flag.
 		S.cpp.addArg(compiler.flags.debug)
 		S.cpp.define{DEBUG=true}
 	else                   -- Add the debug flag.
@@ -270,7 +270,7 @@ function S.cpp.compileObject ( src, headers, obj )
 	end
 	local profile = S.cpp.profileOveride
 	if profile == nil then profile = S.cpp.profile end
-	if profile then                    -- Add the profile flag.
+	if profile then -- Add the profile flag.
 		S.cpp.addArg(compiler.flags.profile)
 	end
 	local optimization = S.cpp.optimizationOveride
@@ -323,16 +323,7 @@ function S.cpp.compile ( sources, out )
 	for source in s:iter() do
 		source = C.path(source)
 
-		local object = nil; -- Get path to put object file.
-
-		if source:sub(0, #projectRoot) == projectRoot then
-			object = C.path(">"..source:sub(#projectRoot)..".o")
-		elseif source:sub(0, #outRoot) == outRoot then
-			object = C.path(source..".o") -- Already in the out dir.
-		else
-			object = C.path("@"..source:sub(#projectRoot)..".o") -- Put inside
-			                                                     -- the build
-		end                                                      -- dir.
+		local object = C.path("@"..source..".o")
 
 		S.cpp.compileObject(source, h, object)
 		objects:append(object)
@@ -376,16 +367,7 @@ function S.cpp.compileShared ( sources, out )
 	for source in s:iter() do
 		source = C.path(source)
 
-		local object = nil; -- Get path to put object file.
-
-		if source:sub(0, #projectRoot) == projectRoot then
-			object = C.path(">"..source:sub(#projectRoot)..".o")
-		elseif source:sub(0, #outRoot) == outRoot then
-			object = C.path(source..".o") -- Already in the out dir.
-		else
-			object = C.path("@"..source:sub(#projectRoot)..".o") -- Put inside
-			                                                     -- the build
-		end                                                      -- dir.
+		local object = C.path("@"..source..".o")
 
 		S.cpp.compileObject(source, h, object)
 		objects:append(object)
