@@ -10,3 +10,4 @@ CMakeLists.txt.user
 # Code::Blocks
 BuildGen.cbp
 BuildGen.layout
+BuildGen.*
