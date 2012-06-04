@@ -33,6 +33,13 @@ L.imported = {}
 if not P.S then P.S = {} end --
 if not P.L then P.L = {} end --
 
+do
+
+local function runScript ( basename )
+	local status, err = pcall(function () dofile(basename..".luo") end)
+	if not status then dofile(basename..".lua") end
+end
+
 --- The Standard Library Root.
 --
 -- This is the root directory of the standard library files.  This is mostly for
@@ -65,7 +72,7 @@ S.os = _G.S.os
 -- @param name The name of the library to load.
 function S.import ( name )
 	if not S.imported["stdlib"] then
-		dofile(S.lualibsRoot.."stdlib.lua")
+		runScript(S.lualibsRoot.."stdlib")
 		S.imported["stdlib"] = true
 	end
 
@@ -73,7 +80,7 @@ function S.import ( name )
 		S.imported[name] = true
 
 		name:gsub("%.", "/") -- Make into a path.
-		dofile(S.lualibsRoot..name..".lua")
+		runScript(S.lualibsRoot..name)
 	end
 end
 
@@ -103,9 +110,10 @@ function L.import ( name )
 		L.imported[name] = true
 		if global then
 			name = name:gsub("%.", "/") -- Make into a path.
-			dofile(L.lualibsRoot..name..".lua")
+			runScript(L.lualibsRoot..name)
 		else
-			dofile(C.path(name))
+			dofile(C.path(name)) -- It is a .lua file already.
 		end
 	end
+end
 end
