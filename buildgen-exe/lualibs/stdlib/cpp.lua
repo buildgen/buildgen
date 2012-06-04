@@ -245,6 +245,10 @@ end
 -- @param headers A list of headers that are needed.
 -- @param obj The place to put the resulting object file.
 function S.cpp.compileObject ( src, headers, obj )
+	T.utils.assert_string(1, src)
+	T.utils.assert_arg(2, headers, "table")
+	T.utils.assert_string(3, obj)
+
 	obj = C.path(obj)
 	src = C.path(src)
 	headers = T.List(headers):map(C.path)
@@ -301,6 +305,9 @@ end
 --	Windows.
 -- @returns The actual output name used.
 function S.cpp.compile ( sources, out )
+	T.utils.assert_arg(1, sources, "table")
+	T.utils.assert_string(2, out)
+
 	sources = T.List(sources):map(C.path)
 	out = C.path(out)
 
@@ -345,6 +352,9 @@ end
 --   a path ending with "foo" will be called "libfoo.so" on Posix platforms.
 -- @returns The actual output name used.
 function S.cpp.compileShared ( sources, out )
+	T.utils.assert_arg(1, sources, "table")
+	T.utils.assert_string(2, out)
+
 	sources = T.List(sources):map(C.path)
 	out = C.path(out)
 

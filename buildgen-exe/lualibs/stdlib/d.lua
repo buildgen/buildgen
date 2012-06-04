@@ -301,9 +301,14 @@ end
 --- Compile a source into an object.
 --
 -- @prarm src The file to compile.
+-- @param src The source file to compile.
 -- @param depends A list of files the object depends on (specificly templates).
 -- @param obj The place to put the resulting object file.
 function S.d.compileObject ( src, depends, obj )
+	T.utils.assert_string(1, src)
+	T.utils.assert_arg(2, depends, "table")
+	T.utils.assert_string(3, obj)
+
 	src = C.path(src)
 	depends = T.List(depends):map(C.path):append(src)
 	obj = C.path(obj)
@@ -359,6 +364,8 @@ function S.d.compileObject ( src, depends, obj )
 	})
 
 	state.arguments = oldarguments;
+
+	return obj
 end
 
 --- Link into an executable
@@ -366,6 +373,9 @@ end
 -- @param out Where to put the executable.  This is treated as a BuildGen path.
 --	.exe will be appended on windows.
 function S.d.link(objects, out)
+	T.utils.assert_arg(1, objects, "table")
+	T.utils.assert_string(2, out)
+
 	objects = T.List(objects):map(C.path)
 	out = C.path(out)
 
@@ -404,6 +414,9 @@ end
 -- @param objects A list of objects that will be used to compile the library.
 -- @param out The file to be created.  An appropriate extension will be added.
 function S.d.linkShared(objects, out)
+	T.utils.assert_arg(1, objects, "table")
+	T.utils.assert_string(2, out)
+
 	objects = T.List(objects):map(C.path)
 	out = C.path(out)
 
@@ -446,6 +459,9 @@ end
 -- @param out The file to be created.  ".exe" will be appended if compiling on
 --	Windows.
 function S.d.compile ( sources, out )
+	T.utils.assert_arg(1, sources, "table")
+	T.utils.assert_string(2, out)
+
 	sources = T.List(sources):map(C.path)
 	out = C.path(out)
 
@@ -472,6 +488,9 @@ end
 -- @param sources A list of sources that will be used to compile the library.
 -- @param out The file to be created.  An appropriate extension will be added.
 function S.d.compileShared ( sources, out )
+	T.utils.assert_arg(1, sources, "table")
+	T.utils.assert_string(2, out)
+
 	sources = T.List(sources):map(C.path)
 	out = C.path(out)
 

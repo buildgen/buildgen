@@ -167,6 +167,9 @@ if not P.S.util.cmd.install then
 end
 
 function S.util.cp ( src, dest )
+	T.utils.assert_string(1, name)
+	T.utils.assert_string(2, name)
+
 	src  = C.path(src)
 	dest = C.path(dest)
 
@@ -181,6 +184,9 @@ function S.util.cp ( src, dest )
 end
 
 function S.util.mv ( src, dest )
+	T.utils.assert_string(1, name)
+	T.utils.assert_string(2, name)
+
 	src  = C.path(src)
 	dest = C.path(dest)
 
@@ -195,6 +201,8 @@ function S.util.mv ( src, dest )
 end
 
 function S.util.rm ( file )
+	T.utils.assert_string(1, file)
+
 	file = C.path(file)
 
 	cmd = T.List()
@@ -207,6 +215,9 @@ function S.util.rm ( file )
 end
 
 function S.util.install ( src, dest )
+	T.utils.assert_string(1, name)
+	T.utils.assert_string(2, name)
+
 	src  = C.path(src)
 	dest = C.path(dest)
 

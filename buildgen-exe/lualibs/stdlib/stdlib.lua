@@ -79,6 +79,8 @@ T.stringx.import()
 -- @param default The value to be put if the value is not defined.  Defaults to
 --	nil.
 function D.resolvePath ( path , default )
+	T.utils.assert_string(1, path)
+
 	if not D[path] then
 		D[path] = default
 	elseif not T.path.isabs(D[path]) then
@@ -103,6 +105,8 @@ end
 --
 -- @param path The path of the target.
 function S.addToDefault ( path )
+	T.utils.assert_string(1, path)
+
 	S.addToTarget("all", path)
 end
 
@@ -111,6 +115,9 @@ end
 -- @param target The name of the magic target.
 -- @param path The path to add.  This is a BuildGen path.
 function S.addToTarget ( target, path )
+	T.utils.assert_string(1, target)
+	T.utils.assert_string(2, path)
+
 	C.addDependancy(target, path, { magic = true })
 end
 
@@ -119,6 +126,9 @@ end
 -- @param target The name of the magic target.
 -- @param path The path to add.  This is a BuildGen path.
 function S.addTargetToTarget ( target, deptarget )
+	T.utils.assert_string(1, target)
+	T.utils.assert_string(2, deptarget)
+
 	C.addDependancy(target, deptarget, { magic = true, magicsrc = true })
 end
 
@@ -130,6 +140,8 @@ end
 -- @param  name The name of the executable.
 -- @return The path of the executable or ``false`` if not found.
 function S.findExecutable ( name )
+	T.utils.assert_string(1, name)
+
 	if T.path.isabs(name) then -- Absolute path.
 		if T.path.isfile(name) then
 			return name
@@ -170,6 +182,9 @@ end
 --	install prefix (S.prefix) if it is not absolute.
 -- @return A List of files that will be installed.
 function S.install ( path, to )
+	T.utils.assert_string(1, path)
+	T.utils.assert_string(2, to)
+
 	S.import "util"
 
 	local apath = C.path(path)

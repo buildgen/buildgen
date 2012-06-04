@@ -244,6 +244,10 @@ end
 -- @ headers A list of headers that are needed.
 -- @param obj The place to put the resulting object file.
 function S.c.compileObject (src, headers, obj)
+	T.utils.assert_string(1, src)
+	T.utils.assert_arg(2, headers, "table")
+	T.utils.assert_string(3, obj)
+
 	obj = C.path(obj)
 	src = C.path(src)
 	headers = T.List(headers):map(C.path)
@@ -339,6 +343,9 @@ end
 --   Windows.
 -- @returns The actual path of the created executable.
 function S.c.compile ( sources, out )
+	T.utils.assert_arg(1, sources, "table")
+	T.utils.assert_string(2, out)
+
 	return compile(S.ld.link, sources, out)
 end
 
@@ -350,6 +357,9 @@ end
 -- @param out The file to be created.  This is just the basename,
 -- @returns The actual path used for the output executable.
 function S.c.compileStatic ( sources, out )
+	T.utils.assert_arg(1, sources, "table")
+	T.utils.assert_string(2, out)
+
 	return compile(S.ld.linkStatic, sources, out)
 end
 
@@ -361,6 +371,9 @@ end
 -- @param out The file to be created.  This is just the basename,
 -- @returns The actual path used for the output executable.
 function S.c.compileShared ( sources, out )
+	T.utils.assert_arg(1, sources, "table")
+	T.utils.assert_string(2, out)
+
 	return compile(S.ld.linkShared, sources, out)
 end
 
@@ -375,6 +388,10 @@ end
 -- @param An object consisting of key/value pairs where the key will be the
 --	variable name and the value will be the value.
 function S.c.generateHeader ( head, src, definitions )
+	T.utils.assert_string(1, head)
+	T.utils.assert_string(2, src)
+	T.utils.assert_arg(2, definitions, "table")
+
 	local generatorScript = S.lualibsRoot .. "c/generateHeader.lua"
 
 	head = C.path(head)

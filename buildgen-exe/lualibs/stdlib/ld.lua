@@ -56,6 +56,8 @@ end
 -- @param new The new state to load.
 -- @return The old state.
 function S.ld.swapState ( new )
+	T.utils.assert_arg(1, new, "table")
+
 	local old = state
 
 	S.ld.loadState(new)
@@ -68,6 +70,8 @@ end
 --
 -- @param data The state to load.
 function S.ld.loadState ( data )
+	T.utils.assert_arg(1, data, "table")
+
 	state = data
 end
 
@@ -138,10 +142,14 @@ end
 --- Link an executable.
 -- Links object files into an executable.
 --
+-- @param objects A list of objects to link.
 -- @param out The location to put the executable.  This is treated as a BuildGen
 --	path.  This is only the base name and it will be modified to fit the platform.
 --  For example, on windows ##.exe## will be added.
 function S.ld.link ( objects, out )
+	T.utils.assert_arg(1, objects, "table")
+	T.utils.assert_string(2, out)
+
 	linker = P.S.ld.linker
 
 	local cmd = T.List{linker.name}
@@ -173,6 +181,9 @@ end
 --	path.  This is only the base name and it will be modified to fit the operating
 --  system.
 function S.ld.linkStatic ( objects, out )
+	T.utils.assert_arg(1, objects, "table")
+	T.utils.assert_string(2, out)
+
 	out = C.path(out)
 	local dir, base = T.path.splitpath(out)
 
@@ -198,6 +209,9 @@ end
 --	path.  This is only the base name and it will be modified to fit the operating
 --  system.
 function S.ld.linkShared ( objects, out )
+	T.utils.assert_arg(1, objects, "table")
+	T.utils.assert_string(2, out)
+
 	out = C.path(out)
 	local dir, base = T.path.splitpath(out)
 

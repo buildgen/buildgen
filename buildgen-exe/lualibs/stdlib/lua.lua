@@ -25,6 +25,9 @@
 S.lua = {}
 
 function S.lua.compile ( source, out )
+	T.utils.assert_string(1, source)
+	T.utils.assert_string(2, out)
+
 	source = C.path(source)
 	out    = C.path(out)
 

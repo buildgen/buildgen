@@ -90,4 +90,7 @@
 -- @class function
 -- @name C.path
 
-dofile(S.lualibsRoot.."stdlib.lua")
+do
+local status, err = pcall(function () dofile(S.lualibsRoot.."stdlib.luo") end)
+if not status then dofile(S.lualibsRoot.."stdlib.lua") end
+end
