@@ -91,6 +91,6 @@
 -- @name C.path
 
 do
-local status, err = pcall(function () dofile(S.lualibsRoot.."stdlib.luo") end)
+local status, err = pcall(dofile, S.lualibsRoot.."stdlib.luo")
 if not status then dofile(S.lualibsRoot.."stdlib.lua") end
 end

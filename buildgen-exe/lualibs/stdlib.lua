@@ -36,7 +36,7 @@ if not P.L then P.L = {} end --
 do
 
 local function runScript ( basename )
-	local status, err = pcall(function () dofile(basename..".luo") end)
+	local status, err = pcall(dofile, basename..".luo")
 	if not status then dofile(basename..".lua") end
 end
 
