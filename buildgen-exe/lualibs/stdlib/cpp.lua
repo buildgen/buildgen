@@ -120,46 +120,114 @@ function S.cpp.loadState ( data )
 	S.cpp.profileOveride      = data.profileOveride
 end
 
-if not P.S.cpp.compiler then
-	local compilers = {
-		{	name = "g++", -- Name of the executable
-			flags = {
-				compile  = "-c",
-				output   = {"-o", "%s"}, -- the option to set the output file name.
-				debug    = "-g",         -- the option to enable debug mode.
-				profile  = "-p",         -- the option to enable profiling.
-				define   = {"-D%s"},     -- the option to define a macro.
-				include  = {"-I", "%s"}, -- the option to add an include directory.
-				optimize = {             -- Flags for different levels of optimization.
-					none    = {},
-					quick   = "-O",
-					regular = "-O2",     -- Default optimazation.
-					full    = "-O3",
-					max     = {
-								"-O3",
-								"-fexpensive-optimizations",
-								"-fomit-frame-pointer"
-							  },     -- Highest possoble (possibly exparemental)
-				}
+local compilers = T.Map{
+	["g++"] = {
+		exe = "g++", -- Name of the executable
+		flags = {
+			compile  = {"-c"},
+			output   = {"-o", "%s"}, -- the option to set the output file name.
+			debug    = "-g",         -- the option to enable debug mode.
+			profile  = "-p",         -- the option to enable profiling.
+			define   = {"-D%s"},     -- the option to define a macro.
+			include  = {"-I", "%s"}, -- the option to add an include directory.
+			optimize = {             -- Flags for different levels of optimization.
+				none    = {},
+				quick   = "-O",
+				regular = "-O2",     -- Default optimazation.
+				full    = "-O3",
+				max     = { -- Highest possoble (possibly exparemental)
+					"-O3",
+					"-fexpensive-optimizations",
+					"-fomit-frame-pointer"
+				},
 			}
-		},
-	}
-	compilers = T.List(compilers) -- turn tabe into a penlight 'list'
+		}
+	},
+	["clang"] = {
+		exe = "clang", -- Name of the executable
+		flags = {
+			compile  = {"-c"},
+			output   = {"-o", "%s"}, -- the option to set the output file name.
+			debug    = {"-g"},         -- the option to enable debug mode.
+			profile  = {"-p"},         -- the option to enable profiling.
+			define   = {"-D%s"},     -- the option to define a macro.
+			include  = {"-I", "%s"}, -- the option to add an include directory.
+			optimize = {             -- Flags for different levels of optimization.
+				none    = {},
+				quick   = "-O",
+				regular = "-O2",     -- Default optimazation.
+				full    = "-O3",
+				max     = { -- Highest possoble (possibly exparemental)
+					"-O3",
+					"-fexpensive-optimizations",
+					"-fomit-frame-pointer"
+				},
+			}
+		}
+	},
+}
 
-	local compiler;
-	for c in compilers:iter() do          -- Find the first compiler they have
-		if S.findExecutable(c.name) then -- installed on thier system.
-			compiler = c
-			compiler.name = S.findExecutable(compiler.name)
+function S.cpp.compilerExists ( name )
+	T.utils.assert_string(1, name)
 
+	if compilers[name] == nil then return false end
+
+	local c = compilers[name]
+	if not S.findExecutable(c.exe) then return false end
+
+	return true
+end
+
+function S.cpp.useCompiler ( name )
+	T.utils.assert_arg(1, name, "string",
+	                  S.cpp.compilerExists, "Unknown compiler",
+	                  2)
+
+	local c = compilers[name]
+
+	local function makeList ( path )
+		local c = c; -- The parent table.
+		local i;     -- The index in c.
+		for e in path:split("."):iter() do -- Recursively get table.
+			if i then c = c[i] end
+			i = e
+		end
+
+		if type(c[i]) == "table" then
+			c[i] = T.List(c[i])
+		else
+			c[i] = T.List{c[i]}
+		end
+
+		return c[i]
+	end
+
+	c.exe = S.findExecutable(c.exe)
+	makeList "flags.compile"
+	makeList "flags.output"
+	makeList "flags.debug"
+	makeList "flags.profile"
+	makeList "flags.define"
+	makeList "flags.include"
+	makeList "flags.optimize.none"
+	makeList "flags.optimize.quick"
+	makeList "flags.optimize.regular"
+	makeList "flags.optimize.full"
+	makeList "flags.optimize.max"
+
+	P.S.cpp.compiler = c
+end
+
+if not P.S.cpp.compiler then
+	for n in compilers:iter() do        -- Find the a compiler that they have
+		if S.cpp.compilerExists(n) then -- installed on thier system.
+			S.cpp.useCompiler(n)
 			break
 		end
 	end
 
-	if compiler == nil then
+	if not P.S.cpp.compiler then
 		error("Error: No C++ compiler found.", 0)
-	else
-		P.S.cpp.compiler = compiler
 	end
 end
 
@@ -259,7 +327,7 @@ function S.cpp.compileObject ( src, headers, obj )
 	local oldarguments = state.arguments
 	state.arguments = T.List()
 
-	S.cpp.addArg(compiler.name)
+	S.cpp.addArg(compiler.exe)
 	S.cpp.addArg(compiler.flags.compile)
 
 	S.cpp.addArg(oldarguments)
