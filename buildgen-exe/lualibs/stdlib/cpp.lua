@@ -266,7 +266,7 @@ function S.cpp.addArg ( arg )
 		arg = {tostring(arg)}
 	end
 
-	for k, v in pairs(arg) do state.arguments:append(v) end
+	state.arguments:extend(arg)
 end
 
 --- Add an include directory
@@ -275,14 +275,14 @@ end
 --	paths.
 function S.cpp.addInclude ( dir )
 	if type(dir) ~= "table" then
-		dir = T.List{tostring(dir)}
+		dir = {tostring(dir)}
 	end
+	dir = T.List(dir)
 
 	for v in dir:iter() do
 		v = C.path(v)
-		for l, w in pairs(P.S.cpp.compiler.flags.include) do
-			S.cpp.addArg(w:format(v))
-		end
+
+		S.cpp.addArg(P.S.cpp.compiler.flags.include:map():format(v))
 	end
 end
 
@@ -291,9 +291,7 @@ end
 --
 -- @param map A table of key/value pairs to be defined during compilation.
 function S.cpp.define ( map )
-	if type(map) ~= "table" then
-		map = {tostring(map)}
-	end
+	T.utils.assert_arg(1, map, "table")
 
 	for k, v in pairs(map) do
 		if type(v) ~= "string" then
@@ -301,9 +299,8 @@ function S.cpp.define ( map )
 		else
 			v = "="..v
 		end
-		for l, w in pairs(P.S.cpp.compiler.flags.define) do
-			S.cpp.addArg(w:format(k..v))
-		end
+
+		S.cpp.addArg(P.S.cpp.compiler.flags.define:map():format(k..v))
 	end
 end
 
@@ -365,9 +362,8 @@ function S.cpp.compileObject ( src, headers, obj )
 		S.cpp.addArg(o)                             --
 	end                                             --
 
-	for i in T.List(compiler.flags.output):iter() do -- Add the desired output file to
-		S.cpp.addArg(i:format(obj))                  -- the command line.
-	end                                              --
+	-- Add the desired output file to the command line.
+	S.cpp.addArg(compiler.flags.output:map():format(obj))
 
 	S.cpp.addArg(src)
 
