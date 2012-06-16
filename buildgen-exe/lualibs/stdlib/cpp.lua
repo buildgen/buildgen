@@ -167,7 +167,14 @@ local compilers = T.Map{
 	},
 }
 
-function S.cpp.compilerExists ( name )
+--- Check to see if a compiler is available.
+--
+-- Checks to see that a compiler is available and that BuildGen knows how
+-- to use it.
+--
+-- @param name The name of the compiler (often the name of the executable).
+-- @returns ``true`` if the compiler can be used otherwise ``false``.
+function S.cpp.hasCompiler ( name )
 	T.utils.assert_string(1, name)
 
 	if compilers[name] == nil then return false end
@@ -178,9 +185,15 @@ function S.cpp.compilerExists ( name )
 	return true
 end
 
+--- Select which compiler to use.
+--
+-- This function selects the C++ compiler to use.  You should first check if
+-- the compiler is avaiable with ``S.cpp.hasCompiler()``.
+--
+-- @param name The name of the compiler (often the name of the executable).
 function S.cpp.useCompiler ( name )
 	T.utils.assert_arg(1, name, "string",
-	                  S.cpp.compilerExists, "Unknown compiler",
+	                  S.cpp.hasCompiler, "Unknown compiler",
 	                  2)
 
 	local c = compilers[name]
@@ -219,8 +232,8 @@ function S.cpp.useCompiler ( name )
 end
 
 if not P.S.cpp.compiler then
-	for n in compilers:iter() do        -- Find the a compiler that they have
-		if S.cpp.compilerExists(n) then -- installed on thier system.
+	for n in compilers:iter() do     -- Find the a compiler that they have
+		if S.cpp.hasCompiler(n) then -- installed on thier system.
 			S.cpp.useCompiler(n)
 			break
 		end
