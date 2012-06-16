@@ -118,7 +118,7 @@ end
 S.c.swapState(S.c.newState())
 
 if not P.S.c.compiler then
-	local compilers = {
+	local compilers = T.List{
 		{	name = "gcc", -- Name of the executable
 			flags = {
 				compile  = "-c",
@@ -141,7 +141,6 @@ if not P.S.c.compiler then
 			}
 		},
 	}
-	T.List(compilers) -- turn tabe into a penlight 'list'
 
 	local compiler;
 	for c in compilers:iter() do          -- Find the first compiler they have
