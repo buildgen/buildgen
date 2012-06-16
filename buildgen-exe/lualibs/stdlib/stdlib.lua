@@ -100,8 +100,8 @@ end
 
 --- Add a Target to the Default Build
 --
--- Adds <span class="code">path</span> to the default build.  This means that if
--- the builder doesn't specify what they want build this will be built.
+-- Adds ``path`` to the default build.  This means that if the builder doesn't
+-- specify what they want build this will be built.
 --
 -- @param path The path of the target.
 function S.addToDefault ( path )
