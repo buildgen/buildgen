@@ -105,7 +105,7 @@
 	#define WINPF(x)   (x)
 	#define UNIXP(x)   (x)
 	#define UNIXPF(x)  (x)
-	#define CYGFREE(x) (x)
+	#define CYGFREE(x)
 #endif
 
 namespace LuaFunctions
