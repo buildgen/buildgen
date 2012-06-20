@@ -201,10 +201,9 @@ function S.install ( path, to )
 			installed:append(fto)
 		end
 	else
-		local fto = T.path.join(to, bname)
-		S.util.install(apath, fto)
-		C.addDependancy("install", fto, { magic = true })
-		installed:append(fto)
+		S.util.install(apath, to)
+		C.addDependancy("install", to, { magic = true })
+		installed:append(to)
 	end
 
 	return installed
