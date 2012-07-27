@@ -1,6 +1,11 @@
+--- The S Namespace
+-- The standard library base BuildGen functions.  These are only available after
+-- importing "stdlib" (`S.import"stdlib"`) or any other library.
+-- @module stdlib
+
 -- Copyright 2011-2012 Kevin Cox
 
---[[---------------------------------------------------------------------------]
+--[[ --------------------------------------------------------------------------]
 [                                                                              ]
 [  This software is provided 'as-is', without any express or implied           ]
 [  warranty. In no event will the authors be held liable for any damages       ]
@@ -75,7 +80,7 @@ T.stringx.import()
 -- path.  If this is not used relitave paths will not be relitive to the
 -- direcotory the caller expects.
 --
--- @param path The key of the defined value.
+-- @tparam string path The key of the defined value.
 -- @param default The value to be put if the value is not defined.  Defaults to
 --	nil.
 function D.resolvePath ( path , default )
@@ -95,15 +100,18 @@ if not S.prefix then
 		D.resolvePath("prefix", "/usr/local/")
 	end
 
+	--- The install prefix.
+	--
+	-- This is the base directory where files will be installed.
 	S.prefix = D.prefix
 end
 
 --- Add a Target to the Default Build
 --
--- Adds ``path`` to the default build.  This means that if the builder doesn't
+-- Adds `path` to the default build.  This means that if the builder doesn't
 -- specify what they want build this will be built.
 --
--- @param path The path of the target.
+-- @tparam string path The path of the target.
 function S.addToDefault ( path )
 	T.utils.assert_string(1, path)
 
@@ -112,8 +120,8 @@ end
 
 --- Add a path to a magic target.
 --
--- @param target The name of the magic target.
--- @param path The path to add.  This is a BuildGen path.
+-- @tparam string target The name of the magic target.
+-- @tparam string path The path to add.  This is a BuildGen path.
 function S.addToTarget ( target, path )
 	T.utils.assert_string(1, target)
 	T.utils.assert_string(2, path)
@@ -123,8 +131,8 @@ end
 
 --- Add a target to a magic target.
 --
--- @param target The name of the magic target.
--- @param path The path to add.  This is a BuildGen path.
+-- @tparam string target The name of the magic target.
+-- @tparam string deptarget The path to add.  This is a BuildGen path.
 function S.addTargetToTarget ( target, deptarget )
 	T.utils.assert_string(1, target)
 	T.utils.assert_string(2, deptarget)
@@ -137,8 +145,8 @@ end
 -- Look for the program in the location(s) appropriate to the system.  For
 -- example in UNIX-style os's it will search your path.
 --
--- @param  name The name of the executable.
--- @return The path of the executable or ``false`` if not found.
+-- @tparam string name The name of the executable.
+-- @treturn string The path of the executable or `false` if not found.
 function S.findExecutable ( name )
 	T.utils.assert_string(1, name)
 
@@ -172,15 +180,15 @@ end
 
 --- Add a Target to the Install Target
 --
--- Installs ``path``.  If ``path`` is a directory it will be installed
+-- Installs `path`.  If `path` is a directory it will be installed
 -- recursivly.  Please note that the directory will be installed, not it's
--- contents.  Example: ``S.install("foo/", "bar/")`` will result in ``bar/foo/``
--- ``bar/{foo_contents}``.
+-- contents.  Example: `S.install("foo/", "bar/")` will result in `bar/foo/`,
+-- not `bar/{foo_contents}`.
 --
--- @param path The path of the target.
--- @param to The directory to install the file.  This is treated as relative to the
---	install prefix (S.prefix) if it is not absolute.
--- @return A List of files that will be installed.
+-- @tparam string path The path of the target.
+-- @tparam string to The directory to install the file.  This is treated as
+-- relative to the install prefix (`S.prefix`) if it is not absolute.
+-- @treturn {string,...} A List of files that will be installed.
 function S.install ( path, to )
 	T.utils.assert_string(1, path)
 	T.utils.assert_string(2, to)

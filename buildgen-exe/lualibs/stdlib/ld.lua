@@ -1,6 +1,9 @@
+--- The Linker Library
+-- @module S.ld
+
 -- Copyright 2011-2012 Kevin Cox
 
---[[---------------------------------------------------------------------------]
+--[[ --------------------------------------------------------------------------]
 [                                                                              ]
 [  This software is provided 'as-is', without any express or implied           ]
 [  warranty. In no event will the authors be held liable for any damages       ]
@@ -75,7 +78,7 @@ function S.ld.loadState ( data )
 	state = data
 end
 
-S.ld.swapState(S.ld.newState())
+S.ld.swapState(S.ld.newState()) -- Set up an initial state.
 
 if not P.S.ld.linker then
 	local linkers = T.List{
@@ -111,8 +114,7 @@ end
 -- modify the command line (such as S.ld.addLib()) as they
 -- are localized to the linker being used.
 --
--- @param args a string or list of strings to be added to the linker command
---	line.
+-- @tparam {string,...} args Arguments to be added to the linker command line.
 function S.ld.addArg ( arg )
 	if type(arg) ~= "table" then
 		arg = {tostring(arg)}
@@ -124,7 +126,7 @@ end
 --- Link in a Library
 -- Link the library to the executable.
 --
--- @param The name of the library to link.
+-- @tparam {string,...} The names of the libraries to link.
 function S.ld.addLib ( lib )
 	if type(lib) ~= "table" then
 		lib = {tostring(lib)}
@@ -142,10 +144,10 @@ end
 --- Link an executable.
 -- Links object files into an executable.
 --
--- @param objects A list of objects to link.
--- @param out The location to put the executable.  This is treated as a BuildGen
---	path.  This is only the base name and it will be modified to fit the platform.
---  For example, on windows ##.exe## will be added.
+-- @tparam {string,...} objects A list of objects to link.
+-- @tparam string out The location to put the executable.  This is treated as a
+-- BuildGen path.  This is only the base name and it will be modified to fit the
+-- platform.  For example, on windows `.exe` will be added.
 function S.ld.link ( objects, out )
 	T.utils.assert_arg(1, objects, "table")
 	T.utils.assert_string(2, out)
@@ -177,9 +179,11 @@ end
 --- Link a Static library.
 -- Links object files into a static library.
 --
--- @param out The location to put the library.  This is treated as a BuildGen
---	path.  This is only the base name and it will be modified to fit the operating
---  system.
+-- @tparam {string,...} objects A list of objects to link.
+-- @tparam string out The location to put the library.  This is treated as a
+-- BuildGen path.  This is only the base name and it will be modified to fit the
+-- platform.  For example, on posix it will become `lib${fname}.a` where
+-- `${fname}` is the file part of the path.
 function S.ld.linkStatic ( objects, out )
 	T.utils.assert_arg(1, objects, "table")
 	T.utils.assert_string(2, out)
@@ -205,9 +209,11 @@ end
 --- Link a Shared library.
 -- Links object files into a shared library.
 --
--- @param out The location to put the library.  This is treated as a BuildGen
---	path.  This is only the base name and it will be modified to fit the operating
---  system.
+-- @tparam {string,...} objects A list of objects to link.
+-- @tparam string out The location to put the library.  This is treated as a
+-- BuildGen path.  This is only the base name and it will be modified to fit the
+-- platform.  For example, on posix it will become `lib${fname}.so` where
+-- `${fname}` is the file part of the path.
 function S.ld.linkShared ( objects, out )
 	T.utils.assert_arg(1, objects, "table")
 	T.utils.assert_string(2, out)

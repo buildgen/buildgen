@@ -1,6 +1,9 @@
+--- Utility Functions.
+-- @module S.util
+
 -- Copyright 2011-2012 Kevin Cox
 
---[[---------------------------------------------------------------------------]
+--[[ --------------------------------------------------------------------------]
 [                                                                              ]
 [  This software is provided 'as-is', without any express or implied           ]
 [  warranty. In no event will the authors be held liable for any damages       ]
@@ -166,6 +169,10 @@ if not P.S.util.cmd.install then
 	end
 end
 
+--- Copy a file.
+--
+-- @tparam string src The file to copy.
+-- @tparam string dest Where to copy it to.
 function S.util.cp ( src, dest )
 	T.utils.assert_string(1, src)
 	T.utils.assert_string(2, dest)
@@ -183,6 +190,10 @@ function S.util.cp ( src, dest )
 	})
 end
 
+--- Move a file.
+--
+-- @tparam string src The file to move.
+-- @tparam string dest Where to move it to.
 function S.util.mv ( src, dest )
 	T.utils.assert_string(1, src)
 	T.utils.assert_string(2, dest)
@@ -200,6 +211,9 @@ function S.util.mv ( src, dest )
 	})
 end
 
+--- Delete a file.
+--
+-- @tparam string file The file to delete.
 function S.util.rm ( file )
 	T.utils.assert_string(1, file)
 
@@ -214,6 +228,11 @@ function S.util.rm ( file )
 	})
 end
 
+--- Safely install a file.
+-- This installs a file without crashing programs.
+--
+-- @tparam string src The file to install.
+-- @tparam string dest Where to install it.
 function S.util.install ( src, dest )
 	T.utils.assert_string(1, src)
 	T.utils.assert_string(2, dest)

@@ -1,6 +1,9 @@
+--- The Lua Library
+-- @module S.lua
+
 -- Copyright 2011-2012 Kevin Cox
 
---[[---------------------------------------------------------------------------]
+--[[ --------------------------------------------------------------------------]
 [                                                                              ]
 [  This software is provided 'as-is', without any express or implied           ]
 [  warranty. In no event will the authors be held liable for any damages       ]
@@ -24,6 +27,13 @@
 
 S.lua = {}
 
+--- Compile a Script into Lua Bytecode.
+-- Pre-compiling a Lua script has a number of advantages such as decreased load
+-- time (usually the script has to be compiled before each run), smaller files
+-- and possibly obfuscation.
+--
+-- @tparam string source The input file.
+-- @tparam string out Where to place the bytecode.
 function S.lua.compile ( source, out )
 	T.utils.assert_string(1, source)
 	T.utils.assert_string(2, out)

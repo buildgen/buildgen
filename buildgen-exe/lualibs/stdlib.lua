@@ -1,6 +1,10 @@
+--- The S Namespace
+-- The standard library base BuildGen functions.
+-- @module S
+
 -- Copyright 2011-2012 Kevin Cox
 
---[[---------------------------------------------------------------------------]
+--[[ --------------------------------------------------------------------------]
 [                                                                              ]
 [  This software is provided 'as-is', without any express or implied           ]
 [  warranty. In no event will the authors be held liable for any damages       ]
@@ -21,9 +25,6 @@
 [  3. This notice may not be removed or altered from any source distribution.  ]                                                           *
 [                                                                              ]
 [-----------------------------------------------------------------------------]]
-
-
---- The Standard library namespace.
 
 S = {} -- Standard libraries
 L = {} -- User libraries
@@ -54,22 +55,18 @@ L.lualibsRoot = _G.S.lualibsRoot.."custom/"
 
 --- Operating System Information
 -- Fields are:
--- <ul><li>
---		style: The style of OS.
--- </li><li>
---		kernel: The kernel the OS uses.
--- </li><li>
---		compliance: The standards that the os complies with.
--- </li></ul>
+--
+-- - style: The style of OS.
+-- - kernel: The kernel the OS uses.
+-- - compliance: The standards that the os complies with.
 S.os = _G.S.os
 
 --- Load a Standard Library
 --
--- Loads the library <span class="code">name</span>.  The library will become
--- available in <span class="code">S[name]</span>.  There is no harm in trying
--- to load a library more than once.
+-- Loads the library `name`.  The library will become available in `S[name]`.
+-- There is no harm in trying to load a library more than once.
 --
--- @param name The name of the library to load.
+-- @tparam string name The name of the library to load.
 function S.import ( name )
 	if not S.imported["stdlib"] then
 		runScript(S.lualibsRoot.."stdlib")
@@ -86,14 +83,13 @@ end
 
 --- Load a Custom Library
 --
--- Loads the library <span class="code">name</span>.  There is no harm in trying
+-- Loads the library `name`.  There is no harm in trying
 -- to load a library more than once.
 --
--- If <span class="code">name</span> ends in <span class="code">.lua</span> it
--- will be treated as a BuildGen path, else it will be loaded form the system
--- library directory.
+-- If `name` ends in `.lua` it will be treated as a BuildGen path, else it will
+-- be loaded form the system library directory.
 --
--- @param name The name of the library to load.
+-- @tparam string name The name of the library to load.
 function L.import ( name )
 	local global = false
 	local lname

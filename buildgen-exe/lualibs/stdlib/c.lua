@@ -1,6 +1,9 @@
+--- The C Library
+-- @module S.c
+
 -- Copyright 2011-2012 Kevin Cox
 
---[[---------------------------------------------------------------------------]
+--[[ --------------------------------------------------------------------------]
 [                                                                              ]
 [  This software is provided 'as-is', without any express or implied           ]
 [  warranty. In no event will the authors be held liable for any damages       ]
@@ -35,17 +38,12 @@ local state = {}
 --
 -- A string value representing the level of optimization to use when building
 -- the project. Possible values are:
--- <ul><li>
---		none - Perform no optimization.
---</li><li>
---		quick - Perform light optimization.
---</li><li>
---		regular - Perform regular optimization.
---</li><li>
---		full - Fully optimize the executable.
---</li><li>
---		max - Optimize as much as possible (possibly experimental optimizations).
---</li></ul>
+--
+-- - none - Perform no optimization.
+-- - quick - Perform light optimization.
+-- - regular - Perform regular optimization.
+-- - full - Fully optimize the executable.
+-- - max - Optimize as much as possible (possibly experimental optimizations).
 S.c.optimization = "regular"
 if D.debug then S.c.optimization = "none" end
 
@@ -79,7 +77,7 @@ end
 
 --- Stashes the current state.
 -- Returns the current state and loads a new state.  This is equivilent to
--- S.c.swapState(S.c.newState()).
+-- `S.c.swapState(S.c.newState())`.
 --
 -- @return The old state.
 function S.c.stashState ( )
@@ -159,13 +157,13 @@ if not P.S.c.compiler then
 	end
 end
 
--- Overide the default optimization level.
+--- Overide the default optimization level.
 S.c.optimizationOveride = S.c.optimizationOveride
 
--- Overide the default profile setting.
+--- Overide the default profile setting.
 S.c.profileOveride = S.c.profileOveride
 
--- Overide the default profile setting.
+--- Overide the default profile setting.
 S.c.debugOveride = S.c.debugOveride
 
 --- Add an argrment.
@@ -174,8 +172,7 @@ S.c.debugOveride = S.c.debugOveride
 -- modify the command line (Such as S.c.optimization and S.c.define()) as they
 -- are localized to the compiler being used.
 --
--- @param args a string or list of strings to be added to the compiler command
---	line.
+-- @tparam {string,...} args values to be added to the compiler command line.
 function S.c.addArg ( args )
 	if type(args) ~= "table" then
 		args = T.List{tostring(args)}
@@ -188,8 +185,7 @@ end
 
 --- Add an include directory
 --
--- @param dir an string or list of strings.  These will be treated as BuildGen
---	paths.
+-- @tparam {string,...} dir These will be treated as BuildGen paths.
 function S.c.addInclude ( dir )
 	if type(dir) ~= "table" then
 		dir = {tostring(dir)}
@@ -206,7 +202,8 @@ end
 --- Define a macro
 -- Define a macro during compliation.
 --
--- @param map A table of key/value pairs to be defined during compilation.
+-- @tparam {[string]=string,...} map A table of key/value pairs to be defined
+-- during compilation.
 function S.c.define ( map )
 	if type(map) ~= "table" then
 		map = {tostring(map)}
@@ -226,9 +223,9 @@ end
 
 --- Link a library.
 --
--- This just calls S.ld.addLib() with the linker being used by S.c.
+-- This just calls `S.ld.addLib()` with the linker being used by S.c.
 --
--- @param dir a string or list of strings as the name of the libraries.
+-- @tparam {string,...} dir names of the libraries.
 function S.c.addLib ( lib )
 	local ln = S.ld.swapState(state.linker)
 
@@ -239,9 +236,9 @@ end
 
 --- Compile a source into an object.
 --
--- @prarm src The file to compile.
--- @ headers A list of headers that are needed.
--- @param obj The place to put the resulting object file.
+-- @tparam string src The file to compile.
+-- @tparam {string,...} headers A list of headers that are needed.
+-- @tparam string obj The place to put the resulting object file.
 function S.c.compileObject (src, headers, obj)
 	T.utils.assert_string(1, src)
 	T.utils.assert_arg(2, headers, "table")
@@ -336,11 +333,11 @@ end
 --- Compile an Executable
 -- Compiles and links a list of files into executables.
 --
--- @param sources A list of sources (bot header and source files) that will be
---   used when compiling the executable.
--- @param out The file to be created.  ".exe" will be appended if compiling on
---   Windows.
--- @returns The actual path of the created executable.
+-- @tparam {string,...} sources A list of sources (both header and source files)
+-- that will be used when compiling the executable.
+-- @tparam string out The file to be created.  ".exe" will be appended if
+-- compiling on Windows.
+-- @treturn string The actual path of the created executable.
 function S.c.compile ( sources, out )
 	T.utils.assert_arg(1, sources, "table")
 	T.utils.assert_string(2, out)
@@ -351,10 +348,10 @@ end
 --- Compile a Static Library
 -- Compiles and links a list of files into a static library.
 --
--- @param sources A list of sources (bot header and source files) that
---   will be used when compiling the library.
+-- @tparam {string,...} sources A list of sources (both header and source files)
+-- that will be used when compiling the library.
 -- @param out The file to be created.  This is just the basename,
--- @returns The actual path used for the output executable.
+-- @treturn string The actual path used for the output executable.
 function S.c.compileStatic ( sources, out )
 	T.utils.assert_arg(1, sources, "table")
 	T.utils.assert_string(2, out)
@@ -365,10 +362,10 @@ end
 --- Compile a Shared Library
 -- Compiles and links a list of files into a shared library.
 --
--- @param sources A list of sources (bot header and source files) that
---   will be used when compiling the library.
--- @param out The file to be created.  This is just the basename,
--- @returns The actual path used for the output executable.
+-- @tparam {string,...} sources A list of sources (both header and source files)
+-- that will be used when compiling the library.
+-- @tparam string out The file to be created.  This is just the basename,
+-- @treturn string The actual path used for the output executable.
 function S.c.compileShared ( sources, out )
 	T.utils.assert_arg(1, sources, "table")
 	T.utils.assert_string(2, out)
@@ -378,14 +375,14 @@ end
 
 --- Create a header file with definitions.
 -- Creates a header/source pair with definitions. Currently all values are
--- treated as strings with type  <span class="code">const char*</span>.
+-- treated as strings with type  `const char*`.
 --
--- @param header Where to put the genereated header.  This is treated as a
---	BuildGen path.
--- @param header Where to put the genereated source file.  This is treated as a
---	BuildGen path.
--- @param An object consisting of key/value pairs where the key will be the
---	variable name and the value will be the value.
+-- @tparam string head Where to put the genereated header.  This is treated
+-- as a BuildGen path.
+-- @tparam string src Where to put the genereated source file.  This is
+-- treated as a BuildGen path.
+-- @tparam {[string]=string,...} definitions An object consisting of key/value
+-- pairs where the key will be the variable name and the value will be the value.
 function S.c.generateHeader ( head, src, definitions )
 	T.utils.assert_string(1, head)
 	T.utils.assert_string(2, src)

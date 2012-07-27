@@ -1,6 +1,9 @@
+--- The C++ Library
+-- @module S.cpp
+
 -- Copyright 2011-2012 Kevin Cox
 
---[[---------------------------------------------------------------------------]
+--[[ --------------------------------------------------------------------------]
 [                                                                              ]
 [  This software is provided 'as-is', without any express or implied           ]
 [  warranty. In no event will the authors be held liable for any damages       ]
@@ -34,17 +37,12 @@ local state = {}
 --
 -- A string value representing the level of optimization to use when building
 -- the project. Possible values are:
--- <ul><li>
---		none - Perform no optimization.
---</li><li>
---		quick - Perform light optimization.
---</li><li>
---		regular - Perform regular optimization.
---</li><li>
---		full - Fully optimize the executable.
---</li><li>
---		max - Optimize as much as possible (possibly experimental optimizations).
---</li></ul>
+--
+-- - none - Perform no optimization.
+-- - quick - Perform light optimization.
+-- - regular - Perform regular optimization.
+-- - full - Fully optimize the executable.
+-- - max - Optimize as much as possible (possibly experimental optimizations).
 S.cpp.optimization = "regular"
 if D.debug then S.cpp.optimization = "none" end
 
@@ -172,8 +170,8 @@ local compilers = T.Map{
 -- Checks to see that a compiler is available and that BuildGen knows how
 -- to use it.
 --
--- @param name The name of the compiler (often the name of the executable).
--- @returns ``true`` if the compiler can be used otherwise ``false``.
+-- @tparam string name The name of the compiler (often the name of the executable).
+-- @treturn boolean `true` if the compiler can be used otherwise `false`.
 function S.cpp.hasCompiler ( name )
 	T.utils.assert_string(1, name)
 
@@ -190,7 +188,7 @@ end
 -- This function selects the C++ compiler to use.  You should first check if
 -- the compiler is avaiable with ``S.cpp.hasCompiler()``.
 --
--- @param name The name of the compiler (often the name of the executable).
+-- @tparam string name The name of the compiler (often the name of the executable).
 function S.cpp.useCompiler ( name )
 	T.utils.assert_arg(1, name, "string",
 	                  S.cpp.hasCompiler, "Unknown compiler",
@@ -244,13 +242,13 @@ if not P.S.cpp.compiler then
 	end
 end
 
--- Overide the default optimization level.
+--- Overide the default optimization level.
 S.cpp.optimizationOveride = S.cpp.optimizationOveride
 
--- Overide the default profile setting.
+--- Overide the default profile setting.
 S.cpp.profileOveride = S.cpp.profileOveride
 
--- Overide the default profile setting.
+--- Overide the default profile setting.
 S.cpp.debugOveride = S.cpp.debugOveride
 
 --- Add an argrment.
@@ -259,8 +257,7 @@ S.cpp.debugOveride = S.cpp.debugOveride
 -- modify the command line (Such as S.coo.optimization and S.cpp.define()) as they
 -- are localized to the compiler being used.
 --
--- @param args a string or list of strings to be added to the compiler command
---	line.
+-- @tparam {string,...} args Arguments to be added to the compiler command line.
 function S.cpp.addArg ( arg )
 	if type(arg) ~= "table" then
 		arg = {tostring(arg)}
@@ -271,8 +268,8 @@ end
 
 --- Add an include directory
 --
--- @param dir an string or list of strings.  These will be treated as BuildGen
---	paths.
+-- @tparam {string,...} dir Add include directories.  These will be treated as
+-- BuildGen paths.
 function S.cpp.addInclude ( dir )
 	if type(dir) ~= "table" then
 		dir = {tostring(dir)}
@@ -289,7 +286,8 @@ end
 --- Define a macro
 -- Define a macro during compliation.
 --
--- @param map A table of key/value pairs to be defined during compilation.
+-- @tparam {[string]=string,...} map A table of key/value pairs to be defined
+-- during compilation.
 function S.cpp.define ( map )
 	T.utils.assert_arg(1, map, "table")
 
@@ -306,9 +304,9 @@ end
 
 --- Link a library.
 --
--- This just calls S.ld.addLib() with the linker being used by S.c.
+-- This just calls `S.ld.addLib()` with the linker being used by `S.cpp`.
 --
--- @param dir a string or list of strings as the name of the libraries.
+-- @tparam {string,...} lib Names of the libraries to link.
 function S.cpp.addLib ( lib )
 	local ln = S.ld.swapState(state.linker)
 
@@ -319,9 +317,9 @@ end
 
 --- Compile a source into an object.
 --
--- @param src The file to compile.
--- @param headers A list of headers that are needed.
--- @param obj The place to put the resulting object file.
+-- @tparam string src The file to compile.
+-- @tparam {string,...} headers A list of headers that are needed.
+-- @tparam string obj The place to put the resulting object file.
 function S.cpp.compileObject ( src, headers, obj )
 	T.utils.assert_string(1, src)
 	T.utils.assert_arg(2, headers, "table")
@@ -376,11 +374,11 @@ end
 --- Compile an Executable
 -- Compiles and links a list of files into executables.
 --
--- @param sources A list of sources (both header and source files) that will be
---	used when compiling the executable.
--- @param out The file to be created.  ".exe" will be appended if compiling on
---	Windows.
--- @returns The actual output name used.
+-- @tparam {string,...} sources A list of sources (both header and source files)
+-- that will be used when compiling the executable.
+-- @tparam string out The file to be created.  ".exe" will be appended if
+-- compiling on Windows.
+-- @treturn string The actual output name used.
 function S.cpp.compile ( sources, out )
 	T.utils.assert_arg(1, sources, "table")
 	T.utils.assert_string(2, out)
@@ -423,11 +421,11 @@ end
 --- Compile a Shared Library
 -- Compiles and links a list of files into a shared library.
 --
--- @param sources A list of sources (both header and source files) that will be
---	used when compiling the executable.
--- @param out The file to be created.  This is only the basename.  For example,
---   a path ending with "foo" will be called "libfoo.so" on Posix platforms.
--- @returns The actual output name used.
+-- @tparam {string,...} sources A list of sources (both header and source files)
+-- that will be used when compiling the executable.
+-- @tparam string out The file to be created.  This is only the basename.  For
+-- example a path ending with "foo" will be called "libfoo.so" on Posix platforms.
+-- @treturn string The actual output name used.
 function S.cpp.compileShared ( sources, out )
 	T.utils.assert_arg(1, sources, "table")
 	T.utils.assert_string(2, out)
