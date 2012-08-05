@@ -22,18 +22,40 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef BUILD_HPP
-#define BUILD_HPP
+#ifndef TARGETMANAGER_H
+#define TARGETMANAGER_H
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <locale.h>
+#include <string.h>
 
 #include <iostream>
 #include <set>
+#include <vector>
 
-#include "buildgen-xml/common.hpp"
-#include "buildgen-xml/target.hpp"
+#include "rapidxml/rapidxml.hpp"
 
-namespace XML
+#include "itargetmanager.hpp"
+
+class TargetManager: public ITargetManager
 {
-	XML::Meta load (ITargetManager *mgnr, std::istream &xml );
+public:
+	struct comparator
+	{
+		bool operator ()(const Target *t1, const Target *t2) const
+		{
+			return strcmp(t1->path, t2->path) < 0;
+		}
+	};
+	typedef std::set<Target*, comparator> TargetSet;
+	TargetSet targets; ///< A lsit of all targets created
+
+	virtual Target *newTarget ( const char *path );
+	virtual Target *findTarget ( const char *path );
+
+	TargetManager();
+	virtual ~TargetManager();
 };
 
 #endif

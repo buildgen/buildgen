@@ -28,6 +28,7 @@
 
 #include "buildgen-exe/messages.hpp"
 #include "buildgen-xml/target.hpp"
+#include "buildgen-xml/targetmanager.hpp"
 
 #include "buildgen-exe/files.hpp"
 
@@ -35,5 +36,5 @@ using namespace rapidxml;
 
 namespace XML
 {
-	std::string create(std::set<Target*, Target::comparator> &targets, Files *files);
+	std::string create(TargetManager::TargetSet &targets, Files *files);
 }

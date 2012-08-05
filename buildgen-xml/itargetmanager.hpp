@@ -22,18 +22,26 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef BUILD_HPP
-#define BUILD_HPP
+#ifndef ITARGETMANAGER_H
+#define ITARGETMANAGER_H
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <locale.h>
+#include <string.h>
 
 #include <iostream>
 #include <set>
+#include <vector>
 
-#include "buildgen-xml/common.hpp"
-#include "buildgen-xml/target.hpp"
+class Target;
+class Generator;
 
-namespace XML
+class ITargetManager
 {
-	XML::Meta load (ITargetManager *mgnr, std::istream &xml );
+public:
+	virtual Target *newTarget ( const char *path ) = 0;
+	virtual Target *findTarget ( const char *path ) = 0;
 };
 
 #endif

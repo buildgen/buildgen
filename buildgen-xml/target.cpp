@@ -22,9 +22,12 @@
 *                                                                              *
 *******************************************************************************/
 
+#include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 #include <string.h>
 #include <sysexits.h>
+#include <execinfo.h>
 
 #include <set>
 
@@ -33,14 +36,24 @@
 
 #include "buildgen-xml/common.hpp"
 
-std::set<Target*, Target::comparator> Target::targets; // All of the targets
-
-Target::Target ( const char *path, bool autodepend )
+Target::Target (ITargetManager *mgnr, const char *path ):
+    manager(mgnr)
 {
 	if (!path) this->path = NULL;
 	else       this->path = strdup(path);
 
-	init(autodepend);
+	generator = NULL;
+	magic = 0;
+}
+
+Target::Target(const Target &t):
+    manager(t.manager)
+{
+	if (!t.path) this->path = NULL;
+	else         this->path = strdup(t.path);
+
+	generator = t.generator;
+	magic = t.magic;
 }
 
 Target::~Target ( )
@@ -48,59 +61,28 @@ Target::~Target ( )
 	free(path);
 }
 
-
-Target *regen = NULL;
-void Target::init( bool autodepend )
+void Target::addDependancy( const Target *t )
 {
-	generator = NULL;
-	magic = 0;
+	msg::log("Added dependacy \"%s\" to \"%s\"", t->path, path);
 
-	if ( regen == NULL && autodepend )
-		regen = Target::newTarget("regen", false); // All targets depend on this.
-
-	if (autodepend)
-		addDependancy(regen); // All targets depend on this
-}
-
-/// Find a target
-/**
- * Returns the target pointed to by \a path or \c NULL if it doesn't exist.
- *
- * \param path The location
- * \return a pointer to the target.
- */
-Target *Target::findTarget ( const char *path )
-{
-	Target *t = new Target(path);
-	return const_cast<Target*>(*targets.find(t));
-}
-
-/// Create a new target
-/**
- * If the path give already relates to a target that target will be
- * returned else a new one will be created.
- *
- * \param path the loacation of the target.  This must be an absolute path.
- */
-Target *Target:: newTarget ( const char *path, bool autodepend )
-{
-	Target *t = new Target(path, autodepend);
-
-	std::pair<std::set<Target*>::iterator,bool> r(targets.insert(t)); // Crashes if we assign right away
-
-	if (!*r.first)
-	{
-		delete t;
+	if ( t->manager == this->manager ) // We can't depend on something from a
+	{                                  // different manager.
+		depends.insert(t);
 	}
+	else
+	{
+		Target *n = manager->newTarget(t->path);
+		n->magic = t->magic;
 
-	return const_cast<Target*>(*r.first);
+		depends.insert(n);
+	}
 }
 
-void Target::addDependancy(Target* d)
+void Target::addDependancy( const char *path )
 {
-	msg::log("Added dependacy \"%s\" to \"%s\"", d->path, path);
+	msg::log("Added dependacy \"%s\" to \"%s\"", path, this->path);
 
-	depends.insert(d);
+	depends.insert(manager->newTarget(path));
 }
 
 void Target::addGenerator( Generator *gen )
@@ -112,17 +94,15 @@ void Target::addGenerator( Generator *gen )
 
 void Target::addGenerator(std::vector<char*> cmd)
 {
-	std::vector<const char*> dup(cmd.size());
-	for ( int i = cmd.size(); --i; )
-	{
-		dup[i] = strdup(cmd[i]);
-	}
-	dup[0] = strdup(cmd[0]);
-
-	addGenerator(new Generator(dup));
+	addGenerator(*(std::vector<const char*>*)&cmd);
 }
 
-rapidxml::xml_node<> *Target::toXML ( rapidxml::xml_document<> &d )
+void Target::addGenerator(std::vector<const char*> cmd)
+{
+	addGenerator(new Generator(cmd));
+}
+
+rapidxml::xml_node<> *Target::toXML ( rapidxml::xml_document<> &d ) const
 {
 	if ( !generator && !depends.size()) return NULL; // This is an existing file
 
@@ -142,18 +122,32 @@ rapidxml::xml_node<> *Target::toXML ( rapidxml::xml_document<> &d )
 	if (generator)
 		t->append_node(generator->toXML(d));
 
-	for ( std::set<Target*>::iterator i = depends.begin(); i != depends.end(); ++i)
+	for ( std::set<const Target*>::iterator i = depends.begin(); i != depends.end(); ++i)
 	{
 		t->append_node(d.allocate_node(node_element, XML::target_dependsNName, (*i)->path));
 	}
 
 	return t;
 }
-Target *Target::fromXML ( const rapidxml::xml_node<> *src )
+
+Target &Target::operator =(const Target &t)
+{
+	manager = t.manager;
+
+	free(path);
+	path = strdup(t.path);
+
+	generator = t.generator;
+	magic = t.magic;
+
+	return *this;
+}
+
+Target *Target::fromXML ( ITargetManager *mgnr, const rapidxml::xml_node<> *src )
 {
 	using namespace rapidxml;
 	xml_node<> *p = src->first_node(XML::target_outNName);
-	Target *t = Target::newTarget(p->value(), false);
+	Target *t = mgnr->newTarget(p->value());
 
 	xml_attribute<> *magic = p->first_attribute(XML::target_out_magicAName);
 	if (magic && !strcmp(magic->value(), "true")) t->magic = 1;
@@ -161,7 +155,7 @@ Target *Target::fromXML ( const rapidxml::xml_node<> *src )
 	if ( xml_node<> *n = src->first_node(XML::target_dependsNName) )
 	{
 		do {
-			t->addDependancy(Target::newTarget(n->value(), false));
+			t->addDependancy(mgnr->newTarget(n->value()));
 		} while ( n = n->next_sibling(XML::target_dependsNName) );
 	}
 
@@ -171,14 +165,12 @@ Target *Target::fromXML ( const rapidxml::xml_node<> *src )
 	return t;
 }
 
-Generator::Generator( void ):
-	Target(),
+Generator::Generator():
 	desc(NULL)
 {
 }
 
 Generator::Generator( const std::vector<const char*> &cmd ):
-	Target(cmd[0]),
 	desc(NULL)
 {
 	addCommand(cmd);
@@ -186,6 +178,7 @@ Generator::Generator( const std::vector<const char*> &cmd ):
 
 void Generator::addDescription ( const char *d )
 {
+	free(desc);
 	desc = strdup(d);
 }
 
@@ -276,9 +269,6 @@ void Generator::addCommand ( const std::vector<const char *> &cmd )
 
 	for ( unsigned int i = cmd.size(); i--; )
 		n[i] = strdup(cmd[i]);
-
-	if ( cmds.size() == 0 )
-		path = n[0];
 
 	cmds.push_back(n);
 }

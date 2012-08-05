@@ -36,6 +36,7 @@
 
 #include "commandline.hpp"
 #include "buildgen-xml/target.hpp"
+#include "buildgen-xml/targetmanager.hpp"
 #include "lua-init.hpp"
 #include "files.hpp"
 #include "buildgen-xml/save.hpp"
@@ -59,7 +60,9 @@ int main ( int argc, char **argv )
 
 	opt::get_options(&argc, &argv);
 
-	Files files(opt::src_dir, cmd[0]);
+	TargetManager targetmanager;
+
+	Files files(&targetmanager, opt::src_dir, cmd[0]);
 	LuaFunctions::files = &files;
 
 	opt::do_options(&files); // May not return.
@@ -71,7 +74,7 @@ int main ( int argc, char **argv )
 	BuildGenLuaEnv lua(&files, rootFileName);
 	free(rootFileName);
 
-	Target *regen = Target::newTarget("regen", false);
+	Target *regen = targetmanager.newTarget("regen");
 	regen->magic = 1;
 
 	cmd[0] = files.normalizeFilename(cmd[0]);
@@ -92,7 +95,7 @@ int main ( int argc, char **argv )
 		);
 		if (p.second) // New file
 		{
-			Target *t = Target::newTarget(files.infofile.front(), false);
+			Target *t = targetmanager.newTarget(files.infofile.front());
 			regen->addDependancy(t);
 
 			lua.runFile(files.infofile.front());
@@ -101,7 +104,7 @@ int main ( int argc, char **argv )
 		files.infofile.pop();
 	}
 
-	fputs(XML::create(Target::targets, &files).c_str(), opt::xml_out);
+	fputs(XML::create(targetmanager.targets, &files).c_str(), opt::xml_out);
 	opt::close_xml_out();
 
 	return 0;

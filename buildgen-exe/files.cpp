@@ -41,7 +41,8 @@
 #include "files.hpp"
 #include "buildgen-xml/target.hpp"
 
-Files::Files ( const char *srcdir, char *buildgen_root ):
+Files::Files (ITargetManager * const mgnr, const char *srcdir, const char *buildgen_root ):
+	manager(mgnr),
 	project_root(NULL),
 	out_root(NULL),
 
@@ -53,7 +54,7 @@ Files::Files ( const char *srcdir, char *buildgen_root ):
 	init(srcdir, buildgen_root);
 }
 
-void Files::init ( const char *srcdir, char *buildgenroot )
+void Files::init ( const char *srcdir, const char *buildgenroot )
 {
 	out_root = getcwd(NULL, 0);
 	appendSlash(&out_root);
@@ -174,8 +175,8 @@ void Files::findProjectRoot( void )
 	project_root = getcwd(NULL, 0);
 	Files::appendSlash(&project_root);
 
-	Target *t = Target::newTarget(normalizeFilename(rootfilename), false);
-	Target::newTarget("regen")->addDependancy(t);
+	Target *t = manager->newTarget(normalizeFilename(rootfilename));
+	manager->newTarget("regen")->addDependancy(t);
 
 	msg::log("Project Root at \"%s\"", project_root);
 }
@@ -429,6 +430,7 @@ char *Files::prettyPath ( char *path )
 
 	return path;
 }
+
 #ifdef DEBUG
 void _TEST_Files_prettyPath ( void )
 {

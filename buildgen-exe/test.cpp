@@ -22,18 +22,10 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef BUILD_HPP
-#define BUILD_HPP
+#include <gtest/gtest.h>
 
-#include <iostream>
-#include <set>
-
-#include "buildgen-xml/common.hpp"
-#include "buildgen-xml/target.hpp"
-
-namespace XML
+int main ( int argc, char** argv )
 {
-	XML::Meta load (ITargetManager *mgnr, std::istream &xml );
-};
-
-#endif
+	testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}

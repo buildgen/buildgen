@@ -37,7 +37,7 @@
 
 using namespace rapidxml;
 
-std::string XML::create(std::set<Target*, Target::comparator> &targets, Files *files)
+std::string XML::create(TargetManager::TargetSet &targets, Files *files)
 {
 	msg::log("Linking and Generating XML");
 
@@ -70,7 +70,7 @@ std::string XML::create(std::set<Target*, Target::comparator> &targets, Files *f
 	root->append_node(targ);
 
 	std::set<Target*>::iterator it;
-	for ( it = Target::targets.begin(); it != Target::targets.end(); ++it )
+	for ( it = targets.begin(); it != targets.end(); ++it )
 	{
 		xml_node<> *n = (*it)->toXML(doc);
 		if (n) targ->append_node(n);

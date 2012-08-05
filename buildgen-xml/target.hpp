@@ -36,40 +36,32 @@
 
 #include "rapidxml/rapidxml.hpp"
 
+#include "itargetmanager.hpp"
+
 class Generator;
 
 class Target
 {
 public:
-	struct comparator
-	{
-		bool operator ()(Target* t1, Target* t2) const
-		{
-			return strcmp(t1->path, t2->path) < 0;
-		}
-	};
-
-	static std::set<Target*, Target::comparator> targets; ///< A lsit of all targets created
-
-	static Target *newTarget ( const char *path, bool autodepend = true );
-	static Target *findTarget ( const char *path );
-
+	ITargetManager *manager;
 	char *path;  ///< The lcoation of the target.  This is an absolute value.
 	short int magic; ///< If the target is a magic target.
-	std::set<Target*> depends; ///< The targets that this target depends on
+	std::set<const Target*> depends; ///< The targets that this target depends on
 	Generator *generator; ///< The generator used to create this target.
-private:
-	void init(bool autodepend);
-public:
 
-	Target(const char *path = NULL, bool autodepend = true  );
+	Target(ITargetManager *mgnr, const char *path = NULL );
+	Target(const Target &t);
 	~Target( );
-	void addDependancy(Target*);
-	void addGenerator( Generator *gen );
+	void addDependancy(const Target *);
+	void addDependancy(const char *);
+	void addGenerator(Generator *gen);
 	void addGenerator(std::vector<char*> cmd);
+	void addGenerator(std::vector<const char*> cmd);
 
-	static Target *fromXML(const rapidxml::xml_node<> *n);
-	virtual rapidxml::xml_node<> *toXML(rapidxml::xml_document<> &d);
+	static Target *fromXML(ITargetManager *mgnr, const rapidxml::xml_node<> *n);
+	virtual rapidxml::xml_node<> *toXML(rapidxml::xml_document<> &d) const;
+
+	Target &operator = (const Target&);
 
 	bool operator > (const Target &c) const;
 	bool operator >= (const Target &c) const;
@@ -79,15 +71,15 @@ public:
 	bool operator != (const Target &c) const;
 };
 
-class Generator : public Target
+class Generator
 {
 public:
-	Generator( void );
-	Generator( const std::vector<const char*> &cmds );
+	Generator(void);
+	Generator(const std::vector<const char*> &cmds);
 	char *desc;
-	void addDescription ( const char *d );
+	void addDescription(const char *d);
 	std::vector< std::vector<char*> > cmds;
-	virtual void addCommand ( const std::vector<const char*> &cmd );
+	virtual void addCommand(const std::vector<const char*> &cmd);
 	virtual rapidxml::xml_node<> *toXML(rapidxml::xml_document<> &d);
 	static Generator *fromXML(const rapidxml::xml_node<> *n);
 };

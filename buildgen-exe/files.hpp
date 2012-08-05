@@ -41,11 +41,13 @@ public:
 	const char *config_file_system;
 	const char *config_file_user;
 	const char *buildgen_root;
+
+	ITargetManager * const manager;
 private:
-	void init(const char *srcdir, char *buildgen_root);
+	void init(const char *srcdir, const char *buildgen_root);
 	void appendSlash(char **inputoutput);
 public:
-	Files(const char *srcdir, char *buildgen_root);
+	Files(ITargetManager * const mgnr, const char *srcdir, const char *buildgen_root);
 	std::queue<char*> infofile;
 
 	void findInfoFile(void);
@@ -98,8 +100,5 @@ public:
 	  */
 	static char *prettyPath(char *path);
 };
-
-void _TEST_Files_normalizeFilename ( Files *f );
-void _TEST_Files_prettyPath(void);
 
 #endif

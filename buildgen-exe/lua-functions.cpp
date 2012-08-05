@@ -155,8 +155,8 @@ int add_depandancy (lua_State *L)
 	}
 	else dep = mstrdup(lua_tostring(L, 2));
 
-	Target *t = Target::newTarget(targ);
-	Target *d = Target::newTarget(dep);
+	Target *t = files->manager->newTarget(targ);
+	Target *d = files->manager->newTarget(dep);
 	if ( magic & 0x01 ) t->magic = 1;
 	if ( magic & 0x02 ) d->magic = 1;
 	t->addDependancy(d);
@@ -295,7 +295,7 @@ int add_generator (lua_State *L)
 		}
 		else t = mstrdup(lua_tostring(L, -1));
 
-		in[i-1] = Target::newTarget(t);
+		in[i-1] = files->manager->newTarget(t);
 		if (magic & 0x02) in[i-1]->magic = 1;
 
 		free(t);
@@ -323,7 +323,7 @@ int add_generator (lua_State *L)
 		}
 		else tpath = mstrdup(lua_tostring(L, -1));
 
-		Target *t = Target::newTarget(tpath);
+		Target *t = files->manager->newTarget(tpath);
 		if (magic & 0x01) t->magic = 1;
 
 		free(tpath);

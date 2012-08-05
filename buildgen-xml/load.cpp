@@ -44,7 +44,7 @@ void die_badFile ( void )
 	exit(EX_DATAERR);
 }
 
-XML::Meta XML::load ( std::istream &xml )
+XML::Meta XML::load ( ITargetManager *mgnr, std::istream &xml )
 {
 	msg::log("Loading XML");
 	std::string xmlbuf((std::istreambuf_iterator<char>(xml)), std::istreambuf_iterator<char>());
@@ -82,7 +82,7 @@ XML::Meta XML::load ( std::istream &xml )
 	if ( n = targ->first_node(XML::targetNName) )
 	{
 		do {
-			Target::fromXML(n);
+			Target::fromXML(mgnr, n);
 		} while ( n = n->next_sibling(XML::targetNName) );
 	}
 

@@ -22,18 +22,66 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef BUILD_HPP
-#define BUILD_HPP
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
+#include <sysexits.h>
 
-#include <iostream>
 #include <set>
 
-#include "buildgen-xml/common.hpp"
+#include <gtest/gtest.h>
+
+#include "buildgen-exe/messages.hpp"
 #include "buildgen-xml/target.hpp"
 
-namespace XML
-{
-	XML::Meta load (ITargetManager *mgnr, std::istream &xml );
-};
+#include "buildgen-xml/common.hpp"
 
-#endif
+#include "targetmanager.hpp"
+
+Target *TargetManager::newTarget ( const char *path )
+{
+	Target *t = new Target(this, path);
+	std::pair<TargetSet::iterator,bool> r = targets.insert(t);
+
+	if (!r.second) free(t); // It was already there.
+
+	return *r.first;
+}
+
+Target *TargetManager::findTarget ( const char *path )
+{
+	Target t(this, path);
+	TargetSet::iterator r = targets.find(&t);
+
+	if ( r == targets.end() )
+		return NULL;
+
+	return *r;
+}
+
+TargetManager::TargetManager()
+{
+
+}
+
+TargetManager::~TargetManager()
+{
+}
+
+
+TEST(TargetManager, Basic)
+{
+	TargetManager m;
+
+	Target *t1 = m.newTarget("t1");
+
+	ASSERT_EQ(t1, m.newTarget("t1"));
+	ASSERT_EQ(t1, m.findTarget("t1"));
+
+	Target *t2 = m.newTarget("t2");
+
+	ASSERT_NE(t1, m.newTarget("t2"));
+	ASSERT_NE(t1, m.findTarget("t2"));
+	ASSERT_NE(t2, m.newTarget("t1"));
+	ASSERT_NE(t2, m.findTarget("t1"));
+}

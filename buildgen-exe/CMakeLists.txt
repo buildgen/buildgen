@@ -28,16 +28,22 @@ PROJECT(BuildGen)
 
 ##### Files
 FILE(GLOB sources *.cpp)
+GET_FILENAME_COMPONENT(mainfile main.cpp ABSOLUTE)     # GLOB returns absolute
+GET_FILENAME_COMPONENT(testmainfile test.cpp ABSOLUTE) # paths.
+LIST(REMOVE_ITEM sources "${mainfile}" "${testmainfile}")
 FILE(GLOB headers *.hpp)
 SET(xml_sources
 	../buildgen-xml/common.cpp
 	../buildgen-xml/save.cpp
 	../buildgen-xml/target.cpp
+	../buildgen-xml/targetmanager.cpp
 )
 SET(xml_headers
 	../buildgen-xml/common.hpp
 	../buildgen-xml/save.hpp
 	../buildgen-xml/target.hpp
+	../buildgen-xml/itargetmanager.hpp
+	../buildgen-xml/targetmanager.hpp
 )
 
 ##### Target Settings
@@ -73,6 +79,16 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
 INCLUDE_DIRECTORIES(..)
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}")
 ADD_EXECUTABLE(gen
+	"main.cpp"
+	${sources}
+	${headers}
+	${xml_sources}
+	${xml_headers}
+	"${CMAKE_CURRENT_BINARY_DIR}/info.cpp"
+	"info.h"
+)
+ADD_EXECUTABLE(test
+	"test.cpp"
 	${sources}
 	${headers}
 	${xml_sources}
@@ -81,5 +97,6 @@ ADD_EXECUTABLE(gen
 	"info.h"
 )
 
-TARGET_LINK_LIBRARIES(gen lua m)
+TARGET_LINK_LIBRARIES(gen gtest lua m)
+TARGET_LINK_LIBRARIES(test gtest lua m)
 INSTALL(TARGETS gen DESTINATION bin)
