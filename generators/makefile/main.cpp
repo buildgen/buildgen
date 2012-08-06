@@ -29,6 +29,7 @@
 
 #include "buildgen-exe/messages.hpp"
 #include "buildgen-xml/target.hpp"
+#include "buildgen-xml/targetmanager.hpp"
 #include "buildgen-xml/load.hpp"
 
 #include "commandline.hpp"
@@ -39,19 +40,18 @@ int main ( int argc, char **argv )
 {
 	opt::get_options(&argc, &argv);
 
-	XML::Meta meta = XML::load(opt::xml_in);
+	TargetManager manager;
 
-	Target *t = Target::findTarget("regen");
-	Target::targets.erase(t);
-	t->path = "Makefile";
+	XML::Meta meta = XML::load(&manager, opt::xml_in);
+
+	Target *t = manager.changePath("regen", "Makefile");
 	t->magic = 0;
-	Target::targets.insert(t);
 
-	Target *n = Target::newTarget("regen");
+	Target *n = manager.newTarget("regen");
 	n->magic = 1;
 	n->addDependancy(t);
 
-	Makefile m(&Target::targets);
+	Makefile m(&manager);
 	opt::makefile_out << m.generate();
 	opt::makefile_out.flush();
 

@@ -29,26 +29,29 @@
 #include <list>
 
 #include "buildgen-xml/target.hpp"
+#include "buildgen-xml/targetmanager.hpp"
 
 class Makefile
 {
 	char *cwd;
 	unsigned int cwdlen;
 
-	std::set<Target*, Target::comparator> *targets;
-	std::list<Target*> generated;
+	ITargetManager *manager;
+
+	const std::set<const Target*> *targets;
+	std::list<const Target*> generated;
 
 	std::string relitiveName(std::string path);
 	std::string escape(std::string path);
 
-	std::string writeTarget(Target *t);
+	std::string writeTarget(const Target *t);
 	std::string writeGenerator(Generator *g);
 
 	std::string writeClean(void);
 	std::string writeHelp(void);
 
 public:
-    Makefile( std::set<Target*, Target::comparator> *targets);
+    Makefile(ITargetManager *manager);
 	std::string generate(void);
 };
 

@@ -59,6 +59,49 @@ Target *TargetManager::findTarget ( const char *path )
 	return *r;
 }
 
+Target *TargetManager::changePath(const char *oldp, const char *newp)
+{
+	Target *t = findTarget(oldp);
+	targets.erase(t);
+	free(t->path);
+	t->path = strdup(newp);
+
+	return t;
+}
+TEST(TargetManager, changePath)
+{
+	TargetManager m;
+	Target *t = m.newTarget("path");
+
+	ASSERT_STREQ(t->path, "path");
+
+	m.changePath("path", "newPath");
+
+	ASSERT_STREQ(t->path, "newPath");
+}
+
+const std::set<const Target*> *TargetManager::allTargets(void)
+{
+	return (std::set<const Target*>*)&targets;
+}
+TEST(TargetManager, allTargets)
+{
+	TargetManager m;
+	m.newTarget("1");
+	m.newTarget("2");
+	m.newTarget("3");
+	m.newTarget("4");
+	m.newTarget("5");
+
+	const std::set<const Target*> *tgts = m.allTargets();
+	for ( std::set<const Target*>::iterator i = tgts->begin();
+	      i != tgts->end();
+	      i++)
+	{
+		const Target *t = *i;
+	}
+}
+
 TargetManager::TargetManager()
 {
 

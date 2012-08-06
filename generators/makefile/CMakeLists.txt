@@ -33,11 +33,14 @@ SET(xml_sources
 	../../buildgen-xml/common.cpp
 	../../buildgen-xml/load.cpp
 	../../buildgen-xml/target.cpp
+	../../buildgen-xml/targetmanager.cpp
 )
 SET(xml_headers
 	../../buildgen-xml/common.hpp
 	../../buildgen-xml/load.hpp
 	../../buildgen-xml/target.hpp
+	../../buildgen-xml/itargetmanager.hpp
+	../../buildgen-xml/targetmanager.hpp
 )
 
 ##### Target Settings
@@ -64,6 +67,6 @@ ADD_EXECUTABLE(gen-makefile
 	../../buildgen-exe/messages.hpp # Keep a uniform look and feel
 	../../buildgen-exe/messages.cpp #
 )
-
+TARGET_LINK_LIBRARIES(gen-makefile gtest)
 INSTALL(TARGETS gen-makefile DESTINATION bin)
 #INSTALL(COPY resources DESTINATION .) # Get our resources file location

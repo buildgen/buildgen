@@ -42,6 +42,8 @@ class ITargetManager
 public:
 	virtual Target *newTarget ( const char *path ) = 0;
 	virtual Target *findTarget ( const char *path ) = 0;
+
+	virtual const std::set<const Target*> *allTargets(void) = 0;
 };
 
 #endif

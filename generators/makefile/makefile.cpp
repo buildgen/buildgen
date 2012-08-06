@@ -29,10 +29,11 @@
 #include <algorithm>
 #include <unistd.h>
 
-Makefile::Makefile ( std::set<Target *, Target::comparator> *targets ):
+Makefile::Makefile (ITargetManager *manager):
 	cwd(getcwd(NULL, 0)),
 	cwdlen(strlen(cwd)), // The one is for the trailing slash
-	targets(targets)
+	manager(manager),
+	targets(manager->allTargets())
 {
 	cwd = (char*)realloc(cwd, cwdlen*sizeof(char));
 	cwd[cwdlen++] = '/';
@@ -89,7 +90,7 @@ std::string Makefile::generate ( void )
 	out += ctime(&curtime);
 	out += "\n\n.DEFAULT_GOAL := all\n\n";
 
-	for ( std::set<Target *, Target::comparator>::iterator ti = targets->begin();
+	for (std::set<const Target*>::iterator ti = targets->begin();
 		  ti != targets->end();
 		  ++ti
 		)
@@ -103,7 +104,7 @@ std::string Makefile::generate ( void )
 	return out;
 }
 
-std::string Makefile::writeTarget(Target *t)
+std::string Makefile::writeTarget(const Target *t)
 {
 	std::string out;
 
@@ -120,17 +121,17 @@ std::string Makefile::writeTarget(Target *t)
 	out += escape(relitiveName(t->path));
 	out += ": ";
 
-	for ( std::set<Target *, Target::comparator>::iterator di = t->depends.begin();
+	for (std::set<const Target *>::iterator di = t->depends.begin();
 		  di != t->depends.end();
 		  ++di
 		)
 	{
-		Target *d = *di;
+		const Target *d = *di;
 
 		out += escape(relitiveName(d->path));
 		out += " ";
 	}
-	if (t->generator) out += relitiveName(t->generator->path);
+	if (t->generator) out += relitiveName(t->generator->cmds[0][0]);
 	out += "\n";
 	char *dup = strdup(relitiveName(t->path).c_str());
 	std::string dir(dirname(dup));
@@ -174,24 +175,26 @@ std::string Makefile::writeClean (void)
 {
 	std::string out;
 
-	Target *makefile = Target::findTarget("Makefile");
+	Target *makefile = manager->findTarget("Makefile");
 
 	out += ".PHONY: clean\n\n";
 
 	out += "clean:\n";
 	out += "	rm -rv";
 
-	std::list<Target*>::const_iterator i = generated.begin();
-	do
+
+	for ( std::list<const Target*>::const_iterator i = generated.begin();
+	      i != generated.end();
+	      i++)
 	{
-		Target *t = *i;
+		const Target *t = *i;
 
 		if ( !strncmp(cwd, t->path, cwdlen-1) && t != makefile ) // strcmp is so
 		{ // that we only delete files in the build directory.
 			out += " ";
 			out += escape(relitiveName(t->path));
 		}
-	} while ( ++i != generated.begin() );
+	}
 
 	out += " || true\n\n";
 
@@ -206,11 +209,12 @@ std::string Makefile::writeHelp ( void )
 
 	out += "help:\n";
 
-	for ( std::set<Target *,Target::comparator>::iterator i = Target::targets.begin();
-	      i != Target::targets.end(); ++i
+	for ( std::set<const Target*>::iterator i = targets->begin();
+	      i != targets->end();
+	      i++
 	    )
 	{
-		Target *t = *i;
+		const Target *t = *i;
 
 		if ( (t->generator == NULL) && (!t->magic) ) continue; // Not a generated file.
 
