@@ -26,7 +26,7 @@ S.import "cpp"
 
 S.cpp.addInclude "<"
 
-S.cpp.addLib "m"
+S.cpp.addLib{"gtest", "m"}
 
 S.cpp.compile({
 	"commandline.hpp",
@@ -41,6 +41,9 @@ S.cpp.compile({
 	"<buildgen-xml/load.hpp",
 	"<buildgen-xml/target.cpp",
 	"<buildgen-xml/target.hpp",
+	"<buildgen-xml/targetmanager.cpp",
+	"<buildgen-xml/targetmanager.hpp",
+	"<buildgen-xml/itargetmanager.hpp",
 
 	"<buildgen-exe/messages.hpp",
 	"<buildgen-exe/messages.cpp",

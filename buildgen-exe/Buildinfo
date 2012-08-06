@@ -38,7 +38,7 @@ S.c.generateHeader("@info.h", "@info.cpp", {
 })
 S.cpp.addInclude "@"
 
-S.cpp.addLib{"m", "lua"}
+S.cpp.addLib{"m", "lua", "gtest"}
 
 S.cpp.addInclude "<"
 
@@ -56,6 +56,8 @@ local headers = T.List{
 	"<buildgen-xml/common.hpp",
 	"<buildgen-xml/save.hpp",
 	"<buildgen-xml/target.hpp",
+	"<buildgen-xml/targetmanager.hpp",
+	"<buildgen-xml/itargetmanager.hpp",
 }
 local sources = T.List{
 	"commandline.cpp",
@@ -71,6 +73,7 @@ local sources = T.List{
 	"<buildgen-xml/common.cpp",
 	"<buildgen-xml/save.cpp",
 	"<buildgen-xml/target.cpp",
+	"<buildgen-xml/targetmanager.cpp",
 }
 
 files = T.List{"main.cpp"}               -- Compile gen
@@ -78,13 +81,9 @@ files:extend(headers)                    --
 files:extend(sources)                    --
 local gen = S.cpp.compile(files, "@gen") --
 
-files = T.List()  -- Compile the tests
+files = T.List{"test.cpp"} -- Compile the tests
 files:extend(headers)
 files:extend(sources)
-C.addGenerator(files, {C.path"test.lua", C.path"", C.path"@test.cpp"}, {"@test.cpp"}, {
-	description = "Generatring tests..."
-})
-files:append("@test.cpp")
 local test = S.cpp.compile(files, "@test")
 S.addToTarget("test", test)
 
