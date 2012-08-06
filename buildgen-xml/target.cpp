@@ -31,8 +31,11 @@
 
 #include <set>
 
+#include <gtest/gtest.h>
+
 #include "buildgen-exe/messages.hpp"
 #include "buildgen-xml/target.hpp"
+#include "buildgen-xml/targetmanager.hpp"
 
 #include "buildgen-xml/common.hpp"
 
@@ -45,6 +48,14 @@ Target::Target (ITargetManager *mgnr, const char *path ):
 	generator = NULL;
 	magic = 0;
 }
+TEST(Target, Constructor)
+{
+	const char *p = "test";
+	Target t(NULL, p);
+	ASSERT_NE(t.path, p);
+	ASSERT_STREQ(t.path, "test");
+	ASSERT_FALSE(t.magic);
+}
 
 Target::Target(const Target &t):
     manager(t.manager)
@@ -54,6 +65,34 @@ Target::Target(const Target &t):
 
 	generator = t.generator;
 	magic = t.magic;
+
+	depends = t.depends;
+}
+TEST(Target, CopyConstructor)
+{
+	const char *p1 = "test";
+	Target t1(NULL, p1);
+
+	std::vector<const char*> cmd;
+	cmd.push_back("this");
+	cmd.push_back("is");
+	cmd.push_back("a");
+	cmd.push_back("test");
+	t1.generator = new Generator(cmd);
+
+	t1.magic = 1;
+
+	Target t2(t1);
+
+	ASSERT_STREQ(t1.path, p1);
+	ASSERT_STREQ(t2.path, p1);
+	ASSERT_NE(t1.path, p1);
+	ASSERT_NE(t2.path, p1);
+	ASSERT_NE(t1.path, t2.path);
+
+	ASSERT_EQ(t1.magic, t2.magic);
+	ASSERT_EQ(t1.generator, t2.generator);
+	ASSERT_EQ(t1.depends, t2.depends);
 }
 
 Target::~Target ( )
@@ -73,16 +112,52 @@ void Target::addDependancy( const Target *t )
 	{
 		Target *n = manager->newTarget(t->path);
 		n->magic = t->magic;
+		n->generator = t->generator;
 
 		depends.insert(n);
 	}
 }
+TEST(Target, addDependancy_Target)
+{
+	TargetManager m;
+
+	Target *t1 = m.newTarget("t1");
+	Target *t2 = m.newTarget("t2");
+
+	Target t3(NULL, "test");
+
+	t1->addDependancy(t2);
+	t1->addDependancy(&t3);
+
+	ASSERT_EQ(t1->depends.size(), 2);
+	ASSERT_TRUE(m.findTarget("test") != NULL);
+}
+
 
 void Target::addDependancy( const char *path )
 {
 	msg::log("Added dependacy \"%s\" to \"%s\"", path, this->path);
 
 	depends.insert(manager->newTarget(path));
+}
+TEST(Target, addDependancy_Path)
+{
+	TargetManager m;
+
+	Target *t = m.newTarget("targ");
+
+	t->addDependancy("t1");
+	t->addDependancy("t2");
+	t->addDependancy("t3");
+	t->addDependancy("t4");
+	t->addDependancy("t5");
+
+	ASSERT_EQ(t->depends.size(), 5);
+	ASSERT_TRUE(m.findTarget("t1") != NULL);
+	ASSERT_TRUE(m.findTarget("t2") != NULL);
+	ASSERT_TRUE(m.findTarget("t3") != NULL);
+	ASSERT_TRUE(m.findTarget("t4") != NULL);
+	ASSERT_TRUE(m.findTarget("t5") != NULL);
 }
 
 void Target::addGenerator( Generator *gen )
@@ -137,10 +212,44 @@ Target &Target::operator =(const Target &t)
 	free(path);
 	path = strdup(t.path);
 
+	depends = t.depends;
+
 	generator = t.generator;
 	magic = t.magic;
 
 	return *this;
+}
+TEST(Target, AsignmentOperator)
+{
+	TargetManager m;
+	const char *p = "targ";
+	Target *t = m.newTarget(p);
+
+	t->addDependancy("t1");
+	t->addDependancy("t2");
+	t->addDependancy("t3");
+	t->addDependancy("t4");
+	t->addDependancy("t5");
+
+	std::vector<const char*> cmd;
+	cmd.push_back("this");
+	cmd.push_back("is");
+	cmd.push_back("a");
+	cmd.push_back("test");
+	t->generator = new Generator(cmd);
+
+	t->magic = 1;
+
+	Target c(NULL, "garbage");
+	c = *t;
+
+	ASSERT_STREQ(t->path, c.path);
+	ASSERT_NE(t->path, c.path);
+	ASSERT_NE(p, c.path);
+	ASSERT_NE(p, t->path);
+
+	ASSERT_EQ(t->depends, c.depends);
+	ASSERT_EQ(t->generator, c.generator);
 }
 
 Target *Target::fromXML ( ITargetManager *mgnr, const rapidxml::xml_node<> *src )
