@@ -80,9 +80,9 @@ TEST(TargetManager, changePath)
 	ASSERT_STREQ(t->path, "newPath");
 }
 
-const std::set<const Target*> *TargetManager::allTargets(void)
+std::set<const Target*> TargetManager::allTargets(void)
 {
-	return (std::set<const Target*>*)&targets;
+	return *(std::set<const Target*>*)&targets;
 }
 TEST(TargetManager, allTargets)
 {
@@ -93,9 +93,9 @@ TEST(TargetManager, allTargets)
 	m.newTarget("4");
 	m.newTarget("5");
 
-	const std::set<const Target*> *tgts = m.allTargets();
-	for ( std::set<const Target*>::iterator i = tgts->begin();
-	      i != tgts->end();
+	const std::set<const Target*> tgts = m.allTargets();
+	for ( std::set<const Target*>::iterator i = tgts.begin();
+	      i != tgts.end();
 	      i++)
 	{
 		const Target *t = *i;

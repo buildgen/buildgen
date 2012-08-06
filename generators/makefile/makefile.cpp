@@ -90,8 +90,8 @@ std::string Makefile::generate ( void )
 	out += ctime(&curtime);
 	out += "\n\n.DEFAULT_GOAL := all\n\n";
 
-	for (std::set<const Target*>::iterator ti = targets->begin();
-		  ti != targets->end();
+	for (std::set<const Target*>::iterator ti = targets.begin();
+		  ti != targets.end();
 		  ++ti
 		)
 	{
@@ -209,8 +209,8 @@ std::string Makefile::writeHelp ( void )
 
 	out += "help:\n";
 
-	for ( std::set<const Target*>::iterator i = targets->begin();
-	      i != targets->end();
+	for ( std::set<const Target*>::iterator i = targets.begin();
+	      i != targets.end();
 	      i++
 	    )
 	{

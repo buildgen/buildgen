@@ -38,7 +38,7 @@ class Makefile
 
 	ITargetManager *manager;
 
-	const std::set<const Target*> *targets;
+	std::set<const Target*> targets;
 	std::list<const Target*> generated;
 
 	std::string relitiveName(std::string path);
