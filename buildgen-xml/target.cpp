@@ -362,9 +362,9 @@ Generator *Generator::fromXML ( const rapidxml::xml_node<> *src )
 
 	Generator *g = new Generator();
 
-	xml_node<> *n = NULL;
+	xml_node<> *n = src->first_node(XML::target_generator_descriptionNName);
 
-	if ( n = src->first_node(XML::target_generator_descriptionNName))
+	if ( n != NULL )
 	{
 		g->addDescription(n->value());
 	}
