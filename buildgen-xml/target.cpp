@@ -52,9 +52,9 @@ TEST(Target, Constructor)
 {
 	const char *p = "test";
 	Target t(NULL, p);
-	ASSERT_NE(t.path, p);
-	ASSERT_STREQ(t.path, "test");
-	ASSERT_FALSE(t.magic);
+	EXPECT_NE(p, t.path) << "Path was not coppied.";
+	EXPECT_STREQ("test", t.path);
+	EXPECT_FALSE(t.magic);
 }
 
 Target::Target(const Target &t):
@@ -84,15 +84,15 @@ TEST(Target, CopyConstructor)
 
 	Target t2(t1);
 
-	ASSERT_STREQ(t1.path, p1);
-	ASSERT_STREQ(t2.path, p1);
-	ASSERT_NE(t1.path, p1);
-	ASSERT_NE(t2.path, p1);
-	ASSERT_NE(t1.path, t2.path);
+	EXPECT_STREQ(p1, t1.path);
+	EXPECT_STREQ(p1, t2.path);
+	EXPECT_NE(p1, t1.path) << "Path was not coppied.";
+	EXPECT_NE(p1, t2.path) << "Path was not coppied.";
+	EXPECT_NE(t1.path, t2.path);
 
-	ASSERT_EQ(t1.magic, t2.magic);
-	ASSERT_EQ(t1.generator, t2.generator);
-	ASSERT_EQ(t1.depends, t2.depends);
+	EXPECT_EQ(t1.magic, t2.magic);
+	EXPECT_EQ(t1.generator, t2.generator);
+	EXPECT_EQ(t1.depends, t2.depends);
 }
 
 Target::~Target ( )
@@ -129,8 +129,8 @@ TEST(Target, addDependancy_Target)
 	t1->addDependancy(t2);
 	t1->addDependancy(&t3);
 
-	ASSERT_EQ(t1->depends.size(), 2);
-	ASSERT_TRUE(m.findTarget("test") != NULL);
+	EXPECT_EQ(2, t1->depends.size());
+	EXPECT_TRUE(m.findTarget("test") != NULL);
 }
 
 
@@ -152,12 +152,12 @@ TEST(Target, addDependancy_Path)
 	t->addDependancy("t4");
 	t->addDependancy("t5");
 
-	ASSERT_EQ(t->depends.size(), 5);
-	ASSERT_TRUE(m.findTarget("t1") != NULL);
-	ASSERT_TRUE(m.findTarget("t2") != NULL);
-	ASSERT_TRUE(m.findTarget("t3") != NULL);
-	ASSERT_TRUE(m.findTarget("t4") != NULL);
-	ASSERT_TRUE(m.findTarget("t5") != NULL);
+	EXPECT_EQ(5, t->depends.size());
+	EXPECT_TRUE(m.findTarget("t1") != NULL);
+	EXPECT_TRUE(m.findTarget("t2") != NULL);
+	EXPECT_TRUE(m.findTarget("t3") != NULL);
+	EXPECT_TRUE(m.findTarget("t4") != NULL);
+	EXPECT_TRUE(m.findTarget("t5") != NULL);
 }
 
 void Target::addGenerator( Generator *gen )
@@ -243,13 +243,13 @@ TEST(Target, AsignmentOperator)
 	Target c(NULL, "garbage");
 	c = *t;
 
-	ASSERT_STREQ(t->path, c.path);
-	ASSERT_NE(t->path, c.path);
-	ASSERT_NE(p, c.path);
-	ASSERT_NE(p, t->path);
+	EXPECT_STREQ(t->path, c.path);
+	EXPECT_NE(t->path, c.path);
+	EXPECT_NE(p, c.path);
+	EXPECT_NE(p, t->path);
 
-	ASSERT_EQ(t->depends, c.depends);
-	ASSERT_EQ(t->generator, c.generator);
+	EXPECT_EQ(t->depends, c.depends);
+	EXPECT_EQ(t->generator, c.generator);
 }
 
 Target *Target::fromXML ( ITargetManager *mgnr, const rapidxml::xml_node<> *src )
@@ -278,17 +278,44 @@ Generator::Generator():
 	desc(NULL)
 {
 }
+TEST(Generator, DefaultConstructor)
+{
+	Generator g;
+
+	EXPECT_EQ(0, g.cmds.size());
+}
 
 Generator::Generator( const std::vector<const char*> &cmd ):
 	desc(NULL)
 {
 	addCommand(cmd);
 }
+TEST(Generator, CmdConstructor)
+{
+	std::vector<const char*> cmd;
+	cmd.push_back("this");
+	cmd.push_back("is");
+	cmd.push_back("a");
+	cmd.push_back("test");
+	Generator g(cmd);
+
+	EXPECT_EQ(1, g.cmds.size());
+	EXPECT_EQ(4, g.cmds[0].size());
+}
 
 void Generator::addDescription ( const char *d )
 {
 	free(desc);
 	desc = strdup(d);
+}
+TEST(Generator, addDescription)
+{
+	const char *d = "This is the description.";
+	Generator g;
+	g.addDescription(d);
+
+	EXPECT_STREQ(d, g.desc);
+	EXPECT_NE(d, g.desc) << "Description was not coppied.";
 }
 
 rapidxml::xml_node<> *Generator::toXML(rapidxml::xml_document<> &d)
@@ -381,6 +408,38 @@ void Generator::addCommand ( const std::vector<const char *> &cmd )
 
 	cmds.push_back(n);
 }
+TEST(Generator, addCommand)
+{
+	std::vector<const char*> cmd1;
+	cmd1.push_back("this");
+	cmd1.push_back("is");
+	cmd1.push_back("a");
+	cmd1.push_back("test");
+
+	std::vector<const char*> cmd2;
+	cmd2.push_back("this");
+	cmd2.push_back("is");
+	cmd2.push_back("a");
+	cmd2.push_back("second");
+	cmd2.push_back("test");
+
+	Generator g;
+	g.addCommand(cmd1);
+
+	EXPECT_EQ(1, g.cmds.size());
+	EXPECT_EQ(4, g.cmds[0].size());
+
+	g.addCommand(cmd2);
+	EXPECT_EQ(2, g.cmds.size());
+	EXPECT_EQ(4, g.cmds[0].size());
+	EXPECT_EQ(5, g.cmds[1].size());
+
+	g.addCommand(cmd1);
+	EXPECT_EQ(3, g.cmds.size());
+	EXPECT_EQ(4, g.cmds[0].size());
+	EXPECT_EQ(5, g.cmds[1].size());
+	EXPECT_EQ(4, g.cmds[2].size());
+}
 
 bool Target::operator > (const Target &c) const
 {
@@ -405,4 +464,27 @@ bool Target::operator == (const Target &c) const
 bool Target::operator != (const Target &c) const
 {
 	return strcmp(this->path, c.path) == 0;
+}
+TEST(Target, ComparisonOperator)
+{
+	Target t1(NULL, "1 low");
+	Target t2(NULL, "5 mid");
+	Target t3(NULL, "5 mid");
+	Target t4(NULL, "9 high");
+
+	EXPECT_LT(t1, t2);
+	EXPECT_LT(t1, t3);
+	EXPECT_LT(t1, t4);
+
+	EXPECT_GT(t2, t1);
+	EXPECT_EQ(t2, t3);
+	EXPECT_LT(t2, t4);
+
+	EXPECT_GT(t3, t1);
+	EXPECT_EQ(t3, t2);
+	EXPECT_LT(t3, t4);
+
+	EXPECT_GT(t4, t1);
+	EXPECT_GT(t4, t2);
+	EXPECT_GT(t4, t3);
 }
