@@ -29,7 +29,7 @@
 
 #include <set>
 
-#include <gtest/gtest.h>
+#include <test.hpp>
 
 #include "buildgen-exe/messages.hpp"
 #include "buildgen-xml/target.hpp"
@@ -37,6 +37,9 @@
 #include "buildgen-xml/common.hpp"
 
 #include "targetmanager.hpp"
+#include "itargemanager-test.hpp"
+
+RUN_IFACE_TEST(ITargetManager, TargetManager);
 
 Target *TargetManager::newTarget ( const char *path )
 {
@@ -68,6 +71,7 @@ Target *TargetManager::changePath(const char *oldp, const char *newp)
 
 	return t;
 }
+#ifdef TEST
 TEST(TargetManager, changePath)
 {
 	TargetManager m;
@@ -79,27 +83,11 @@ TEST(TargetManager, changePath)
 
 	ASSERT_STREQ(t->path, "newPath");
 }
+#endif
 
 std::set<const Target*> TargetManager::allTargets(void)
 {
 	return *(std::set<const Target*>*)&targets;
-}
-TEST(TargetManager, allTargets)
-{
-	TargetManager m;
-	m.newTarget("1");
-	m.newTarget("2");
-	m.newTarget("3");
-	m.newTarget("4");
-	m.newTarget("5");
-
-	const std::set<const Target*> tgts = m.allTargets();
-	for ( std::set<const Target*>::iterator i = tgts.begin();
-	      i != tgts.end();
-	      i++)
-	{
-		const Target *t = *i;
-	}
 }
 
 TargetManager::TargetManager()
@@ -109,22 +97,4 @@ TargetManager::TargetManager()
 
 TargetManager::~TargetManager()
 {
-}
-
-
-TEST(TargetManager, Basic)
-{
-	TargetManager m;
-
-	Target *t1 = m.newTarget("t1");
-
-	ASSERT_EQ(t1, m.newTarget("t1"));
-	ASSERT_EQ(t1, m.findTarget("t1"));
-
-	Target *t2 = m.newTarget("t2");
-
-	ASSERT_NE(t1, m.newTarget("t2"));
-	ASSERT_NE(t1, m.findTarget("t2"));
-	ASSERT_NE(t2, m.newTarget("t1"));
-	ASSERT_NE(t2, m.findTarget("t1"));
 }

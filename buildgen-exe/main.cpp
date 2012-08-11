@@ -70,7 +70,7 @@ int main ( int argc, char **argv )
 	std::set<std::string> runfiles;
 
 	chdir(files.project_root);
-	char *rootFileName = files.normalizeFilename(files.rootfilename);
+/*	char *rootFileName = files.normalizeFilename(files.rootfilename);
 	BuildGenLuaEnv lua(&files, rootFileName);
 	free(rootFileName);
 
@@ -106,6 +106,6 @@ int main ( int argc, char **argv )
 
 	fputs(XML::create(targetmanager.targets, &files).c_str(), opt::xml_out);
 	opt::close_xml_out();
-
+*/
 	return 0;
 }

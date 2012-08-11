@@ -50,6 +50,7 @@ local headers = T.List{
 	"lua-init.hpp",
 	"messages.hpp",
 	"mystring.hpp",
+	"pathresolver.hpp",
 
 	"@info.h",
 
@@ -67,6 +68,7 @@ local sources = T.List{
 	"lua-init.cpp",
 	"messages.cpp",
 	"mystring.cpp",
+	"pathresolver.cpp",
 
 	"@info.cpp",
 
@@ -81,11 +83,14 @@ files:extend(headers)                    --
 files:extend(sources)                    --
 local gen = S.cpp.compile(files, "@gen") --
 
-files = T.List{"test.cpp"} -- Compile the tests
-files:extend(headers)
-files:extend(sources)
-local test = S.cpp.compile(files, "@test")
-S.addToTarget("test", test)
+if D.test then
+	files = T.List{"test.cpp"} -- Compile the tests
+	files:extend(headers)
+	files:extend(sources)
+	local test = S.cpp.compile(files, "@test")
+	S.addToTarget("test", test)
+	S.addMagicToDefault "test"
+end
 
 S.addToDefault(gen)
 

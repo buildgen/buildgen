@@ -31,7 +31,7 @@
 
 #include <set>
 
-#include <gtest/gtest.h>
+#include "test.hpp"
 
 #include "buildgen-exe/messages.hpp"
 #include "buildgen-xml/target.hpp"
@@ -48,6 +48,7 @@ Target::Target (ITargetManager *mgnr, const char *path ):
 	generator = NULL;
 	magic = 0;
 }
+#ifdef TEST
 TEST(Target, Constructor)
 {
 	const char *p = "test";
@@ -94,6 +95,7 @@ TEST(Target, CopyConstructor)
 	EXPECT_EQ(t1.generator, t2.generator);
 	EXPECT_EQ(t1.depends, t2.depends);
 }
+#endif
 
 Target::~Target ( )
 {
@@ -117,6 +119,8 @@ void Target::addDependancy( const Target *t )
 		depends.insert(n);
 	}
 }
+
+#ifdef TEST
 TEST(Target, addDependancy_Target)
 {
 	TargetManager m;
@@ -132,7 +136,7 @@ TEST(Target, addDependancy_Target)
 	EXPECT_EQ(2, t1->depends.size());
 	EXPECT_TRUE(m.findTarget("test") != NULL);
 }
-
+#endif
 
 void Target::addDependancy( const char *path )
 {
@@ -140,6 +144,7 @@ void Target::addDependancy( const char *path )
 
 	depends.insert(manager->newTarget(path));
 }
+#ifdef TEST
 TEST(Target, addDependancy_Path)
 {
 	TargetManager m;
@@ -159,6 +164,7 @@ TEST(Target, addDependancy_Path)
 	EXPECT_TRUE(m.findTarget("t4") != NULL);
 	EXPECT_TRUE(m.findTarget("t5") != NULL);
 }
+#endif
 
 void Target::addGenerator( Generator *gen )
 {
@@ -219,6 +225,7 @@ Target &Target::operator =(const Target &t)
 
 	return *this;
 }
+#ifdef TEST
 TEST(Target, AsignmentOperator)
 {
 	TargetManager m;
@@ -251,6 +258,7 @@ TEST(Target, AsignmentOperator)
 	EXPECT_EQ(t->depends, c.depends);
 	EXPECT_EQ(t->generator, c.generator);
 }
+#endif
 
 Target *Target::fromXML ( ITargetManager *mgnr, const rapidxml::xml_node<> *src )
 {
@@ -278,18 +286,21 @@ Generator::Generator():
 	desc(NULL)
 {
 }
+#ifdef TEST
 TEST(Generator, DefaultConstructor)
 {
 	Generator g;
 
 	EXPECT_EQ(0, g.cmds.size());
 }
+#endif
 
 Generator::Generator( const std::vector<const char*> &cmd ):
 	desc(NULL)
 {
 	addCommand(cmd);
 }
+#ifdef TEST
 TEST(Generator, CmdConstructor)
 {
 	std::vector<const char*> cmd;
@@ -302,12 +313,14 @@ TEST(Generator, CmdConstructor)
 	EXPECT_EQ(1, g.cmds.size());
 	EXPECT_EQ(4, g.cmds[0].size());
 }
+#endif
 
 void Generator::addDescription ( const char *d )
 {
 	free(desc);
 	desc = strdup(d);
 }
+#ifdef TEST
 TEST(Generator, addDescription)
 {
 	const char *d = "This is the description.";
@@ -317,6 +330,7 @@ TEST(Generator, addDescription)
 	EXPECT_STREQ(d, g.desc);
 	EXPECT_NE(d, g.desc) << "Description was not coppied.";
 }
+#endif
 
 rapidxml::xml_node<> *Generator::toXML(rapidxml::xml_document<> &d)
 {
@@ -408,6 +422,7 @@ void Generator::addCommand ( const std::vector<const char *> &cmd )
 
 	cmds.push_back(n);
 }
+#ifdef TEST
 TEST(Generator, addCommand)
 {
 	std::vector<const char*> cmd1;
@@ -440,6 +455,7 @@ TEST(Generator, addCommand)
 	EXPECT_EQ(5, g.cmds[1].size());
 	EXPECT_EQ(4, g.cmds[2].size());
 }
+#endif
 
 bool Target::operator > (const Target &c) const
 {
@@ -465,6 +481,7 @@ bool Target::operator != (const Target &c) const
 {
 	return strcmp(this->path, c.path) == 0;
 }
+#ifdef TEST
 TEST(Target, ComparisonOperator)
 {
 	Target t1(NULL, "1 low");
@@ -488,3 +505,4 @@ TEST(Target, ComparisonOperator)
 	EXPECT_GT(t4, t2);
 	EXPECT_GT(t4, t3);
 }
+#endif

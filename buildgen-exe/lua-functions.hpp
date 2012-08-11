@@ -27,10 +27,13 @@
 
 #include <lua.hpp>
 #include "files.hpp"
+#include "pathresolver.hpp"
 
 namespace LuaFunctions
 {
 	extern Files *files;
+	extern PathResolver *pres;
+
 	namespace C
 	{
 		int add_depandancy(lua_State *L);

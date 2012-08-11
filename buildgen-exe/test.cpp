@@ -22,7 +22,11 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <gtest/gtest.h>
+#include <test.hpp>
+
+#ifndef TEST
+	#error TEST needs to be defined when building tests.
+#endif
 
 int main ( int argc, char** argv )
 {

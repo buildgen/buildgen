@@ -87,16 +87,6 @@ ADD_EXECUTABLE(gen
 	"${CMAKE_CURRENT_BINARY_DIR}/info.cpp"
 	"info.h"
 )
-ADD_EXECUTABLE(test
-	"test.cpp"
-	${sources}
-	${headers}
-	${xml_sources}
-	${xml_headers}
-	"${CMAKE_CURRENT_BINARY_DIR}/info.cpp"
-	"info.h"
-)
 
 TARGET_LINK_LIBRARIES(gen gtest lua m)
-TARGET_LINK_LIBRARIES(test gtest lua m)
 INSTALL(TARGETS gen DESTINATION bin)

@@ -37,6 +37,7 @@
 #include "info.h"
 #include "globals.hpp"
 #include "mystring.hpp"
+#include "pathresolver.hpp"
 
 #include "lua-functions.hpp"
 #include "buildgen-xml/target.hpp"
@@ -111,6 +112,7 @@
 namespace LuaFunctions
 {
 	Files *files;
+	PathResolver *pres;
 
 namespace C
 {
@@ -143,14 +145,14 @@ int add_depandancy (lua_State *L)
 	if (!(magic & 0x01))
 	{
 		const char *t = UNIXP(lua_tostring(L, 1));
-		targ = files->normalizeFilename(t);
+		targ = pres->normalizeFilename(t);
 		CYGFREE(t);
 	}
 	else targ = mstrdup(lua_tostring(L, 1));
 	if (!(magic & 0x02))
 	{
 		const char *t = UNIXP(lua_tostring(L, 2));
-		dep = files->normalizeFilename(t);
+		dep = pres->normalizeFilename(t);
 		CYGFREE(t);
 	}
 	else dep = mstrdup(lua_tostring(L, 2));
@@ -262,7 +264,7 @@ int add_generator (lua_State *L)
 		if (lua_objlen(L, curcmd))
 		{
 			const char *t = UNIXP(cmd[0]);
-			cmd[0] = generatorCmd = files->normalizeFilename(t);
+			cmd[0] = generatorCmd = pres->normalizeFilename(t);
 			CYGFREE(t);
 		}
 
@@ -290,7 +292,7 @@ int add_generator (lua_State *L)
 		if (!(magic & 0x02))
 		{
 			const char *tmp = UNIXP(lua_tostring(L, -1));
-			t = files->normalizeFilename(tmp);
+			t = pres->normalizeFilename(tmp);
 			CYGFREE(tmp);
 		}
 		else t = mstrdup(lua_tostring(L, -1));
@@ -318,7 +320,7 @@ int add_generator (lua_State *L)
 		if (!(magic & 0x01))
 		{
 			const char *t = UNIXP(lua_tostring(L, -1));
-			tpath = files->normalizeFilename(t);
+			tpath = pres->normalizeFilename(t);
 			CYGFREE(t);
 		}
 		else tpath = mstrdup(lua_tostring(L, -1));
@@ -348,8 +350,8 @@ int path (lua_State *L)
 		luaL_error(L, "path was asked to convert a path that is not a string");
 
 	const char *p1 = UNIXP(lua_tostring(L, 1));
-	char *p2 = files->normalizeFilename(p1);
-	files->prettyPath(p2);
+	char *p2 = pres->normalizeFilename(p1);
+	pres->prettyPath(p2);
 	p2 = WINPF(p2);
 	lua_pushstring(L, p2); // Push our result.
 	CYGFREE(p1);

@@ -22,39 +22,20 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef FILES_HPP
-#define FILES_HPP
+#ifndef TEST_HPP
+#define TEST_HPP
 
-#include <queue>
-#include "buildgen-xml/target.hpp"
+#ifdef TEST
+	#include <gtest/gtest.h>
 
-/// Info about the filesystem as it relates to us.
-class Files
-{
-public:
-	char *project_root;
-	char *lualibs_root;
-	char *out_root;
+	#define IFACE_TEST(iface) \
+		template <class T> \
+		void test##iface (void)
 
-	const char *infofilename;
-	const char *rootfilename;
-	const char *config_file_system;
-	const char *config_file_user;
-	const char *buildgen_root;
-
-	ITargetManager * const manager;
-private:
-	void init(const char *srcdir, const char *buildgen_root);
-	void appendSlash(char **inputoutput);
-public:
-	Files(ITargetManager * const mgnr, const char *srcdir, const char *buildgen_root);
-	std::queue<char*> infofile;
-
-	void findInfoFile(void);
-	void addDirectory(const char *path);
-	void addInfoFile(const char *path);
-
-	void findProjectRoot(void);
-};
-
+	#define RUN_IFACE_TEST(iface, impl) TEST(impl, iface##Compatability) \
+	                                { test##iface<impl>(); }
+#else ///// NOT TESTING
+	#define IFACE_TEST(iface, impl) // Gone
 #endif
+
+#endif // TEST_HPP

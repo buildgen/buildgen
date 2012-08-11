@@ -118,6 +118,18 @@ function S.addToDefault ( path )
 	S.addToTarget("all", path)
 end
 
+--- Add a Magic Target to the Default Build
+--
+-- Adds `targ` to the default build.  This means that if the builder doesn't
+-- specify what they want build this will be built.
+--
+-- @tparam string targ The target.
+function S.addMagicToDefault ( targ )
+	T.utils.assert_string(1, targ)
+
+	S.addTargetToTarget("all", targ)
+end
+
 --- Add a path to a magic target.
 --
 -- @tparam string target The name of the magic target.

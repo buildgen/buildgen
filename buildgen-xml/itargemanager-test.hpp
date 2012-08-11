@@ -22,39 +22,57 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef FILES_HPP
-#define FILES_HPP
+#ifndef ITARGEMANAGERTEST_HPP
+#define ITARGEMANAGERTEST_HPP
 
-#include <queue>
-#include "buildgen-xml/target.hpp"
+#include "test.hpp"
+#include "itargetmanager.hpp"
 
-/// Info about the filesystem as it relates to us.
-class Files
+#ifdef TEST
+IFACE_TEST(ITargetManager)
 {
-public:
-	char *project_root;
-	char *lualibs_root;
-	char *out_root;
+	{ ///// ITargetManager::newTarget(const char *);
+		T m;
+		Target *t = m.newTarget("path");
 
-	const char *infofilename;
-	const char *rootfilename;
-	const char *config_file_system;
-	const char *config_file_user;
-	const char *buildgen_root;
+		ASSERT_STREQ("path", t->path);
 
-	ITargetManager * const manager;
-private:
-	void init(const char *srcdir, const char *buildgen_root);
-	void appendSlash(char **inputoutput);
-public:
-	Files(ITargetManager * const mgnr, const char *srcdir, const char *buildgen_root);
-	std::queue<char*> infofile;
+		m.changePath("path", "newPath");
 
-	void findInfoFile(void);
-	void addDirectory(const char *path);
-	void addInfoFile(const char *path);
+		ASSERT_STREQ("newPath", t->path);
+	}
+	{ ///// ITargetManager::allTargets(void);
+		TargetManager m;
+		m.newTarget("1");
+		m.newTarget("2");
+		m.newTarget("3");
+		m.newTarget("4");
+		m.newTarget("5");
 
-	void findProjectRoot(void);
-};
+		const std::set<const Target*> tgts = m.allTargets();
+		for ( std::set<const Target*>::iterator i = tgts.begin();
+		      i != tgts.end();
+		      i++)
+		{
+			const Target *t = *i;
+		}
+	}
+	{ ///// Basic Usage.
+		TargetManager m;
 
+		Target *t1 = m.newTarget("t1");
+
+		ASSERT_EQ(t1, m.newTarget("t1"));
+		ASSERT_EQ(t1, m.findTarget("t1"));
+
+		Target *t2 = m.newTarget("t2");
+
+		ASSERT_NE(t1, m.newTarget("t2"));
+		ASSERT_NE(t1, m.findTarget("t2"));
+		ASSERT_NE(t2, m.newTarget("t1"));
+		ASSERT_NE(t2, m.findTarget("t1"));
+	}
+}
 #endif
+
+#endif // ITARGEMANAGERTEST_HPP
