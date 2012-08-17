@@ -30,6 +30,7 @@
 #include <string.h>
 #include <dirent.h>
 #include <sysexits.h>
+#include <assert.h>
 
 #include "test.hpp"
 
@@ -45,6 +46,18 @@ PathResolver::PathResolver(const char *project_root, const char *out_root):
 {
 	assert(project_root[project_root_len-1] == '/');
 	assert(out_root[out_root_len-1] == '/');
+}
+
+PathResolver::~PathResolver()
+{
+	free(project_root);
+	free(out_root);
+}
+
+PathResolver &PathResolver::operator =(const PathResolver &pr)
+{
+	setProjectRoot(pr.project_root);
+	setOutRoot(pr.out_root);
 }
 
 char *PathResolver::normalizeFilename( const char *path )
@@ -259,3 +272,17 @@ TEST(PathResolver, prettyPath)
 #undef T
 }
 #endif
+
+void PathResolver::setProjectRoot(const char *path)
+{
+	free(project_root);
+	project_root = mstrdup(path);
+	project_root_len = strlen(project_root);
+}
+
+void PathResolver::setOutRoot(const char *path)
+{
+	free(out_root);
+	out_root = mstrdup(path);
+	out_root_len = strlen(out_root);
+}

@@ -22,13 +22,18 @@
 *                                                                              *
 *******************************************************************************/
 
+#include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "globals.hpp"
 #include "messages.hpp"
 
 char *mstrdup ( const char *s )
 {
+	assert( s != NULL );
+	if ( s == NULL ) return NULL; // Safest runtime fallback;
+
 	char *r = strdup(s);
 	checkAlloc(r);
 	return r;

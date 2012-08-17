@@ -26,7 +26,10 @@
 #define FILES_HPP
 
 #include <queue>
+
 #include "buildgen-xml/target.hpp"
+
+#include "pathresolver.hpp"
 
 /// Info about the filesystem as it relates to us.
 class Files
@@ -43,6 +46,7 @@ public:
 	const char *buildgen_root;
 
 	ITargetManager * const manager;
+	PathResolver resolver;
 private:
 	void init(const char *srcdir, const char *buildgen_root);
 	void appendSlash(char **inputoutput);

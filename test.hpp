@@ -35,7 +35,7 @@
 	#define RUN_IFACE_TEST(iface, impl) TEST(impl, iface##Compatability) \
 	                                { test##iface<impl>(); }
 #else ///// NOT TESTING
-	#define IFACE_TEST(iface, impl) // Gone
+	#define RUN_IFACE_TEST(iface, impl) // Gone
 #endif
 
 #endif // TEST_HPP

@@ -46,6 +46,8 @@ Files::Files (ITargetManager * const mgnr, const char *srcdir, const char *build
 	project_root(NULL),
 	out_root(NULL),
 
+	resolver("/", "/"),
+
 	infofilename("Buildinfo"),
 	rootfilename("Buildroot"),
 	config_file_system("/etc/buildgen/buildgen.conf"),
@@ -60,16 +62,15 @@ void Files::init ( const char *srcdir, const char *buildgenroot )
 	appendSlash(&out_root);
 
 	/*** Get BuildGen root ***/
-	char *br = "/data/Scripts/buildgen-install/bin/gen";// normalizeFilename(buildgenroot);
+	char *br = resolver.normalizeFilename(buildgenroot);
 
 	unsigned int ls = strlen(br);
-	while ( br[ls] != '/' ) ls--;
+	while ( br[ls] != '/' ) ls--; // Remove the executable name.
 	ls--;
-	while ( br[ls] != '/' ) ls--;
+	while ( br[ls] != '/' ) ls--; // Remove "bin".
 	br[ls+1] = '\0';
 
 	buildgen_root = mstrdup(br);
-
 	free(br);
 
 	/*** Get LuaLibs root ***/
@@ -90,6 +91,8 @@ void Files::init ( const char *srcdir, const char *buildgenroot )
 		fchdir(dirfd(d));
 		findInfoFile();
 
+		resolver = PathResolver(project_root, out_root);
+
 		closedir(d);
 	}
 }
@@ -99,7 +102,8 @@ void Files::findInfoFile ( void )
 	FILE *conf = fopen(Files::infofilename, "r");
 	if (!conf)
 	{
-		//msg::error("Could not open Buildinfo file \"%s\"", normalizeFilename(Files::infofilename));
+		msg::error("Could not open Buildinfo file \"%s\"",
+		           resolver.normalizeFilename(Files::infofilename));
 		exit(EX_NOINPUT);
 	}
 	fclose(conf);
@@ -113,8 +117,8 @@ void Files::addDirectory( const char *path )
 
 	if (chdir(path)) // Returns 0 on success
 	{
-		//msg::error("Could not add directory \"%s\".  Reason: \"%s\"",
-		//	normalizeFilename(path), strerror(errno));
+		msg::error("Could not add directory \"%s\".  Reason: \"%s\"",
+		           resolver.normalizeFilename(path), strerror(errno));
 	}
 
 	findInfoFile();
@@ -125,7 +129,7 @@ void Files::addDirectory( const char *path )
 
 void Files::addInfoFile ( const char *path )
 {
-	char *info = strdup(path);//normalizeFilename(path);
+	char *info = resolver.normalizeFilename(path);
 	infofile.push(info);
 
 	msg::log("Buildinfo file added at \"%s\"", info);
@@ -175,8 +179,8 @@ void Files::findProjectRoot( void )
 	project_root = getcwd(NULL, 0);
 	Files::appendSlash(&project_root);
 
-	//Target *t = manager->newTarget(normalizeFilename(rootfilename));
-	//manager->newTarget("regen")->addDependancy(t);
+	Target *t = manager->newTarget(resolver.normalizeFilename(rootfilename));
+	manager->newTarget("regen")->addDependancy(t);
 
 	msg::log("Project Root at \"%s\"", project_root);
 }

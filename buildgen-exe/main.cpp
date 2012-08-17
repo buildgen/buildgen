@@ -70,14 +70,14 @@ int main ( int argc, char **argv )
 	std::set<std::string> runfiles;
 
 	chdir(files.project_root);
-/*	char *rootFileName = files.normalizeFilename(files.rootfilename);
+	char *rootFileName = files.resolver.normalizeFilename(files.rootfilename);
 	BuildGenLuaEnv lua(&files, rootFileName);
 	free(rootFileName);
 
 	Target *regen = targetmanager.newTarget("regen");
 	regen->magic = 1;
 
-	cmd[0] = files.normalizeFilename(cmd[0]);
+	cmd[0] = files.resolver.normalizeFilename(cmd[0]);
 
 	regen->addGenerator(cmd);
 	regen->generator->addDescription("Regenerating build information");
@@ -106,6 +106,6 @@ int main ( int argc, char **argv )
 
 	fputs(XML::create(targetmanager.targets, &files).c_str(), opt::xml_out);
 	opt::close_xml_out();
-*/
+
 	return 0;
 }

@@ -52,6 +52,8 @@ class Makefile
 
 public:
     Makefile(ITargetManager *manager);
+	~Makefile();
+
 	std::string generate(void);
 };
 

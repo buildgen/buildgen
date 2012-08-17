@@ -225,3 +225,9 @@ std::string Makefile::writeHelp ( void )
 
 	return out;
 }
+
+Makefile::~Makefile()
+{
+	free(cwd);
+	printf("DONE\n");
+}

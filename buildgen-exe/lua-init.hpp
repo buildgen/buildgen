@@ -40,7 +40,7 @@ class BuildGenLuaEnv
 
 	void init(void);
 	void init_lua(void);
-	void dmakeify_lua(void);
+	void buildgenify_lua(void);
 	void report_errors(lua_State *L, int status);
 
 	void clenseEnvironment(void);

@@ -32,7 +32,7 @@
 #include "messages.hpp"
 #include "info.h"
 
-void help ( void )
+void help ( int status = 0 )
 {
 	puts("Usage:"                                                                );
 	puts("  --define <key>=<value>, -D <key>=<value>"                            );
@@ -70,7 +70,7 @@ void help ( void )
 	puts("    verbosity is raised by 1 for each time this argument is passed."   );
 	puts("  --version"                                                           );
 	puts("    Print the version of BuildGen and exit."                           );
-	exit(0);
+	exit(status);
 }
 
 void version ( void )
@@ -112,6 +112,8 @@ namespace opt
 		{
 			switch (i)
 			{
+			case '?': // Unknown argument.
+				help(EX_USAGE);
 			case 0:
 				switch (flag)
 				{

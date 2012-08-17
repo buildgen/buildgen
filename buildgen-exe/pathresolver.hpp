@@ -39,6 +39,9 @@ class PathResolver
 	char *out_root;
 	size_t out_root_len;
 
+	void setProjectRoot (const char *path);
+	void setOutRoot (const char *path);
+
 public:
 	/** Create a PathResolver.
 	 *
@@ -50,6 +53,10 @@ public:
 	 *   string should have a trailing slash.
 	 */
 	PathResolver(const char *project_root, const char *out_root);
+
+	virtual ~PathResolver(void);
+
+	virtual PathResolver &operator = ( const PathResolver &pr );
 
 	/** Makes a BuildGen path absolute.
 	  *

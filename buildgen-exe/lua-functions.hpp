@@ -32,7 +32,6 @@
 namespace LuaFunctions
 {
 	extern Files *files;
-	extern PathResolver *pres;
 
 	namespace C
 	{

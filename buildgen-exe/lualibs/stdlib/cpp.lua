@@ -173,6 +173,7 @@ local compilers = T.Map{
 -- @tparam string name The name of the compiler (often the name of the executable).
 -- @treturn boolean `true` if the compiler can be used otherwise `false`.
 function S.cpp.hasCompiler ( name )
+	if name == nil then return false end
 	T.utils.assert_string(1, name)
 
 	if compilers[name] == nil then return false end
@@ -230,10 +231,26 @@ function S.cpp.useCompiler ( name )
 end
 
 if not P.S.cpp.compiler then
-	for n in compilers:iter() do     -- Find the a compiler that they have
-		if S.cpp.hasCompiler(n) then -- installed on thier system.
-			S.cpp.useCompiler(n)
-			break
+	if D["cpp.compiler"] then
+		if S.cpp.hasCompiler(D["cpp.compiler"]) then
+			S.cpp.useCompiler(D["cpp.compiler"])
+		else
+			error("Error: requested compiler "..D["cpp.compiler"].." not found", 0)
+		end
+	end
+
+	if not P.S.cpp.compiler then
+		if S.cpp.hasCompiler(D["cpp.preferedCompiler"]) then
+			S.cpp.useCompiler(D["cpp.preferedCompiler"])
+		end
+	end
+
+	if not P.S.cpp.compiler then
+		for n in compilers:iter() do     -- Find the a compiler that they have
+			if S.cpp.hasCompiler(n) then -- installed on thier system.
+				S.cpp.useCompiler(n)
+				break
+			end
 		end
 	end
 

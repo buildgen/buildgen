@@ -63,7 +63,7 @@ void BuildGenLuaEnv::init ( void )
 	corefile = mstrcat(files->lualibs_root, cf);
 
 	init_lua();
-	dmakeify_lua();
+	buildgenify_lua();
 }
 
 void BuildGenLuaEnv::init_lua ( void )
@@ -77,7 +77,7 @@ void BuildGenLuaEnv::init_lua ( void )
 	luaL_openlibs(L);
 }
 
-void BuildGenLuaEnv::dmakeify_lua ( void )
+void BuildGenLuaEnv::buildgenify_lua ( void )
 {
 	lua_settop(L, 0);
 
@@ -162,7 +162,7 @@ void BuildGenLuaEnv::doRunFile ( const char *path )
 
 	int s = luaL_loadfile(L, (char*)path);
 	if ( s == 0 )
-    {
+	{
 		s = lua_pcall(L, 0, LUA_MULTRET, 0); // execute Lua program
 	}
 

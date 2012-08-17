@@ -97,4 +97,8 @@ TargetManager::TargetManager()
 
 TargetManager::~TargetManager()
 {
+	for ( TargetSet::const_iterator i = targets.begin();
+	      i != targets.end();
+	      i++)
+		free(*i);
 }
