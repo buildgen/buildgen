@@ -5,8 +5,7 @@ compiler:
 
 before_install:
  - sudo apt-get install cmake lua50 luarocks libgtest-dev
- - luarocks install lfs
- - luarocks install penlight
+ - luarocks install luafilesystem penlight
 script:
  - SRC="$(pwd)"
  - OLDPATH=$PATH
