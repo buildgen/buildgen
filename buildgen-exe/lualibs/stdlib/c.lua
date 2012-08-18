@@ -373,6 +373,20 @@ function S.c.compileShared ( sources, out )
 	return compile(S.ld.linkShared, sources, out)
 end
 
+--- Find Include Directory
+-- Find the directory that holds the given file.
+--
+-- @tparam string file The suffux to search for (ex: `test.h`, `test/test.h`)
+-- @return The directory or false.
+function S.c.findIncludeDir ( file )
+	local f = S.findFile(file, {"/usr/include","/usr/local/include"})
+	if f then
+		return T.path.dirname(f)
+	end
+
+	return false
+end
+
 --- Create a header file with definitions.
 -- Creates a header/source pair with definitions. Currently all values are
 -- treated as strings with type  `const char*`.

@@ -27,6 +27,14 @@
 
 S.lua = {}
 
+--- The directory where the lua headers are found.
+S.lua.includeDir = S.c.findIncludeDir("lua.h")
+for l in T.List{"lua51", "lua5.1", "lua-5.1", "lua"}:iter() do
+	if S.findSharedLibrary(l) then
+		S.lua.libName = l
+	end
+end
+
 --- Compile a Script into Lua Bytecode.
 -- Pre-compiling a Lua script has a number of advantages such as decreased load
 -- time (usually the script has to be compiled before each run), smaller files

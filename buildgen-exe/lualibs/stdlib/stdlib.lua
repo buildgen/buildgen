@@ -190,6 +190,67 @@ function S.findExecutable ( name )
 	return false
 end
 
+--- Find a file.
+-- This function recursivly searches the given directory to find the specified
+-- file.
+--
+-- @tparam string file The suffux to search for (ex: `test.h`, `test/test.h`)
+-- @tparam {string,...} dirs The directories to search in.
+-- @return The path to the file or `false` if it was not found.
+function S.findFile ( file, dirs )
+	if type(dirs) ~= "table" then
+		dirs = {tostring(dirs)}
+	end
+	dirs = T.List(dirs):map(C.path)
+	T.utils.assert_string(1, file)
+	T.utils.assert_arg(2, dirs, "table")
+
+	for dir in dirs:iter() do
+		for root, dir, files in T.dir.walk(dir) do
+			for f in files:iter() do
+				if (root..f):endswith(file) then
+					return f
+				end
+			end
+		end
+	end
+
+	return false;
+end
+
+--- Find a library.
+--
+-- @tparam string lib The base name of the library.
+-- @return The path to the file or `false` if it was not found.
+function S.findSharedLibrary ( lib )
+	T.utils.assert_string(1, lib)
+
+	local join = T.path.join
+	local isfile = T.path.isfile
+
+	local dirs = T.List()
+	local names = T.List()
+
+	if S.os.compliance == "posix" then
+		names:append("lib"..lib..".so")
+
+		dirs:append "/lib/"
+		dirs:append "/usr/lib/"
+		dirs:append "/usr/local/lib/"
+	end
+
+	for f in dirs:iter() do
+		for n in names:iter() do
+			local p = join(f, n)
+			if isfile(p) then
+				return p
+			end
+		end
+	end
+
+	return false;
+end
+
 --- Add a Target to the Install Target
 --
 -- Installs `path`.  If `path` is a directory it will be installed

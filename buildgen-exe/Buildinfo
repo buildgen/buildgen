@@ -37,10 +37,11 @@ S.c.generateHeader("@info.h", "@info.cpp", {
 	DEFAULT_GENERATOR = "gen-makefile",
 })
 S.cpp.addInclude "@"
-
-S.cpp.addLib{"m", "lua", "gtest"}
-
 S.cpp.addInclude "<"
+S.cpp.addInclude(S.c.findIncludeDir("lua.hpp"))
+
+S.cpp.addLib{"m", S.lua.libName, "gtest"}
+
 
 local headers = T.List{
 	"commandline.hpp",
