@@ -8,7 +8,6 @@ before_install:
  - luarocks install penlight
 script:
  - SRC="$(pwd)"
- - echo $SRC
  - mkdir "$SRC/cmake/" && cd "$SRC/cmake/" && cmake .. && make install
  - mkdir "$SRC/bs/"    && cd "$SRC/bg/"    && gen -Ddebug -Dtest .. && make test
 after-script:
