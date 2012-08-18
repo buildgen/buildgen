@@ -10,6 +10,6 @@ script:
  - SRC="$(pwd)"
  - mkdir "$SRC/cmake/" && cd "$SRC/cmake/" && cmake "-DCMAKE_INSTALL_PREFIX:PATH=$SRC/ins/" .. && make install
  - PATH="$SRC/ins/bin/:$PATH"
- - mkdir "$SRC/bs/"    && cd "$SRC/bg/"    && gen -Ddebug -Dtest .. && make test
+ - mkdir "$SRC/bg/"    && cd "$SRC/bg/"    && gen -Ddebug -Dtest .. && make test
 after-script:
  -  bg/buildgen-exe/test
