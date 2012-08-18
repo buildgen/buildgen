@@ -4,7 +4,7 @@ compiler:
  - clang
 
 before_install:
- - sudo apt-get install cmake lua luarocks
+ - sudo apt-get install cmake lua50 luarocks
  - luarocks install penlight
 script:
  - SRC="$(pwd)"
