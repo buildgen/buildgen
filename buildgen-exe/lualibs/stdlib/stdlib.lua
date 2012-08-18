@@ -206,9 +206,10 @@ function S.findFile ( file, dirs )
 	T.utils.assert_arg(2, dirs, "table")
 
 	for dir in dirs:iter() do
-		for root, dir, files in T.dir.walk(dir) do
+		for root, dirs, files in T.dir.walk(dir) do
 			for f in files:iter() do
-				if (root..f):endswith(file) then
+				f = T.path.join(root, f)
+				if f:endswith(file) then
 					return f
 				end
 			end

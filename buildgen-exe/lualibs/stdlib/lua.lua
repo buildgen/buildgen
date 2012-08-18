@@ -27,12 +27,34 @@
 
 S.lua = {}
 
---- The directory where the lua headers are found.
-S.lua.includeDir = S.c.findIncludeDir("lua.h")
-for l in T.List{"lua51", "lua5.1", "lua-5.1", "lua"}:iter() do
-	if S.findSharedLibrary(l) then
-		S.lua.libName = l
+--- Get the directory where the lua headers are found.
+--
+-- @tparam bool noerr Pass false to not fail if the header is not found.
+-- @return The directory.  Or false if `noerr` is true.
+function S.lua.includeDir ( noerr )
+	local d = S.c.findIncludeDir("lua.h")
+	if not noerr and not d then
+		error("Could not find lua header files.")
 	end
+
+	return d
+end
+
+--- Get the lua library basename.
+--
+-- @tparam bool noerr Pass false to not fail if the library is not found.
+-- @return The name of the library.  Or false if `noerr` is true.
+function S.lua.libName (noerr)
+	for l in T.List{"lua51", "lua5.1", "lua-5.1", "lua"}:iter() do
+		if S.findSharedLibrary(l) then
+			return l
+		end
+	end
+
+	if noerr then
+		return false
+	end
+	error "Could not find the lua shared library."
 end
 
 --- Compile a Script into Lua Bytecode.

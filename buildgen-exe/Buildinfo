@@ -38,9 +38,9 @@ S.c.generateHeader("@info.h", "@info.cpp", {
 })
 S.cpp.addInclude "@"
 S.cpp.addInclude "<"
-S.cpp.addInclude(S.c.findIncludeDir("lua.hpp"))
+S.cpp.addInclude(S.lua.includeDir())
 
-S.cpp.addLib{"m", S.lua.libName, "gtest"}
+S.cpp.addLib{"m", S.lua.libName(), "gtest"}
 
 
 local headers = T.List{
