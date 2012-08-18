@@ -82,7 +82,7 @@ T.stringx.import()
 --
 -- @tparam string path The key of the defined value.
 -- @param default The value to be put if the value is not defined.  Defaults to
---	nil.
+-- `nil`.
 function D.resolvePath ( path , default )
 	T.utils.assert_string(1, path)
 
