@@ -1,10 +1,11 @@
 language: cpp
 compiler:
-  - gcc
-  - clang
+ - gcc
+ - clang
 
 before_install:
-  - sudo apt-get install cmake
+ - sudo apt-get install cmake lua luarocks
+ - luarocks install penlight
 script:
  - SRC="$(pwd)"
  - echo $SRC
