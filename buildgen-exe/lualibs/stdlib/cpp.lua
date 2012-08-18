@@ -164,6 +164,7 @@ local compilers = T.Map{
 		}
 	},
 }
+compilers["gcc"] = compilers["g++"]
 
 --- Check to see if a compiler is available.
 --
