@@ -6,7 +6,10 @@ compiler:
 before_install:
   - sudo apt-get install cmake
 script:
- - mkdir cmake/ && cd cmake/ && cmake .. && make install ; cd ..
- - mkdir bg/    && cd bg/    && gen -Ddebug -Dtest .. && make test ; cd ..
+ - pwd
+ - SRC="$(pwd)"
+ - echo $SRC
+# - mkdir cmake/ && cd cmake/ && cmake .. && make install ; cd ..
+# - mkdir bg/    && cd bg/    && gen -Ddebug -Dtest .. && make test ; cd ..
 after-script:
- - bg/buildgen-exe/test
+# -  bg/buildgen-exe/test
