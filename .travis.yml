@@ -12,7 +12,7 @@ script:
  - OLDPATH=$PATH
  - mkdir "$SRC/cmake/" && cd "$SRC/cmake/" && cmake "-DCMAKE_INSTALL_PREFIX:PATH=$SRC/cmakeins/" .. && make install
  - PATH="$SRC/cmakeins/bin/:$OLDPATH"
- - mkdir "$SRC/bg/"    && cd "$SRC/bg/"    && gen -Ddebug -Dtest "-Dprefix=$SRC/bgins/" .. && make test
+ - mkdir "$SRC/bg/"    && cd "$SRC/bg/"    && sudo gen -Ddebug -Dtest "-Dprefix=$SRC/bgins/" .. && make test
  - PATH="$SRC/bgins/bin/:$OLDPATH"
  - rm -rv "$SRC/bg/"*
  - mkdir "$SRC/bg/"    && cd "$SRC/bg/"    && sudo gen -Ddebug -Dtest "-Dprefix=$SRC/bgins/" .. && make test
