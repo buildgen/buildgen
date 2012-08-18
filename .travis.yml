@@ -5,11 +5,15 @@ compiler:
 
 before_install:
  - sudo apt-get install cmake lua50 luarocks libgtest-dev
- - luarocks install penlight
+ - luarocks install lfs penlight
 script:
  - SRC="$(pwd)"
- - mkdir "$SRC/cmake/" && cd "$SRC/cmake/" && cmake "-DCMAKE_INSTALL_PREFIX:PATH=$SRC/ins/" .. && make install
- - PATH="$SRC/ins/bin/:$PATH"
- - mkdir "$SRC/bg/"    && cd "$SRC/bg/"    && gen -Ddebug -Dtest .. && make test
+ - OLDPATH=$PATH
+ - mkdir "$SRC/cmake/" && cd "$SRC/cmake/" && cmake "-DCMAKE_INSTALL_PREFIX:PATH=$SRC/cmakeins/" .. && make install
+ - PATH="$SRC/cmakeins/bin/:$OLDPATH"
+ - mkdir "$SRC/bg/"    && cd "$SRC/bg/"    && gen -Ddebug -Dtest "-Dprefix=$SRC/bgins/" .. && make test
+ - PATH="$SRC/bgins/bin/:$OLDPATH"
+ - rm -rv "$SRC/bg/"*
+ - mkdir "$SRC/bg/"    && cd "$SRC/bg/"    && gen -Ddebug -Dtest "-Dprefix=$SRC/bgins/" .. && make test
 after-script:
  -  bg/buildgen-exe/test
