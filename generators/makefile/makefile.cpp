@@ -31,11 +31,11 @@
 
 Makefile::Makefile (ITargetManager *manager):
 	cwd(getcwd(NULL, 0)),
-	cwdlen(strlen(cwd)), // The one is for the trailing slash
+	cwdlen(strlen(cwd)+1), // The one is for the trailing slash
 	manager(manager),
 	targets(manager->allTargets())
 {
-	cwd = (char*)realloc(cwd, cwdlen*sizeof(char));
+	cwd = (char*)realloc(cwd, (cwdlen+1)*sizeof(char));
 	cwd[cwdlen++] = '/';
 	cwd[cwdlen]   = '\0';
 }
@@ -116,7 +116,8 @@ std::string Makefile::writeTarget(const Target *t)
 		out += escape(std::string(t->path));
 		out += "\n\n";
 	}
-	else generated.push_back(t); // We are creating it so it needs to be cleaned.
+	else
+		generated.push_back(t); // We are creating it so it needs to be cleaned.
 
 	out += escape(relitiveName(t->path));
 	out += ": ";
@@ -229,5 +230,4 @@ std::string Makefile::writeHelp ( void )
 Makefile::~Makefile()
 {
 	free(cwd);
-	printf("DONE\n");
 }
