@@ -26,6 +26,10 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 PROJECT(BuildGen)
 
+find_package(Lua51 REQUIRED)
+include_directories(${LUA_INCLUDE_DIR})
+
+
 ##### Files
 FILE(GLOB sources *.cpp)
 GET_FILENAME_COMPONENT(mainfile main.cpp ABSOLUTE)     # GLOB returns absolute
