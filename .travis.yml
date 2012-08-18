@@ -4,7 +4,7 @@ compiler:
  - clang
 
 before_install:
- - sudo apt-get install cmake lua50 luarocks libgtest-dev lua-filesystem-dev
+ - sudo apt-get install cmake lua50 luarocks libgtest-dev lua-filesystem
 # - luarocks install luafilesystem
  - luarocks install penlight
 script:
