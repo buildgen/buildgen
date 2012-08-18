@@ -247,8 +247,8 @@ if not P.S.cpp.compiler then
 	end
 
 	if not P.S.cpp.compiler then
-		for n in compilers:iter() do     -- Find the a compiler that they have
-			if S.cpp.hasCompiler(n) then -- installed on thier system.
+		for n in T.Map.iter(compilers) do -- Find the a compiler that they have
+			if S.cpp.hasCompiler(n) then  -- installed on thier system.
 				S.cpp.useCompiler(n)
 				break
 			end
