@@ -67,9 +67,9 @@ char *PathResolver::normalizeFilename( const char *path )
 	case '<': // Input
 			return prettyPath(mstrcat(project_root, path+1));
 	case '>': // Output
-		{
 			return prettyPath(mstrcat(out_root, path+1));
-		}
+	case '~': // Output
+		return prettyPath(mstrcat(getenv("HOME"), path+1));
 	case '@': // Auto path
 		{
 			/***** Expand the path *****/

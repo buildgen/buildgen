@@ -41,8 +41,8 @@ public:
 
 	const char *infofilename;
 	const char *rootfilename;
-	const char *config_file_system;
-	const char *config_file_user;
+	char *config_file_system;
+	char *config_file_user;
 	const char *buildgen_root;
 
 	ITargetManager * const manager;
@@ -52,7 +52,10 @@ private:
 	void appendSlash(char **inputoutput);
 public:
 	Files(ITargetManager * const mgnr, const char *srcdir, const char *buildgen_root);
+	~Files();
 	std::queue<char*> infofile;
+
+	bool fileExists (const char *path );
 
 	void findInfoFile(void);
 	void addDirectory(const char *path);

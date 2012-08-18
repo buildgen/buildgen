@@ -36,6 +36,8 @@ class BuildGenLuaEnv
 
 	char *root_file;
 
+	char *sysfile;
+	char *userfile;
 	char *corefile;
 
 	void init(void);

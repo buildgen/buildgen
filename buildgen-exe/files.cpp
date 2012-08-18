@@ -50,10 +50,28 @@ Files::Files (ITargetManager * const mgnr, const char *srcdir, const char *build
 
 	infofilename("Buildinfo"),
 	rootfilename("Buildroot"),
-	config_file_system("/etc/buildgen/buildgen.conf"),
-	config_file_user("~/.config/buildgen/buildgen.conf")
+	config_file_system(mstrdup("/etc/buildgen/conf.lua")),
+	config_file_user(mstrdup("~/.config/buildgen/conf.lua"))
 {
 	init(srcdir, buildgen_root);
+}
+
+Files::~Files()
+{
+	free(config_file_system);
+	free(config_file_user);
+}
+
+bool Files::fileExists(const char *path)
+{
+	FILE *f = fopen(path, "r");
+	if ( f != NULL )
+	{
+		fclose(f);
+		return true;
+	}
+
+	return false;
 }
 
 void Files::init ( const char *srcdir, const char *buildgenroot )
@@ -92,6 +110,13 @@ void Files::init ( const char *srcdir, const char *buildgenroot )
 		findInfoFile();
 
 		resolver = PathResolver(project_root, out_root);
+
+		char *o = config_file_system;
+		config_file_system = resolver.normalizeFilename(o);
+		free(o);
+		o = config_file_user;
+		config_file_user = resolver.normalizeFilename(o);
+		free(o);
 
 		closedir(d);
 	}
@@ -151,15 +176,13 @@ void Files::appendSlash ( char **inputoutput )
 
 void Files::findProjectRoot( void )
 {
-	FILE *root = fopen(rootfilename, "r");
 	unsigned int i = 0;
-
-	while (!root)
+	while (!fileExists(rootfilename))
 	{
-		if ( i > 10 ) // Check for the root directory every once and a while.
+		if ( i > 5 ) // Check for the root directory every once and a while.
 		{
 			char *cur = getcwd(NULL, 0);
-			if (!cur[1]) // This is the root directory
+			if ( cur[1] == '\0' ) // This is the root directory
 			{
 				free(cur);
 				msg::error("Could not find project root");
@@ -167,14 +190,12 @@ void Files::findProjectRoot( void )
 			}
 			free(cur);
 
-			i -= 5;
+			i -= 3;
 		}
 		else i++;
 
 		chdir("..");
-		root = fopen(rootfilename, "r");
 	}
-	fclose(root);
 
 	project_root = getcwd(NULL, 0);
 	Files::appendSlash(&project_root);

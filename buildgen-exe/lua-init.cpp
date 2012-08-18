@@ -59,8 +59,11 @@ BuildGenLuaEnv::~BuildGenLuaEnv ( )
 
 void BuildGenLuaEnv::init ( void )
 {
-	const char *cf = "core.lua";
-	corefile = mstrcat(files->lualibs_root, cf);
+	sysfile  = files->config_file_system;
+	if (!files->fileExists(sysfile)) sysfile = NULL;
+	userfile  = files->config_file_user;
+	if (!files->fileExists(userfile)) userfile = NULL;
+	corefile = mstrcat(files->lualibs_root, "core.lua");
 
 	init_lua();
 	buildgenify_lua();
@@ -156,6 +159,8 @@ void BuildGenLuaEnv::clenseEnvironment ( void )
 
 void BuildGenLuaEnv::doRunFile ( const char *path )
 {
+	assert(path != NULL);
+
 	char *d = mstrdup(path);
 	chdir(dirname(d));
 	free(d);
@@ -178,6 +183,8 @@ void BuildGenLuaEnv::runFile ( const char *path )
 {
 	clenseEnvironment();
 
+	if ( sysfile  != NULL )  doRunFile(sysfile);
+	if ( userfile != NULL ) doRunFile(userfile);
 	doRunFile(corefile);
 
 	if ( root_file != NULL ) // Run the root file.
