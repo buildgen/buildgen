@@ -49,8 +49,8 @@ IFACE_TEST(ITargetManager)
 		m.newTarget("4");
 		m.newTarget("5");
 
-		const std::set<const Target*> tgts = m.allTargets();
-		for ( std::set<const Target*>::iterator i = tgts.begin();
+		std::set<Target*> tgts = m.allTargets();
+		for ( std::set<Target*>::iterator i = tgts.begin();
 		      i != tgts.end();
 		      i++)
 		{

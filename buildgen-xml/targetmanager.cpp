@@ -85,9 +85,9 @@ TEST(TargetManager, changePath)
 }
 #endif
 
-std::set<const Target*> TargetManager::allTargets(void)
+std::set<Target*> TargetManager::allTargets(void)
 {
-	return *(std::set<const Target*>*)&targets;
+	return std::set<Target*>(targets.begin(), targets.end());
 }
 
 TargetManager::TargetManager()

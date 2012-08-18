@@ -104,6 +104,18 @@ int main ( int argc, char **argv )
 		files.infofile.pop();
 	}
 
+	std::set<Target*> targets = targetmanager.allTargets();
+	for ( std::set<Target*>::iterator i = targets.begin();
+	      i != targets.end();
+	      i++)
+	{
+		Target *t = *i;
+		if ( t == regen ) continue;
+
+		if ( t->depends.size() > 0 )
+			t->addDependancy(regen);
+	}
+
 	fputs(XML::create(targetmanager.targets, &files).c_str(), opt::xml_out);
 	opt::close_xml_out();
 

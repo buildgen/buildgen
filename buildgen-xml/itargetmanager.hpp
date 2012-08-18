@@ -75,7 +75,7 @@ public:
 	 * \return The set of targets.  The targets inside are owned by the
 	 *   ITargetManager.
 	 */
-	virtual std::set<const Target*> allTargets(void) = 0;
+	virtual std::set<Target*> allTargets(void) = 0;
 };
 
 #endif

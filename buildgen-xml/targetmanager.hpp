@@ -55,7 +55,7 @@ public:
 	virtual Target *findTarget ( const char *path );
 	virtual Target *changePath ( const char *oldp, const char *newp );
 
-	virtual std::set<const Target*> allTargets(void);
+	virtual std::set<Target*> allTargets(void);
 
 	TargetManager();
 	virtual ~TargetManager();
