@@ -4,8 +4,8 @@ compiler:
  - clang
 
 before_install:
- - sudo apt-get install cmake lua50 luarocks libgtest-dev
- - luarocks install luafilesystem
+ - sudo apt-get install cmake lua50 luarocks libgtest-dev lua-filesystem-dev
+# - luarocks install luafilesystem
  - luarocks install penlight
 script:
  - SRC="$(pwd)"
