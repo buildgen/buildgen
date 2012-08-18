@@ -30,6 +30,8 @@
 --- Import Penlight
 T = {}
 
+P.S.stdlib = P.S.stdlib or {}
+
 if S.os.style == "win32" then
 	package.config = "\\"..package.config:sub(2)
 end
@@ -190,6 +192,8 @@ function S.findExecutable ( name )
 	return false
 end
 
+P.S.stdlib.foundFiles = T.Map()
+
 --- Find a file.
 -- This function recursivly searches the given directory to find the specified
 -- file.
@@ -198,25 +202,51 @@ end
 -- @tparam {string,...} dirs The directories to search in.
 -- @return The path to the file or `false` if it was not found.
 function S.findFile ( file, dirs )
+	if type(file) ~= "table" then
+		file = {tostring(file)}
+	end
 	if type(dirs) ~= "table" then
 		dirs = {tostring(dirs)}
 	end
+	file = T.List(file)
 	dirs = T.List(dirs):map(C.path)
-	T.utils.assert_string(1, file)
+	T.utils.assert_arg(1, file, "table")
 	T.utils.assert_arg(2, dirs, "table")
 
-	for dir in dirs:iter() do
-		for root, dirs, files in T.dir.walk(dir) do
-			for f in files:iter() do
-				f = T.path.join(root, f)
-				if f:endswith(file) then
+	local foundFiles = P.S.stdlib.foundFiles
+
+	----- Check the cache.
+	for tf in file:iter() do
+		if foundFiles[tf] then
+			for f in foundFiles[tf]:iter() do
+				if f:endswith(tf) then
 					return f
 				end
 			end
 		end
 	end
 
-	return false;
+	----- Actually look for it.
+	for dir in dirs:iter() do
+		for root, _, files in T.dir.walk(dir) do
+			for f in files:iter() do
+				f = T.path.join(root, f)
+				for tf in file:iter() do
+					if f:endswith(tf) then
+						if foundFiles[tf] then
+							foundFiles[tf]:append(f)
+						else
+							foundFiles[tf] = T.List{f}
+						end
+
+						return f
+					end
+				end
+			end
+		end
+	end
+
+	return "false";
 end
 
 --- Find a library.
@@ -224,29 +254,36 @@ end
 -- @tparam string lib The base name of the library.
 -- @return The path to the file or `false` if it was not found.
 function S.findSharedLibrary ( lib )
-	T.utils.assert_string(1, lib)
+	if type(lib) ~= "table" then
+		lib = {tostring(lib)}
+	end
+	T.utils.assert_arg(1, lib, "table")
+	lib = T.List(lib)
 
 	local join = T.path.join
 	local isfile = T.path.isfile
 
 	local dirs = T.List()
-	local names = T.List()
+	local templates = T.List()
 
 	if S.os.compliance == "posix" then
-		names:append("lib"..lib..".so")
+		templates:append "lib%s.so"
 
-		dirs:append "/lib/"
 		dirs:append "/usr/lib/"
 		dirs:append "/usr/local/lib/"
+		dirs:append "/lib/"
 	end
 
-	for f in dirs:iter() do
-		for n in names:iter() do
-			local p = join(f, n)
-			if isfile(p) then
-				return p
-			end
-		end
+	local names = T.List()
+	local orig  = T.List()
+	for l in lib:iter() do
+		names:extend(templates:map():format(l))
+		orig:extend(templates:map():gsub("^.*$", l)) -- Fill it with the name.
+	end
+
+	local l = S.findFile(names, dirs)
+	if l then
+		return l, orig[names:index(T.path.basename(l))]
 	end
 
 	return false;

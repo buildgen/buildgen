@@ -34,7 +34,7 @@ S.lua = {}
 function S.lua.includeDir ( noerr )
 	local d = S.c.findIncludeDir("lua.h")
 	if not noerr and not d then
-		error("Could not find lua header files.")
+		error "Could not find lua header files."
 	end
 
 	return d
@@ -45,16 +45,13 @@ end
 -- @tparam bool noerr Pass false to not fail if the library is not found.
 -- @return The name of the library.  Or false if `noerr` is true.
 function S.lua.libName (noerr)
-	for l in T.List{"lua51", "lua5.1", "lua-5.1", "lua"}:iter() do
-		if S.findSharedLibrary(l) then
-			return l
-		end
+	local s, l = S.findSharedLibrary({"lua51", "lua5.1", "lua-5.1", "lua"})
+
+	if not noerr and not s then
+		error "Could not find the lua shared library."
 	end
 
-	if noerr then
-		return false
-	end
-	error "Could not find the lua shared library."
+	return l or s
 end
 
 --- Compile a Script into Lua Bytecode.
