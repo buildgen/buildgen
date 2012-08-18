@@ -8,7 +8,7 @@ before_install:
 script:
  - SRC="$(pwd)"
  - echo $SRC
- - mkdir "$SRC/cmake/" && "$SRC/cmake/" && cmake .. && make install
+ - mkdir "$SRC/cmake/" && echo 0 && "$SRC/cmake/" && echo 1 && cmake .. && make install
  - mkdir "$SRC/bs/"    && "$SRC/bg/"    && gen -Ddebug -Dtest .. && make test
 after-script:
  -  bg/buildgen-exe/test
