@@ -84,7 +84,7 @@ void checkAlloc ( void *p )
 #ifdef TEST
 TEST(Globals, checkAlloc)
 {
-	EXPECT_EXIT(checkAlloc(NULL), ::testing::ExitedWithCode(EX_OSERR), ".*");
+	EXPECT_EXIT(checkAlloc(NULL), ::testing::ExitedWithCode(EX_OSERR), "Error:.*");
 	//EXPECT_NEXIT(checkAlloc((void*)0x12345), ::testing::ExitedWithCode(EX_OSERR), ".*");
 	//EXPECT_NEXIT(checkAlloc((void*)0xABCDE), ::testing::ExitedWithCode(EX_OSERR), ".*");
 	//EXPECT_NEXIT(checkAlloc((void*)0xAAAAA), ::testing::ExitedWithCode(EX_OSERR), ".*");

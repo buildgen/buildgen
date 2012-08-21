@@ -27,7 +27,7 @@
 namespace msg
 {
 	FILE *msg_out = stdout;
-	FILE *err_out = stdout;
+	FILE *err_out = stderr;
 
 	bool useColor;
 	int verbosity = 1;
