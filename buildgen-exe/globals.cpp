@@ -27,11 +27,11 @@
 #include <set>
 #include <ext/slist>
 
+#include "test.hpp"
+
 #include "messages.hpp"
 #include "files.hpp"
 #include "buildgen-xml/target.hpp"
-
-//Files *files;
 
 #if defined(__linux__)
 	const char *OS_STYLE = "linux";
@@ -77,7 +77,16 @@ void checkAlloc ( void *p )
 {
 	if (!p)
 	{
-		msg::error("Error could not allocate memory");
+		msg::error("could not allocate memory");
 		exit(EX_OSERR);
 	}
 }
+#ifdef TEST
+TEST(Globals, checkAlloc)
+{
+	EXPECT_EXIT(checkAlloc(NULL), ::testing::ExitedWithCode(EX_OSERR), ".*");
+	//EXPECT_NEXIT(checkAlloc((void*)0x12345), ::testing::ExitedWithCode(EX_OSERR), ".*");
+	//EXPECT_NEXIT(checkAlloc((void*)0xABCDE), ::testing::ExitedWithCode(EX_OSERR), ".*");
+	//EXPECT_NEXIT(checkAlloc((void*)0xAAAAA), ::testing::ExitedWithCode(EX_OSERR), ".*");
+}
+#endif

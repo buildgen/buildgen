@@ -26,6 +26,8 @@
 #include <string.h>
 #include <assert.h>
 
+#include "test.hpp"
+
 #include "globals.hpp"
 #include "messages.hpp"
 
@@ -38,6 +40,23 @@ char *mstrdup ( const char *s )
 	checkAlloc(r);
 	return r;
 }
+#ifdef TEST
+TEST(MyString, mstrdup)
+{
+#define T(s) { \
+	char *r = mstrdup(s); \
+	EXPECT_NE(s, r); \
+	EXPECT_STREQ(s, r); \
+	free(r); \
+}
+
+	T("string");
+	T("stRing");
+	T("test string");
+
+#undef T
+}
+#endif
 
 char *myalloc ( size_t chars )
 {
@@ -65,6 +84,23 @@ char *mstrcat ( const char *s1, const char *s2 )
 
 	return r;
 }
+#ifdef TEST
+TEST(MyString, mstrcat_stringstring)
+{
+#define T(s1, s2, e) { \
+	char *r = mstrcat(s1, s2); \
+	EXPECT_STREQ(e, r); \
+	free(r); \
+}
+
+	T("string", "string", "stringstring");
+	T("This is ", "a test.", "This is a test.");
+	T("test string", "", "test string");
+	T("", "test string", "test string");
+
+#undef T
+}
+#endif
 
 char *mstrcat ( char c, const char *s2 )
 {
@@ -77,6 +113,22 @@ char *mstrcat ( char c, const char *s2 )
 
 	return r;
 }
+#ifdef TEST
+TEST(MyString, mstrcat_charstring)
+{
+#define T(c, s, e) { \
+	char *r = mstrcat(c, s); \
+	EXPECT_STREQ(e, r); \
+	free(r); \
+}
+
+	T('a', " string", "a string");
+	T('s', "plat", "splat");
+	T('!', "", "!");
+
+#undef T
+}
+#endif
 
 char *mstrcat ( const char *s1, const char *s2, const char *s3 )
 {
@@ -95,6 +147,24 @@ char *mstrcat ( const char *s1, const char *s2, const char *s3 )
 
 	return r;
 }
+#ifdef TEST
+TEST(MyString, mstrcat_stringstringstring)
+{
+#define T(s1, s2, s3, e) { \
+	char *r = mstrcat(s1, s2, s3); \
+	EXPECT_STREQ(e, r); \
+	free(r); \
+}
+
+	T("string", "string", "string", "stringstringstring");
+	T("This is ", "a test", ".", "This is a test.");
+	T("", "Hello,", " goodbye.", "Hello, goodbye.");
+	T("Hello,", "", " goodbye.", "Hello, goodbye.");
+	T("Hello,", " goodbye.", "", "Hello, goodbye.");
+
+#undef T
+}
+#endif
 
 char *mstrcat ( const char *s1, char c, const char *s3 )
 {
@@ -112,6 +182,23 @@ char *mstrcat ( const char *s1, char c, const char *s3 )
 
 	return r;
 }
+#ifdef TEST
+TEST(MyString, mstrcat_stringcharstring)
+{
+#define T(s1, c, s2, e) { \
+	char *r = mstrcat(s1, c, s2); \
+	EXPECT_STREQ(e, r); \
+	free(r); \
+}
+
+	T("/usr", '/', "share/", "/usr/share/");
+	T("Hello", ' ', "Joe.", "Hello Joe.");
+	T("Hi", '!', "", "Hi!");
+	T("", '/', "bin/", "/bin/");
+
+#undef T
+}
+#endif
 
 char *mstrcat ( char c,const char *s2,  const char *s3 )
 {
@@ -129,3 +216,19 @@ char *mstrcat ( char c,const char *s2,  const char *s3 )
 
 	return r;
 }
+#ifdef TEST
+TEST(MyString, mstrcat_charstringstring)
+{
+#define T(c, s1, s2, e) { \
+	char *r = mstrcat(c, s1, s2); \
+	EXPECT_STREQ(e, r); \
+	free(r); \
+}
+
+	T('H', "ello, ", "Joe.", "Hello, Joe.");
+	T('H', "eidi.", "ello.", "Heidi.ello.");
+	T('H', "", "ello.", "Hello.");
+	T('H', "eidi.", "", "Heidi.");
+#undef T
+}
+#endif
