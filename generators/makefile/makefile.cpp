@@ -44,7 +44,7 @@ std::string Makefile::relitiveName(std::string path)
 {
 	if ( path.find(cwd) != std::string::npos ) // Found it
 	{
-		std::string s(path.c_str()+cwdlen);
+		std::string s(path.substr(cwdlen-1));
 
 		if ( s[0] == '\0' )
 			s = '.';
