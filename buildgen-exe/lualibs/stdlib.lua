@@ -99,18 +99,18 @@ local function runInDir ( script )
 	local dir = T.path.dirname(script)
 
 	local oldpwd = T.lfs.currentdir()
+
 	T.lfs.chdir(dir)
-
-	local status, err = pcall(dofile, script)
-
+	dofile(script)
 	T.lfs.chdir(oldpwd)
-
-	return status, err
 end
 
 local function runProperScript ( basename )
-	local status, err = runInDir(basename..".luo")
-	if not status then dofile(basename..".lua") end
+	if T.path.exists(basename..".luo") then
+		runInDir(basename..".luo")
+	else
+		runInDir(basename..".lua")
+	end
 end
 
 --- The Standard Library Root.

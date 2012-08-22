@@ -113,28 +113,6 @@ namespace LuaFunctions
 {
 	Files *files;
 
-int error_handler(lua_State *L)
-{
-	lua_Debug d;
-	char buf[1024];
-
-	char *msg = mstrdup(lua_tostring(L, -1));
-	mstrapp(&msg, "\n\nStack trace:\n~~~~~~~~~~~~~~~~~~~~\n");
-
-	for ( unsigned int l = 0; lua_getstack(L, l, &d); l++)
-	{
-		lua_getinfo(L, "nSl", &d);
-		snprintf(buf, 1024, "%s:%d: %s\n", d.short_src, d.currentline, d.name);
-		mstrapp(&msg, buf);
-	}
-	mstrapp(&msg, "~~~~~~~~~~~~~~~~~~~~\n");
-
-	lua_pushstring(L, msg);
-	free(msg);
-
-	return 1;
-}
-
 namespace C
 {
 

@@ -33,8 +33,6 @@ namespace LuaFunctions
 {
 	extern Files *files;
 
-	int error_handler(lua_State *L);
-
 	namespace C
 	{
 		int add_depandancy(lua_State *L);

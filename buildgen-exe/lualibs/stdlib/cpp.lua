@@ -67,14 +67,20 @@ if D.debug then S.cpp.debug = true end
 -- @return The newly created state.
 function S.cpp.newState ( )
 	local data = {
+		includes = T.OrderedMap(),
+		defines  = T.OrderedMap(),
+
 		arguments = T.List(),
+
+		debug        = S.cpp.debug,
+		optimization = S.cpp.optimization,
+		profile      = S.cpp.profile,
+
 		linker    = S.ld.newState(),
 	}
 
 	local s = S.cpp.swapState(data)
-
 	S.cpp.addLib "stdc++"
-
 	S.cpp.loadState(s)
 
 	return data
@@ -97,10 +103,6 @@ end
 function S.cpp.swapState ( new )
 	local old = state
 
-	old.debug        = S.cpp.debugOveride
-	old.optimization = S.cpp.optimizationOveride
-	old.profile      = S.cpp.profileOveride
-
 	S.cpp.loadState(new)
 
 	return old
@@ -112,10 +114,6 @@ end
 -- @param data The state to load.
 function S.cpp.loadState ( data )
 	state = data
-
-	S.cpp.debugOveride        = data.debugOveride
-	S.cpp.optimizationOveride = data.optimizationOveride
-	S.cpp.profileOveride      = data.profileOveride
 end
 
 local compilers = T.Map{
@@ -260,14 +258,32 @@ if not P.S.cpp.compiler then
 	end
 end
 
+local function validOptimization ( level )
+	return {none=true,quick=true,regular=true,full=true,max=true} or false
+end
+
 --- Overide the default optimization level.
-S.cpp.optimizationOveride = S.cpp.optimizationOveride
+function S.cpp.optimizationOveride ( level )
+	T.utils.assert_arg(1, level, "string",
+	                   validOptimization, "Unknown optimization level.",
+	                   2)
+
+	state.optimization = level
+end
 
 --- Overide the default profile setting.
-S.cpp.profileOveride = S.cpp.profileOveride
+function S.cpp.profileOveride ( profile )
+	T.utils.assert_arg(1, profile, "boolean")
+
+	state.profile = profile
+end
 
 --- Overide the default profile setting.
-S.cpp.debugOveride = S.cpp.debugOveride
+function S.cpp.debugOveride ( debug )
+	T.utils.assert_arg(1, debug, "boolean")
+
+	state.debug = debug
+end
 
 --- Add an argrment.
 -- Add an argument to the compiler command line.  Please try to avoid using this

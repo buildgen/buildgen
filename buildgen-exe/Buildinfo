@@ -44,7 +44,6 @@ S.cpp.addInclude(S.lua.includeDir())
 
 S.cpp.addLib{"m", S.lua.libName(), "gtest"}
 
-
 local headers = T.List{"@info.h"}:extend(T.dir.getfiles(".", "*.hpp"))
                                  :extend(L.buildgenXML.headers)
 
@@ -79,7 +78,7 @@ for f in llibs:iter() do
 	S.util.cp(f, lua)     -- Copy the source.
 
 	S.install(lua, tdir)
-	--S.install(luo, tdir)
+	S.install(luo, tdir)
 end
 
 S.install("lualibs/config.ld", lualibsdir)
