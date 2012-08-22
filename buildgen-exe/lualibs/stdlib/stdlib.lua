@@ -27,52 +27,7 @@
 [                                                                              ]
 [-----------------------------------------------------------------------------]]
 
---- Import Penlight
-T = {}
-
 P.S.stdlib = P.S.stdlib or {}
-
-if S.os.style == "win32" then
-	package.config = "\\"..package.config:sub(2)
-end
-
-require "lfs"
-
-T.List = require "pl.List"
-T.class = require "pl.class"
-T.Map = require "pl.Map"
-T.Set = require "pl.Set"
-
-T.OrderedMap = require "pl.OrderedMap"
-T.MultiMap = require "pl.MultiMap"
---T.TypedList = require "pl.TypedList"
-
-T.app = require "pl.app"
-T.array2d = require "pl.array2d"
-T.comprehension = require "pl.comprehension"
-T.config = require "pl.config"
-T.data = require "pl.data"
-T.dir = require "pl.dir"
-T.file = require "pl.file"
-T.func = require "pl.func"
-T.input = require "pl.input"
-T.lapp = require "pl.lapp"
-T.lexer = require "pl.lexer"
-T.luabalanced = require "pl.luabalanced"
-T.operator = require "pl.operator"
-T.path = require "pl.path"
-T.permute = require "pl.permute"
-T.pretty = require "pl.pretty"
-T.seq = require "pl.seq"
-T.sip = require "pl.sip"
-T.stringio = require "pl.stringio"
-T.stringx = require "pl.stringx"
-T.tablex = require "pl.tablex"
-T.test = require "pl.test"
-T.text = require "pl.text"
-T.utils = require "pl.utils"
-
-T.stringx.import()
 
 --- Resolve a path passed as a define.
 --
@@ -308,7 +263,7 @@ function S.install ( path, to )
 
 	local apath = C.path(path)
 	local bname = T.path.basename(apath)
-	to = T.path.join(S.prefix, to or "", bname)
+	to = T.path.join(T.path.join(S.prefix, to or ""), bname)
 
 	local installed = T.List()
 

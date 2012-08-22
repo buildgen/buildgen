@@ -22,83 +22,57 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
-#include <sysexits.h>
+#ifndef ITARGEMANAGERTEST_HPP
+#define ITARGEMANAGERTEST_HPP
 
-#include <set>
+#include "test.hpp"
+#include "itargetmanager.hpp"
 
-#include <test.hpp>
-
-#include "buildgen-exe/messages.hpp"
-#include "buildgen-xml/target.hpp"
-
-#include "buildgen-xml/common.hpp"
-
-#include "targetmanager.hpp"
-#include "itargetmanager-test.hpp"
-
-RUN_IFACE_TEST(ITargetManager, TargetManager);
-
-Target *TargetManager::newTarget ( const char *path )
-{
-	Target *t = new Target(this, path);
-	std::pair<TargetSet::iterator,bool> r = targets.insert(t);
-
-	if (!r.second) free(t); // It was already there.
-
-	return *r.first;
-}
-
-Target *TargetManager::findTarget ( const char *path )
-{
-	Target t(this, path);
-	TargetSet::iterator r = targets.find(&t);
-
-	if ( r == targets.end() )
-		return NULL;
-
-	return *r;
-}
-
-Target *TargetManager::changePath(const char *oldp, const char *newp)
-{
-	Target *t = findTarget(oldp);
-	targets.erase(t);
-	free(t->path);
-	t->path = strdup(newp);
-
-	return t;
-}
 #ifdef TEST
-TEST(TargetManager, changePath)
+IFACE_TEST(ITargetManager)
 {
-	TargetManager m;
-	Target *t = m.newTarget("path");
+	{ ///// ITargetManager::newTarget(const char *);
+		T m;
+		Target *t = m.newTarget("path");
 
-	ASSERT_STREQ(t->path, "path");
+		ASSERT_STREQ("path", t->path);
 
-	m.changePath("path", "newPath");
+		m.changePath("path", "newPath");
 
-	ASSERT_STREQ(t->path, "newPath");
+		ASSERT_STREQ("newPath", t->path);
+	}
+	{ ///// ITargetManager::allTargets(void);
+		TargetManager m;
+		m.newTarget("1");
+		m.newTarget("2");
+		m.newTarget("3");
+		m.newTarget("4");
+		m.newTarget("5");
+
+		std::set<Target*> tgts = m.allTargets();
+		for ( std::set<Target*>::iterator i = tgts.begin();
+		      i != tgts.end();
+		      i++)
+		{
+			const Target *t = *i;
+		}
+	}
+	{ ///// Basic Usage.
+		TargetManager m;
+
+		Target *t1 = m.newTarget("t1");
+
+		ASSERT_EQ(t1, m.newTarget("t1"));
+		ASSERT_EQ(t1, m.findTarget("t1"));
+
+		Target *t2 = m.newTarget("t2");
+
+		ASSERT_NE(t1, m.newTarget("t2"));
+		ASSERT_NE(t1, m.findTarget("t2"));
+		ASSERT_NE(t2, m.newTarget("t1"));
+		ASSERT_NE(t2, m.findTarget("t1"));
+	}
 }
 #endif
 
-std::set<Target*> TargetManager::allTargets(void)
-{
-	return std::set<Target*>(targets.begin(), targets.end());
-}
-
-TargetManager::TargetManager()
-{
-
-}
-
-TargetManager::~TargetManager()
-{
-	for ( TargetSet::const_iterator i = targets.begin();
-	      i != targets.end();
-	      i++)
-		free(*i);
-}
+#endif // ITARGEMANAGERTEST_HPP

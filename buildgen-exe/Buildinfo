@@ -60,6 +60,7 @@ local headers = T.List{
 	"<buildgen-xml/target.hpp",
 	"<buildgen-xml/targetmanager.hpp",
 	"<buildgen-xml/itargetmanager.hpp",
+	"<buildgen-xml/itargetmanager-test.hpp",
 }
 local sources = T.List{
 	"commandline.cpp",
@@ -108,9 +109,9 @@ for f in llibs:iter() do
 	S.util.cp(f, lua)     -- Copy the source.
 
 	S.install(lua, tdir)
-	S.install(luo, tdir)
+	--S.install(luo, tdir)
 end
 
 S.install("lualibs/config.ld", lualibsdir)
-S.util.install("lualibs/gen-docs.sh", T.path.join(S.prefix, "bin", "gen-docs"))
+S.util.install("lualibs/gen-docs.sh", T.path.join(T.path.join(S.prefix, "bin"), "gen-docs"))
 S.addToTarget("install",  T.path.join(S.prefix, "bin", "gen-docs"))

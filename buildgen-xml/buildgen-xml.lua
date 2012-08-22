@@ -22,33 +22,8 @@
 [                                                                              ]
 [-----------------------------------------------------------------------------]]
 
-S.import "cpp"
+S.import "stdlib"
 
-S.cpp.addInclude "<"
+L.buildgenXML = {}
 
-S.cpp.addLib{"gtest", "m"}
-
-makefile = S.cpp.compile({
-	"commandline.hpp",
-	"commandline.cpp",
-	"main.cpp",
-	"makefile.hpp",
-	"makefile.cpp",
-
-	"<buildgen-xml/common.cpp",
-	"<buildgen-xml/common.hpp",
-	"<buildgen-xml/load.cpp",
-	"<buildgen-xml/load.hpp",
-	"<buildgen-xml/target.cpp",
-	"<buildgen-xml/target.hpp",
-	"<buildgen-xml/targetmanager.cpp",
-	"<buildgen-xml/targetmanager.hpp",
-	"<buildgen-xml/itargetmanager.hpp",
-
-	"<buildgen-exe/messages.hpp",
-	"<buildgen-exe/messages.cpp",
-}, "@gen-makefile")
-
-S.addToDefault(makefile)
-
-S.install(makefile, "bin/")
+L.buildgenXML.sources = T.path.getallfiles("")

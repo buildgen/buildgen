@@ -31,13 +31,85 @@ L = {} -- User libraries
 S.imported = {}
 L.imported = {}
 
-if not P.S then P.S = {} end --
-if not P.L then P.L = {} end --
+if not P.S then P.S = {} end -- Don't smash the persistant namespace if it
+if not P.L then P.L = {} end -- already exists.
+if not P.T then P.T = {} end --
+
+--- Operating System Information
+-- Fields are:
+--
+-- - style: The style of OS.
+-- - kernel: The kernel the OS uses.
+-- - compliance: The standards that the os complies with.
+S.os = _G.S.os
+
+if S.os.style == "win32" then
+	package.config = "\\"..package.config:sub(2)
+end
+
+--- Import Penlight
+T = {}
+
+if not P.T.lfs then -- Lua won't re-import it even if we loose our handle.
+	require "lfs"
+	P.T.lfs = lfs
+	lfs = nil
+end
+T.lfs = P.T.lfs
+
+T.List = require "pl.List"
+T.class = require "pl.class"
+T.Map = require "pl.Map"
+T.Set = require "pl.Set"
+
+T.OrderedMap = require "pl.OrderedMap"
+T.MultiMap = require "pl.MultiMap"
+--T.TypedList = require "pl.TypedList"
+
+T.app = require "pl.app"
+T.array2d = require "pl.array2d"
+T.comprehension = require "pl.comprehension"
+T.config = require "pl.config"
+T.data = require "pl.data"
+T.dir = require "pl.dir"
+T.file = require "pl.file"
+T.func = require "pl.func"
+T.input = require "pl.input"
+T.lapp = require "pl.lapp"
+T.lexer = require "pl.lexer"
+T.luabalanced = require "pl.luabalanced"
+T.operator = require "pl.operator"
+T.path = require "pl.path"
+T.permute = require "pl.permute"
+T.pretty = require "pl.pretty"
+T.seq = require "pl.seq"
+T.sip = require "pl.sip"
+T.stringio = require "pl.stringio"
+T.stringx = require "pl.stringx"
+T.tablex = require "pl.tablex"
+T.test = require "pl.test"
+T.text = require "pl.text"
+T.utils = require "pl.utils"
+
+T.stringx.import()
 
 do
 
-local function runScript ( basename )
-	local status, err = pcall(dofile, basename..".luo")
+local function runInDir ( script )
+	local dir = T.path.dirname(script)
+
+	local oldpwd = T.lfs.currentdir()
+	T.lfs.chdir(dir)
+
+	local status, err = pcall(dofile, script)
+
+	T.lfs.chdir(oldpwd)
+
+	return status, err
+end
+
+local function runProperScript ( basename )
+	local status, err = runInDir(basename..".luo")
 	if not status then dofile(basename..".lua") end
 end
 
@@ -53,14 +125,6 @@ S.lualibsRoot = _G.S.lualibsRoot.."stdlib/"
 -- internal use and for installing custom libraries.  This is an absolute path.
 L.lualibsRoot = _G.S.lualibsRoot.."custom/"
 
---- Operating System Information
--- Fields are:
---
--- - style: The style of OS.
--- - kernel: The kernel the OS uses.
--- - compliance: The standards that the os complies with.
-S.os = _G.S.os
-
 --- Load a Standard Library
 --
 -- Loads the library `name`.  The library will become available in `S[name]`.
@@ -69,7 +133,7 @@ S.os = _G.S.os
 -- @tparam string name The name of the library to load.
 function S.import ( name )
 	if not S.imported["stdlib"] then
-		runScript(S.lualibsRoot.."stdlib")
+		runProperScript(S.lualibsRoot.."stdlib")
 		S.imported["stdlib"] = true
 	end
 
@@ -77,7 +141,7 @@ function S.import ( name )
 		S.imported[name] = true
 
 		name:gsub("%.", "/") -- Make into a path.
-		runScript(S.lualibsRoot..name)
+		runProperScript(S.lualibsRoot..name)
 	end
 end
 
@@ -106,9 +170,9 @@ function L.import ( name )
 		L.imported[name] = true
 		if global then
 			name = name:gsub("%.", "/") -- Make into a path.
-			runScript(L.lualibsRoot..name)
+			runProperScript(L.lualibsRoot..name)
 		else
-			dofile(C.path(name)) -- It is a .lua file already.
+			runInDir(C.path(name)) -- It is a .lua file already.
 		end
 	end
 end

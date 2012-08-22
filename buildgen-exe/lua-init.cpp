@@ -183,7 +183,7 @@ void BuildGenLuaEnv::runFile ( const char *path )
 {
 	clenseEnvironment();
 
-	if ( sysfile  != NULL )  doRunFile(sysfile);
+	if ( sysfile  != NULL ) doRunFile(sysfile);
 	if ( userfile != NULL ) doRunFile(userfile);
 	doRunFile(corefile);
 
