@@ -69,6 +69,8 @@ Target *TargetManager::changePath(const char *oldp, const char *newp)
 	free(t->path);
 	t->path = strdup(newp);
 
+	targets.insert(t);
+
 	return t;
 }
 #ifdef TEST
@@ -77,11 +79,11 @@ TEST(TargetManager, changePath)
 	TargetManager m;
 	Target *t = m.newTarget("path");
 
-	ASSERT_STREQ(t->path, "path");
-
+	EXPECT_STREQ(t->path, "path");
 	m.changePath("path", "newPath");
+	EXPECT_STREQ(t->path, "newPath");
 
-	ASSERT_STREQ(t->path, "newPath");
+	EXPECT_EQ(t, m.findTarget("newPath"));
 }
 #endif
 
