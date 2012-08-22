@@ -165,18 +165,21 @@ void BuildGenLuaEnv::doRunFile ( const char *path )
 	chdir(dirname(d));
 	free(d);
 
+	lua_settop(L, 0);
+	lua_pushcfunction(L, &LuaFunctions::error_handler);
 	int s = luaL_loadfile(L, (char*)path);
 	if ( s == 0 )
 	{
-		s = lua_pcall(L, 0, LUA_MULTRET, 0); // execute Lua program
+		s = lua_pcall(L, 0, LUA_MULTRET, 1); // execute Lua program
 	}
 
 	if (s) // Errors
 	{
 		msg::error("%s", lua_tostring(L, -1));
-		lua_pop(L, 1); // remove error message
 		exit(EX_DATAERR);
 	}
+
+	lua_settop(L, 0);
 }
 
 void BuildGenLuaEnv::runFile ( const char *path )
