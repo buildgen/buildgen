@@ -24,30 +24,17 @@
 
 S.import "cpp"
 
+L.import  "<buildgen-xml/buildgenXML.lua"
+
 S.cpp.addInclude "<"
 
 S.cpp.addLib{"gtest", "m"}
 
-makefile = S.cpp.compile({
-	"commandline.hpp",
-	"commandline.cpp",
-	"main.cpp",
-	"makefile.hpp",
-	"makefile.cpp",
-
-	"<buildgen-xml/common.cpp",
-	"<buildgen-xml/common.hpp",
-	"<buildgen-xml/load.cpp",
-	"<buildgen-xml/load.hpp",
-	"<buildgen-xml/target.cpp",
-	"<buildgen-xml/target.hpp",
-	"<buildgen-xml/targetmanager.cpp",
-	"<buildgen-xml/targetmanager.hpp",
-	"<buildgen-xml/itargetmanager.hpp",
-
+makefile = S.cpp.compile(T.List{
 	"<buildgen-exe/messages.hpp",
 	"<buildgen-exe/messages.cpp",
-}, "@gen-makefile")
+}:extend(T.dir.getallfiles(".", ".hpp")):extend(T.dir.getallfiles(".", ".cpp"))
+:extend(L.buildgenXML.headers):extend(L.buildgenXML.sources), "@gen-makefile")
 
 S.addToDefault(makefile)
 

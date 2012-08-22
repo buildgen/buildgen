@@ -26,4 +26,16 @@ S.import "stdlib"
 
 L.buildgenXML = {}
 
-L.buildgenXML.sources = T.path.getallfiles("")
+do
+local files = T.List(T.dir.getallfiles(".")):map(C.path)
+local headers = files:filter(string.match, ".hpp$")
+local sources = files:filter(string.match, ".cpp$")
+
+if not D.test then
+	headers = headers:filter(function(s)return not s:match"-test.hpp$"end)
+end
+
+L.buildgenXML.headers = headers
+L.buildgenXML.sources = sources
+
+end

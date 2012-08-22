@@ -27,6 +27,8 @@ S.import "c"
 S.import "cpp"
 S.import "lua"
 
+L.import  "<buildgen-xml/buildgenXML.lua"
+
 ----- Executables -----
 
 lualibsdir = "lib/"..name.."/"
@@ -43,52 +45,20 @@ S.cpp.addInclude(S.lua.includeDir())
 S.cpp.addLib{"m", S.lua.libName(), "gtest"}
 
 
-local headers = T.List{
-	"commandline.hpp",
-	"files.hpp",
-	"globals.hpp",
-	"lua-functions.hpp",
-	"lua-init.hpp",
-	"messages.hpp",
-	"mystring.hpp",
-	"pathresolver.hpp",
+local headers = T.List{"@info.h"}:extend(T.dir.getfiles(".", "*.hpp"))
+                                 :extend(L.buildgenXML.headers)
 
-	"@info.h",
+local sources = T.List{"@info.cpp"}:extend(T.dir.getfiles(".", "*.cpp"))
+                                   :remove_value("./main.cpp")
+                                   :remove_value("./test.cpp")
+                                   :extend(L.buildgenXML.sources)
 
-	"<buildgen-xml/common.hpp",
-	"<buildgen-xml/save.hpp",
-	"<buildgen-xml/target.hpp",
-	"<buildgen-xml/targetmanager.hpp",
-	"<buildgen-xml/itargetmanager.hpp",
-	"<buildgen-xml/itargetmanager-test.hpp",
-}
-local sources = T.List{
-	"commandline.cpp",
-	"files.cpp",
-	"globals.cpp",
-	"lua-functions.cpp",
-	"lua-init.cpp",
-	"messages.cpp",
-	"mystring.cpp",
-	"pathresolver.cpp",
-
-	"@info.cpp",
-
-	"<buildgen-xml/common.cpp",
-	"<buildgen-xml/save.cpp",
-	"<buildgen-xml/target.cpp",
-	"<buildgen-xml/targetmanager.cpp",
-}
-
-files = T.List{"main.cpp"}               -- Compile gen
-files:extend(headers)                    --
-files:extend(sources)                    --
-local gen = S.cpp.compile(files, "@gen") --
+files = T.List{"main.cpp"}:extend(headers):extend(sources) -- Compile gen
+local gen = S.cpp.compile(files, "@gen")                   --
 
 if D.test then
-	files = T.List{"test.cpp"} -- Compile the tests
-	files:extend(headers)
-	files:extend(sources)
+	files = T.List{"test.cpp"}:extend(headers):extend(sources) -- Compile the tests
+
 	local test = S.cpp.compile(files, "@test")
 	S.addToTarget("test", test)
 	S.addMagicToDefault "test"
