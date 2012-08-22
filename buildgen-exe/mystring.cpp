@@ -64,7 +64,6 @@ char *myalloc ( size_t chars )
 	checkAlloc(r);
 	return (char*)r;
 }
-
 char *myrealloc ( char *s, size_t chars )
 {
 	s = (char*)realloc(s, chars*sizeof(char));
@@ -230,5 +229,30 @@ TEST(MyString, mstrcat_charstringstring)
 	T('H', "", "ello.", "Hello.");
 	T('H', "eidi.", "", "Heidi.");
 #undef T
+}
+#endif
+
+char *mstrapp ( char **sp, const char *n )
+{
+	char *s = *sp;
+	size_t sl = strlen(s);
+	size_t nl = strlen(n);
+
+	s = myrealloc(s, sl+nl+1);
+	strcpy(s+sl, n);
+
+	*sp = s;
+	return s;
+}
+#ifdef TEST
+TEST(MyString, mstrapp)
+{
+	char *s1, *s2, *s3;
+
+	s1 = s2 = strdup("Hello");
+	s3 = mstrapp(&s1, " Mary.");
+	EXPECT_EQ(s1, s3);
+	EXPECT_STREQ(s1, "Hello Mary.");
+	free(s1);
 }
 #endif

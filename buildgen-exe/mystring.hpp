@@ -31,3 +31,5 @@ char *mstrcat ( char c, const char *s2 );
 
 char *mstrcat ( const char *s1, const char *s2, const char *s3 );
 char *mstrcat ( const char *s1, char c, const char *s3 );
+
+char *mstrapp ( char **sp, const char *n );
