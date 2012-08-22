@@ -130,6 +130,10 @@ void BuildGenLuaEnv::buildgenify_lua ( void )
 
 	lua_pushvalue(L, LUA_GLOBALSINDEX);
 	lua_setfield(L, LUA_REGISTRYINDEX, "buildgen_G");
+
+	/*** Load our Error Handler ***/
+	luaL_loadstring(L, "m = ...; return debug.traceback(m, 2)");
+	lua_setfield(L, LUA_REGISTRYINDEX, "buildgen_errorhandler");
 }
 
 void BuildGenLuaEnv::define( char *key, char *value )
@@ -166,7 +170,9 @@ void BuildGenLuaEnv::doRunFile ( const char *path )
 	free(d);
 
 	lua_settop(L, 0);
-	lua_pushcfunction(L, &LuaFunctions::error_handler);
+
+	lua_getfield(L, LUA_REGISTRYINDEX, "buildgen_errorhandler");
+
 	int s = luaL_loadfile(L, (char*)path);
 	if ( s == 0 )
 	{
