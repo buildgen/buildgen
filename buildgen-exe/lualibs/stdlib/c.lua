@@ -387,6 +387,8 @@ function S.c.findIncludeDir ( file )
 	return false
 end
 
+local generatorScript = C.path("c/generateHeader.lua")
+
 --- Create a header file with definitions.
 -- Creates a header/source pair with definitions. Currently all values are
 -- treated as strings with type  `const char*`.
@@ -401,8 +403,6 @@ function S.c.generateHeader ( head, src, definitions )
 	T.utils.assert_string(1, head)
 	T.utils.assert_string(2, src)
 	T.utils.assert_arg(2, definitions, "table")
-
-	local generatorScript = S.lualibsRoot .. "c/generateHeader.lua"
 
 	head = C.path(head)
 	src  = C.path(src)
