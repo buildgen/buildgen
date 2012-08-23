@@ -68,7 +68,15 @@ if D.debug then S.c.debug = true end
 -- @return The newly created state.
 function S.c.newState ( )
 	local data = {
+		includes = T.OrderedMap(),
+		defines  = T.Map(),
+
 		arguments = T.List(),
+
+		debug        = nil,
+		optimization = nil,
+		profile      = nil,
+
 		linker    = S.ld.newState(),
 	}
 
@@ -91,13 +99,7 @@ end
 -- @return The old state.
 function S.c.swapState ( new )
 	local old = state
-
-	old.debug        = S.c.debugOveride
-	old.optimization = S.c.optimizationOveride
-	old.profile      = S.c.profileOveride
-
 	S.c.loadState(new)
-
 	return old
 end
 
@@ -107,64 +109,156 @@ end
 -- @param data The state to load.
 function S.c.loadState ( data )
 	state = data
-
-	S.c.debugOveride        = data.debug
-	S.c.optimizationOveride = data.optimization
-	S.c.profileOveride      = data.profile
 end
 
 S.c.swapState(S.c.newState())
 
-if not P.S.c.compiler then
-	local compilers = T.List{
-		{	name = "gcc", -- Name of the executable
-			flags = {
-				compile  = "-c",
-				output   = {"-o", "%s"}, -- the option to set the output file name.
-				debug    = "-g",         -- the option to enable debug mode.
-				profile  = "-p",         -- the option to enable profiling.
-				include  = {"-I", "%s"}, -- the option to add an include directory.
-				define   = {"-D%s"}, -- the option to add an include directory.
-				optimize = {             -- Flags for different levels of optimization.
-					none    = {},
-					quick   = "-O",
-					regular = "-O2",     -- Default optimazation.
-					full    = "-O3",
-					max     = {
-								"-O3",
-								"-fexpensive-optimizations",
-								"-fomit-frame-pointer"
-							  },     -- Highest possoble (possibly exparemental)
-				}
-			}
-		},
+local compilers = T.OrderedMap()
+compilers:set("gcc",	{
+	exe = "gcc", -- Name of the executable
+	flags = {
+		compile  = "-c",
+		output   = {"-o", "%s"}, -- the option to set the output file name.
+		debug    = "-g",         -- the option to enable debug mode.
+		profile  = "-p",         -- the option to enable profiling.
+		include  = {"-I", "%s"}, -- the option to add an include directory.
+		define   = {"-D%s"}, -- the option to add an include directory.
+		optimize = {             -- Flags for different levels of optimization.
+			none    = {},
+			quick   = "-O",
+			regular = "-O2",     -- Default optimazation.
+			full    = "-O3",
+			max     = {
+						"-O3",
+						"-fexpensive-optimizations",
+						"-fomit-frame-pointer"
+					  },     -- Highest possoble (possibly exparemental)
+		}
 	}
+})
 
-	local compiler;
-	for c in compilers:iter() do          -- Find the first compiler they have
-		if S.findExecutable(c.name) then -- installed on thier system.
-			compiler = c
-			compiler.name = S.findExecutable(compiler.name)
+--- Check to see if a compiler is available.
+--
+-- Checks to see that a compiler is available and that BuildGen knows how
+-- to use it.
+--
+-- @tparam string name The name of the compiler (often the name of the executable).
+-- @treturn boolean `true` if the compiler can be used otherwise `false`.
+function S.c.hasCompiler ( name )
+	if name == nil then return false end
+	T.utils.assert_string(1, name)
 
-			break
+	if compilers[name] == nil then return false end
+
+	local c = compilers[name]
+	if not S.findExecutable(c.exe) then return false end
+
+	return true
+end
+
+--- Select which compiler to use.
+--
+-- This function selects the C compiler to use.  You should first check if
+-- the compiler is avaiable with `S.c.hasCompiler()`.
+--
+-- @tparam string name The name of the compiler (often the name of the executable).
+function S.c.useCompiler ( name )
+	T.utils.assert_arg(1, name, "string",
+	                  S.c.hasCompiler, "Unknown compiler",
+	                  2)
+
+	local c = compilers[name]
+
+	local function makeList ( path )
+		local c = c; -- The parent table.
+		local i;     -- The index in c.
+		for e in path:split("."):iter() do -- Recursively get table.
+			if i then c = c[i] end
+			i = e
+		end
+
+		if type(c[i]) == "table" then
+			c[i] = T.List(c[i])
+		else
+			c[i] = T.List{c[i]}
+		end
+
+		return c[i]
+	end
+
+	c.exe = S.findExecutable(c.exe)
+	makeList "flags.compile"
+	makeList "flags.output"
+	makeList "flags.debug"
+	makeList "flags.profile"
+	makeList "flags.define"
+	makeList "flags.include"
+	makeList "flags.optimize.none"
+	makeList "flags.optimize.quick"
+	makeList "flags.optimize.regular"
+	makeList "flags.optimize.full"
+	makeList "flags.optimize.max"
+
+	P.S.c.compiler = c
+end
+
+if not P.S.c.compiler then
+	if D["c.compiler"] then
+		if S.c.hasCompiler(D["c.compiler"]) then
+			S.c.useCompiler(D["c.compiler"])
+		else
+			error("Error: requested compiler "..D["c.compiler"].." not found", 0)
 		end
 	end
 
-	if compiler == nil then
+	if not P.S.c.compiler then
+		if S.c.hasCompiler(D["c.preferedCompiler"]) then
+			S.c.useCompiler(D["c.preferedCompiler"])
+		end
+	end
+
+	if not P.S.c.compiler then
+		for n in T.OrderedMap.iter(compilers) do -- Find the a compiler that
+			if S.c.hasCompiler(n) then           -- they have installed on their
+				S.c.useCompiler(n)               -- system.
+				break
+			end
+		end
+	end
+
+	if not P.S.c.compiler then
 		error("Error: No C compiler found.", 0)
-	else
-		P.S.c.compiler = compiler
 	end
 end
 
 --- Overide the default optimization level.
-S.c.optimizationOveride = S.c.optimizationOveride
+function S.c.optimizationOveride ( level )
+	if level ~= nil then
+		T.utils.assert_arg(1, level, "string",
+		                   validOptimization, "Unknown optimization level.",
+		                   2)
+	end
+
+	state.optimization = level
+end
 
 --- Overide the default profile setting.
-S.c.profileOveride = S.c.profileOveride
+function S.c.profileOveride ( profile )
+	if level ~= nil then
+		T.utils.assert_arg(1, profile, "boolean")
+	end
+
+	state.profile = profile
+end
 
 --- Overide the default profile setting.
-S.c.debugOveride = S.c.debugOveride
+function S.c.debugOveride ( debug )
+	if level ~= nil then
+		T.utils.assert_arg(1, debug, "boolean")
+	end
+
+	state.debug = debug
+end
 
 --- Add an argrment.
 -- Add an argument to the compiler command line.  Please try to avoid using this
@@ -175,28 +269,34 @@ S.c.debugOveride = S.c.debugOveride
 -- @tparam {string,...} args values to be added to the compiler command line.
 function S.c.addArg ( args )
 	if type(args) ~= "table" then
-		args = T.List{tostring(args)}
+		args = tostring(args)
 	else
 		args = T.List(args)
 	end
 
-	for a in args:iter() do state.arguments:append(a) end
+	state.arguments:extend(args)
 end
 
 --- Add an include directory
 --
 -- @tparam {string,...} dir These will be treated as BuildGen paths.
 function S.c.addInclude ( dir )
-	if type(dir) ~= "table" then
-		dir = {tostring(dir)}
+	if type(dir) == "table" then
+		for d in T.List(dir):iter() do
+			state.includes:set(C.path(d), true)
+		end
+	else
+		T.utils.assert_string(1, dir)
+		state.includes:set(C.path(dir), true)
+	end
+end
+local function includeArgs ()
+	local a = T.List()
+	for v in state.includes:keys():iter() do
+		a:extend(P.S.c.compiler.flags.include:map():format(v))
 	end
 
-	for k, v in pairs(dir) do
-		v = C.path(v)
-		for l, w in pairs(P.S.c.compiler.flags.include) do
-			S.c.addArg(w:format(v))
-		end
-	end
+	return a
 end
 
 --- Define a macro
@@ -205,20 +305,38 @@ end
 -- @tparam {[string]=string,...} map A table of key/value pairs to be defined
 -- during compilation.
 function S.c.define ( map )
-	if type(map) ~= "table" then
-		map = {tostring(map)}
-	end
+	T.utils.assert_arg(1, map, "table")
 
-	for k, v in pairs(map) do
+	T.Map.update(state.defines, map)
+end
+--- Undefine a macro
+-- Stop a macro from being defined.
+--
+-- @tparam {string,...} ids A list of macro identifiers to be undefined.
+function S.c.undefine ( ids )
+	if type(ids) == "table" then
+		for id in T.List(ids):iter() do
+			T.Map.set(state.defines, id, nil)
+		end
+	else
+		T.utils.assert_arg(1, ids, "string")
+		T.Map.set(state.defines, ids, nil)
+	end
+end
+
+local function defineArgs ()
+	local a = T.List()
+	for k, v in T.Map.iter(state.defines) do
 		if type(v) ~= "string" then
 			v = ""
 		else
 			v = "="..v
 		end
-		for l, w in pairs(P.L.avr.cpp.compiler.flags.define) do
-			L.avr.cpp.addArg(w:format(k..v))
-		end
+
+		a:extend(P.S.c.compiler.flags.define:map():format(k..v))
 	end
+
+	return a
 end
 
 --- Link a library.
@@ -247,46 +365,44 @@ function S.c.compileObject (src, headers, obj)
 	obj = C.path(obj)
 	src = C.path(src)
 	headers = T.List(headers):map(C.path)
-	headers:append(src) -- We depend on the source file too.
+	headers:append(src)
 
 	local compiler = P.S.c.compiler
 
-	local oldarguments = state.arguments
-	state.arguments = T.List()
+	local cmd = T.List{compiler.exe}
+	cmd:extend(compiler.flags.compile)
 
-	S.c.addArg(compiler.name)
-	S.c.addArg(compiler.flags.compile)
-
-	S.c.addArg(oldarguments)
-
-	local debug = S.c.debugOveride
+	local debug = state.debug
 	if debug == nil then debug = S.c.debug end
-	if debug then                      -- Add the debug flag.
-		S.c.addArg(compiler.flags.debug)
+	if debug then -- Add the debug flag.
+		cmd:extend(compiler.flags.debug)
+		S.c.define{DEBUG=true}
+		S.c.undefine("NDEBUG")
+	else                   -- Add the debug flag.
+		S.c.define{NDEBUG=true}
+		S.c.undefine("DEBUG")
 	end
-	local profile = S.c.profileOveride
+	local profile = state.profile
 	if profile == nil then profile = S.c.profile end
-	if profile then                    -- Add the profile flag.
-		S.c.addArg(compiler.flags.profile)
+	if profile then -- Add the profile flag.
+		cmd:extend(compiler.flags.profile)
 	end
-	local optimization = S.c.optimizationOveride
+	local optimization = state.optimization
 	if optimization == nil then optimization = S.c.optimization end
-	local o = compiler.flags.optimize[optimization] -- Set the optimization
-	if o then                                       -- level.                                --
-		S.c.addArg(o)                               --
-	end                                             --
+	cmd:extend(compiler.flags.optimize[optimization]) -- Set the optimization level.
 
-	for i in T.List(compiler.flags.output):iter() do -- Add the desired output
-		S.c.addArg(i:format(obj))                    -- file to the command
-	end                                              -- line.
+	cmd:extend(includeArgs())
+	cmd:extend(defineArgs())
+	cmd:extend(state.arguments)
 
-	S.c.addArg(src)
+	-- Add the desired output file to the command line.
+	cmd:extend(compiler.flags.output:map():format(obj))
 
-	C.addGenerator(headers, state.arguments, {obj}, {
+	cmd:append(src)
+
+	C.addGenerator(headers, cmd, {obj}, {
 		description = "Compiling "..obj
 	})
-
-	state.arguments = oldarguments;
 end
 
 local function compile ( linkfunc, sources, out )

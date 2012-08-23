@@ -68,13 +68,13 @@ if D.debug then S.cpp.debug = true end
 function S.cpp.newState ( )
 	local data = {
 		includes = T.OrderedMap(),
-		defines  = T.OrderedMap(),
+		defines  = T.Map(),
 
 		arguments = T.List(),
 
-		debug        = S.cpp.debug,
-		optimization = S.cpp.optimization,
-		profile      = S.cpp.profile,
+		debug        = nil,
+		optimization = nil,
+		profile      = nil,
 
 		linker    = S.ld.newState(),
 	}
@@ -116,53 +116,52 @@ function S.cpp.loadState ( data )
 	state = data
 end
 
-local compilers = T.Map{
-	["g++"] = {
-		exe = "g++", -- Name of the executable
-		flags = {
-			compile  = {"-c"},
-			output   = {"-o", "%s"}, -- the option to set the output file name.
-			debug    = "-g",         -- the option to enable debug mode.
-			profile  = "-p",         -- the option to enable profiling.
-			define   = {"-D%s"},     -- the option to define a macro.
-			include  = {"-I", "%s"}, -- the option to add an include directory.
-			optimize = {             -- Flags for different levels of optimization.
-				none    = {},
-				quick   = "-O",
-				regular = "-O2",     -- Default optimazation.
-				full    = "-O3",
-				max     = { -- Highest possoble (possibly exparemental)
-					"-O3",
-					"-fexpensive-optimizations",
-					"-fomit-frame-pointer"
-				},
-			}
+local compilers = T.OrderedMap()
+compilers:set("g++", {
+	exe = "g++", -- Name of the executable
+	flags = {
+		compile  = {"-c"},
+		output   = {"-o", "%s"}, -- the option to set the output file name.
+		debug    = "-g",         -- the option to enable debug mode.
+		profile  = "-p",         -- the option to enable profiling.
+		define   = {"-D%s"},     -- the option to define a macro.
+		include  = {"-I", "%s"}, -- the option to add an include directory.
+		optimize = {             -- Flags for different levels of optimization.
+			none    = {},
+			quick   = "-O",
+			regular = "-O2",     -- Default optimazation.
+			full    = "-O3",
+			max     = { -- Highest possoble (possibly exparemental)
+				"-O3",
+				"-fexpensive-optimizations",
+				"-fomit-frame-pointer"
+			},
 		}
-	},
-	["clang"] = {
-		exe = "clang", -- Name of the executable
-		flags = {
-			compile  = {"-c"},
-			output   = {"-o", "%s"}, -- the option to set the output file name.
-			debug    = {"-g"},         -- the option to enable debug mode.
-			profile  = {"-p"},         -- the option to enable profiling.
-			define   = {"-D%s"},     -- the option to define a macro.
-			include  = {"-I", "%s"}, -- the option to add an include directory.
-			optimize = {             -- Flags for different levels of optimization.
-				none    = {},
-				quick   = "-O",
-				regular = "-O2",     -- Default optimazation.
-				full    = "-O3",
-				max     = { -- Highest possoble (possibly exparemental)
-					"-O3",
-					"-fexpensive-optimizations",
-					"-fomit-frame-pointer"
-				},
-			}
+	}
+})
+compilers:set("gcc", compilers["g++"])
+compilers:set("clang", {
+	exe = "clang", -- Name of the executable
+	flags = {
+		compile  = {"-c"},
+		output   = {"-o", "%s"}, -- the option to set the output file name.
+		debug    = {"-g"},         -- the option to enable debug mode.
+		profile  = {"-p"},         -- the option to enable profiling.
+		define   = {"-D%s"},     -- the option to define a macro.
+		include  = {"-I", "%s"}, -- the option to add an include directory.
+		optimize = {             -- Flags for different levels of optimization.
+			none    = {},
+			quick   = "-O",
+			regular = "-O2",     -- Default optimazation.
+			full    = "-O3",
+			max     = { -- Highest possoble (possibly exparemental)
+				"-O3",
+				"-fexpensive-optimizations",
+				"-fomit-frame-pointer"
+			},
 		}
-	},
-}
-compilers["gcc"] = compilers["g++"]
+	}
+})
 
 --- Check to see if a compiler is available.
 --
@@ -245,7 +244,7 @@ if not P.S.cpp.compiler then
 	end
 
 	if not P.S.cpp.compiler then
-		for n in T.Map.iter(compilers) do -- Find the a compiler that they have
+		for n in T.OrderedMap.iter(compilers) do -- Find the a compiler that they have
 			if S.cpp.hasCompiler(n) then  -- installed on thier system.
 				S.cpp.useCompiler(n)
 				break
@@ -259,28 +258,35 @@ if not P.S.cpp.compiler then
 end
 
 local function validOptimization ( level )
-	return {none=true,quick=true,regular=true,full=true,max=true} or false
+	local levels = {none=true,quick=true,regular=true,full=true,max=true}
+	return levels[level] or false
 end
 
 --- Overide the default optimization level.
 function S.cpp.optimizationOveride ( level )
-	T.utils.assert_arg(1, level, "string",
-	                   validOptimization, "Unknown optimization level.",
-	                   2)
+	if level ~= nil then
+		T.utils.assert_arg(1, level, "string",
+		                   validOptimization, "Unknown optimization level.",
+		                   2)
+	end
 
 	state.optimization = level
 end
 
 --- Overide the default profile setting.
 function S.cpp.profileOveride ( profile )
-	T.utils.assert_arg(1, profile, "boolean")
+	if level ~= nil then
+		T.utils.assert_arg(1, profile, "boolean")
+	end
 
 	state.profile = profile
 end
 
 --- Overide the default profile setting.
 function S.cpp.debugOveride ( debug )
-	T.utils.assert_arg(1, debug, "boolean")
+	if level ~= nil then
+		T.utils.assert_arg(1, debug, "boolean")
+	end
 
 	state.debug = debug
 end
@@ -305,16 +311,23 @@ end
 -- @tparam {string,...} dir Add include directories.  These will be treated as
 -- BuildGen paths.
 function S.cpp.addInclude ( dir )
-	if type(dir) ~= "table" then
-		dir = {tostring(dir)}
+	if type(dir) == "table" then
+		for d in T.List(dir):iter() do
+			state.includes:set(C.path(d), true)
+		end
+	else
+		T.utils.assert_string(1, dir)
+		state.includes:set(C.path(dir), true)
 	end
-	dir = T.List(dir)
+end
 
-	for v in dir:iter() do
-		v = C.path(v)
-
-		S.cpp.addArg(P.S.cpp.compiler.flags.include:map():format(v))
+local function includeArgs ()
+	local a = T.List()
+	for v in state.includes:keys():iter() do
+		a:extend(P.S.cpp.compiler.flags.include:map():format(v))
 	end
+
+	return a
 end
 
 --- Define a macro
@@ -325,15 +338,36 @@ end
 function S.cpp.define ( map )
 	T.utils.assert_arg(1, map, "table")
 
-	for k, v in pairs(map) do
+	T.Map.update(state.defines, map)
+end
+--- Undefine a macro
+-- Stop a macro from being defined.
+--
+-- @tparam {string,...} ids A list of macro identifiers to be undefined.
+function S.cpp.undefine ( ids )
+	if type(ids) == "table" then
+		for id in T.List(ids):iter() do
+			T.Map.set(state.defines, id, nil)
+		end
+	else
+		T.utils.assert_arg(1, ids, "string")
+		T.Map.set(state.defines, ids, nil)
+	end
+end
+
+local function defineArgs ()
+	local a = T.List()
+	for k, v in T.Map.iter(state.defines) do
 		if type(v) ~= "string" then
 			v = ""
 		else
 			v = "="..v
 		end
 
-		S.cpp.addArg(P.S.cpp.compiler.flags.define:map():format(k..v))
+		a:extend(P.S.cpp.compiler.flags.define:map():format(k..v))
 	end
+
+	return a
 end
 
 --- Link a library.
@@ -366,45 +400,42 @@ function S.cpp.compileObject ( src, headers, obj )
 
 	local compiler = P.S.cpp.compiler
 
-	local oldarguments = state.arguments
-	state.arguments = T.List()
+	local cmd = T.List{compiler.exe}
+	cmd:extend(compiler.flags.compile)
 
-	S.cpp.addArg(compiler.exe)
-	S.cpp.addArg(compiler.flags.compile)
-
-	S.cpp.addArg(oldarguments)
-
-	local debug = S.cpp.debugOveride
+	local debug = state.debug
 	if debug == nil then debug = S.cpp.debug end
 	if debug then -- Add the debug flag.
-		S.cpp.addArg(compiler.flags.debug)
+		cmd:extend(compiler.flags.debug)
 		S.cpp.define{DEBUG=true}
+		S.cpp.undefine("NDEBUG")
 	else                   -- Add the debug flag.
 		S.cpp.define{NDEBUG=true}
+		S.cpp.undefine("DEBUG")
 	end
-	local profile = S.cpp.profileOveride
+	local profile = state.profile
 	if profile == nil then profile = S.cpp.profile end
 	if profile then -- Add the profile flag.
-		S.cpp.addArg(compiler.flags.profile)
+		cmd:extend(compiler.flags.profile)
 	end
-	local optimization = S.cpp.optimizationOveride
+	local optimization = state.optimization
 	if optimization == nil then optimization = S.cpp.optimization end
-	local o = compiler.flags.optimize[optimization] -- Set the optimization
-	if o then                                       -- level.                                --
-		S.cpp.addArg(o)                             --
-	end                                             --
+	cmd:extend(compiler.flags.optimize[optimization]) -- Set the optimization level.
+
+	cmd:extend(includeArgs())
+	cmd:extend(defineArgs())
+	cmd:extend(state.arguments)
 
 	-- Add the desired output file to the command line.
-	S.cpp.addArg(compiler.flags.output:map():format(obj))
+	cmd:extend(compiler.flags.output:map():format(obj))
 
-	S.cpp.addArg(src)
+	cmd:append(src)
 
-	C.addGenerator(headers, state.arguments, {obj}, {
+	C.addGenerator(headers, cmd, {obj}, {
 		description = "Compiling "..obj
 	})
-
-	state.arguments = oldarguments;
 end
+
 --- Compile an Executable
 -- Compiles and links a list of files into executables.
 --
