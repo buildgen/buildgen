@@ -42,7 +42,10 @@ S.cpp.addInclude "@"
 S.cpp.addInclude "<"
 S.cpp.addInclude(S.lua.includeDir())
 
-S.cpp.addLib{"m", S.lua.libName(), "gtest"}
+S.cpp.addLib{"m", S.lua.libName()}
+if D.test then
+	S.cpp.addLib{"gtest", "pthread"}
+end
 
 local headers = T.List{"@info.h"}:extend(T.dir.getfiles(".", "*.hpp"))
                                  :extend(L.buildgenXML.headers)
@@ -56,6 +59,7 @@ files = T.List{"main.cpp"}:extend(headers):extend(sources) -- Compile gen
 local gen = S.cpp.compile(files, "@gen")                   --
 
 if D.test then
+	S.cpp.addLib{"gtest", "pthread"}
 	files = T.List{"test.cpp"}:extend(headers):extend(sources) -- Compile the tests
 
 	local test = S.cpp.compile(files, "@test")
