@@ -8,7 +8,7 @@ before_install:
  - sudo luarocks install luafilesystem
  - sudo luarocks install penlight
  - SRC="$(pwd)"
- - mkdir "$SRC/gtest/" && cd "$SRC/gtest/" /usr/src/gtest/ && make && sudo cp libgtest.a libgtest_main.a /usr/lib/
+ - mkdir "$SRC/gtest/" && cd "$SRC/gtest/" && cmake /usr/src/gtest/ && make && sudo cp libgtest.a libgtest_main.a /usr/lib/
  - cd "$SRC"
 script:
  - SRC="$(pwd)"
