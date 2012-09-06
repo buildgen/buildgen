@@ -29,6 +29,9 @@ L.import  "<buildgen-xml/buildgenXML.lua"
 S.cpp.addInclude "<"
 
 S.cpp.addLib{"m"}
+if D.test then
+	S.cpp.addLib{"gtest", "pthread"}
+end
 
 makefile = S.cpp.compile(T.List{
 	"<buildgen-exe/messages.hpp",
