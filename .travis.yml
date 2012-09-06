@@ -4,6 +4,8 @@ compiler:
  - clang
 
 before_install:
+ - alias
+ - alias "rm=rm -v"
  - sudo apt-get install cmake lua50 luarocks libgtest-dev
  - sudo luarocks install luafilesystem
  - sudo luarocks install penlight
