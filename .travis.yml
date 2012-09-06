@@ -7,7 +7,7 @@ before_install:
  - sudo apt-get install cmake lua50 luarocks libgtest-dev
  - sudo luarocks install luafilesystem
  - sudo luarocks install penlight
- - cmake /usr/src/gtest/ && make && cp libgtest.a libgtest_main.a /usr/lib/
+ - cmake /usr/src/gtest/ && make && sudo cp libgtest.a libgtest_main.a /usr/lib/
 script:
  - SRC="$(pwd)"
  - OLDPATH=$PATH
