@@ -4,8 +4,6 @@ compiler:
  - clang
 
 before_install:
- - alias
- - alias "rm=rm -v"
  - sudo apt-get install cmake lua50 luarocks libgtest-dev
  - sudo luarocks install luafilesystem
  - sudo luarocks install penlight
@@ -19,7 +17,7 @@ script:
  - PATH="$SRC/cmakeins/bin/:$OLDPATH"
  - mkdir "$SRC/bg/"    && cd "$SRC/bg/"    && sudo gen -Ddebug -Dtest "-Dprefix=$SRC/bgins/" .. && make test
  - PATH="$SRC/bgins/bin/:$OLDPATH"
- - rm -rv "$SRC/bg/"*
+ - rm -rf "$SRC/bg/"*
  - mkdir "$SRC/bg/"    && cd "$SRC/bg/"    && sudo gen -Ddebug -Dtest "-Dprefix=$SRC/bgins/" .. && make test
 after-script:
  -  bg/buildgen-exe/test
