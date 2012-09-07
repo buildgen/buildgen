@@ -9,7 +9,6 @@ before_install:
  - sudo luarocks install penlight
  - src="$(pwd)"
  - mkdir "$src/gtest/" && cd "$src/gtest/" && cmake /usr/src/gtest/ && make && sudo cp libgtest.a libgtest_main.a /usr/lib/
- - cd "$src"
 script:
  - SRC="$(pwd)"
  - OLDPATH=$PATH
@@ -19,6 +18,5 @@ script:
  - PATH="$src/bgins0/bin/:$OLDPATH"
  - mkdir "$src/bg1/"    && cd "$src/bg1/"  && sudo gen -Ddebug -Dtest "-Dprefix=$SRC/bgins1/" .. && make test
 
- - echo "######################$src"
  - cd "$src/"
  - bg1/buildgen-exe/test
