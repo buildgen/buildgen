@@ -18,5 +18,4 @@ script:
  - mkdir "$SRC/bg0/"    && cd "$SRC/bg0/"    && sudo gen -Ddebug -Dtest "-Dprefix=$SRC/bgins0/" .. && make install
  - PATH="$SRC/bgins0/bin/:$OLDPATH"
  - mkdir "$SRC/bg1/"    && cd "$SRC/bg1/"    && sudo gen -Ddebug -Dtest "-Dprefix=$SRC/bgins1/" .. && make test
-after-script:
  -  bg1/buildgen-exe/test
