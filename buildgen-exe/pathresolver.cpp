@@ -188,7 +188,7 @@ TEST(PathResolver, normalizeFilename)
 
 	chdir("/home/");
 
-	T("/this/is/a/test/", "/this/is/a/failed/test/");
+	T("/this/is/a/test/", "/this/is/a/test/");
 	T("/home/this/is/a/test/", "!/this/is/a/test/");
 	T("/home/!!/this/is/a/test/", "!!!/this/is/../is/a/test/");
 	T("/bin/ls", "*ls");
