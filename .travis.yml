@@ -12,11 +12,11 @@ before_install:
 script:
  - SRC="$(pwd)"
  - OLDPATH=$PATH
- - mkdir "$src/cmake/" && cd "$src/cmake/" && cmake "-DCMAKE_INSTALL_PREFIX:PATH=$SRC/cmakeins/" .. && make install
+ - mkdir "$src/cmake/" && cd "$src/cmake/" && cmake "-DCMAKE_INSTALL_PREFIX:PATH=$src/cmakeins/" .. && make install
  - PATH="$src/cmakeins/bin/:$OLDPATH"
- - mkdir "$src/bg0/"    && cd "$src/bg0/"  && sudo gen -Ddebug -Dtest "-Dprefix=$SRC/bgins0/" .. && make install
+ - mkdir "$src/bg0/"    && cd "$src/bg0/"  && sudo gen -Ddebug -Dtest "-Dprefix=$src/bgins0/" .. && make install
  - PATH="$src/bgins0/bin/:$OLDPATH"
- - mkdir "$src/bg1/"    && cd "$src/bg1/"  && sudo gen -Ddebug -Dtest "-Dprefix=$SRC/bgins1/" .. && make test
+ - mkdir "$src/bg1/"    && cd "$src/bg1/"  && sudo gen -Ddebug -Dtest "-Dprefix=$src/bgins1/" .. && make test
 
  - cd "$src/"
  - bg1/buildgen-exe/test
