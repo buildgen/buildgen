@@ -7,17 +7,18 @@ before_install:
  - sudo apt-get install cmake lua50 luarocks libgtest-dev
  - sudo luarocks install luafilesystem
  - sudo luarocks install penlight
- - SRC="$(pwd)"
- - mkdir "$SRC/gtest/" && cd "$SRC/gtest/" && cmake /usr/src/gtest/ && make && sudo cp libgtest.a libgtest_main.a /usr/lib/
- - cd "$SRC"
+ - src="$(pwd)"
+ - mkdir "$src/gtest/" && cd "$src/gtest/" && cmake /usr/src/gtest/ && make && sudo cp libgtest.a libgtest_main.a /usr/lib/
+ - cd "$src"
 script:
  - SRC="$(pwd)"
  - OLDPATH=$PATH
- - mkdir "$SRC/cmake/" && cd "$SRC/cmake/" && cmake "-DCMAKE_INSTALL_PREFIX:PATH=$SRC/cmakeins/" .. && make install
- - PATH="$SRC/cmakeins/bin/:$OLDPATH"
- - mkdir "$SRC/bg0/"    && cd "$SRC/bg0/"    && sudo gen -Ddebug -Dtest "-Dprefix=$SRC/bgins0/" .. && make install
- - PATH="$SRC/bgins0/bin/:$OLDPATH"
- - mkdir "$SRC/bg1/"    && cd "$SRC/bg1/"    && sudo gen -Ddebug -Dtest "-Dprefix=$SRC/bgins1/" .. && make test
+ - mkdir "$src/cmake/" && cd "$src/cmake/" && cmake "-DCMAKE_INSTALL_PREFIX:PATH=$SRC/cmakeins/" .. && make install
+ - PATH="$src/cmakeins/bin/:$OLDPATH"
+ - mkdir "$src/bg0/"    && cd "$src/bg0/"  && sudo gen -Ddebug -Dtest "-Dprefix=$SRC/bgins0/" .. && make install
+ - PATH="$src/bgins0/bin/:$OLDPATH"
+  - mkdir "$src/bg1/"    && cd "$src/bg1/"  && sudo gen -Ddebug -Dtest "-Dprefix=$SRC/bgins1/" .. && make test
 
- - cd "$SRC/
+ - echo "######################$src"
+ - cd "$src/"
  - bg1/buildgen-exe/test
