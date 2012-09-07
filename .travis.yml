@@ -15,8 +15,8 @@ script:
  - OLDPATH=$PATH
  - mkdir "$SRC/cmake/" && cd "$SRC/cmake/" && cmake "-DCMAKE_INSTALL_PREFIX:PATH=$SRC/cmakeins/" .. && make install
  - PATH="$SRC/cmakeins/bin/:$OLDPATH"
- - mkdir "$SRC/bg0/"    && cd "$SRC/bg0/"    && sudo gen -Ddebug -Dtest "-Dprefix=$SRC/bgins/" .. && make install
- - PATH="$SRC/bgins/bin/:$OLDPATH"
- - mkdir "$SRC/bg1/"    && cd "$SRC/bg1/"    && sudo gen -Ddebug -Dtest "-Dprefix=$SRC/bgins/" .. && make test
+ - mkdir "$SRC/bg0/"    && cd "$SRC/bg0/"    && sudo gen -Ddebug -Dtest "-Dprefix=$SRC/bgins0/" .. && make install
+ - PATH="$SRC/bgins0/bin/:$OLDPATH"
+ - mkdir "$SRC/bg1/"    && cd "$SRC/bg1/"    && sudo gen -Ddebug -Dtest "-Dprefix=$SRC/bgins1/" .. && make test
 after-script:
  -  bg1/buildgen-exe/test
