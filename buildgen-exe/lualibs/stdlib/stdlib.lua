@@ -254,8 +254,9 @@ end
 -- @tparam string path The path of the target.
 -- @tparam string to The directory to install the file.  This is treated as
 -- relative to the install prefix (`S.prefix`) if it is not absolute.
+-- @tparam number perm The unix permissions (see S.util.install)
 -- @treturn {string,...} A List of files that will be installed.
-function S.install ( path, to )
+function S.install ( path, to, perm )
 	T.utils.assert_string(1, path)
 	T.utils.assert_string(2, to)
 
@@ -270,12 +271,12 @@ function S.install ( path, to )
 	if T.path.isdir(apath) then
 		for f in T.List(T.dir.getallfiles(path)):iter() do
 			local fto = T.path.join(to, f)
-			S.util.install(f, fto)
+			S.util.install(f, fto, perm)
 			C.addDependancy("install", fto, { magic = true })
 			installed:append(fto)
 		end
 	else
-		S.util.install(apath, to)
+		S.util.install(apath, to, perm)
 		C.addDependancy("install", to, { magic = true })
 		installed:append(to)
 	end
