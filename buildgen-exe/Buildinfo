@@ -86,5 +86,5 @@ for f in llibs:iter() do
 end
 
 S.install("lualibs/config.ld", lualibsdir)
-S.util.install("lualibs/gen-docs.sh", T.path.join(T.path.join(S.prefix, "bin"), "gen-docs"))
+S.util.install("lualibs/gen-docs.sh", T.path.join(S.prefix, "bin", "gen-docs"))
 S.addToTarget("install",  T.path.join(S.prefix, "bin", "gen-docs"))

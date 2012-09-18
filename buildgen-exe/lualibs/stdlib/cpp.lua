@@ -1,5 +1,14 @@
 --- The C++ Library
+--
+--  Definitions:
+--
+-- - `cpp.compiler` - The compiler to use.An error will be raised if this compiler can't be used.
+-- - `cpp.preferedCompiler` - The compiler to use, if available.
+-- - `debug` - If `true` debugging symbols will be included and optimization will
+--   be turned off.
+--
 -- @module S.cpp
+--
 
 -- Copyright 2011-2012 Kevin Cox
 
