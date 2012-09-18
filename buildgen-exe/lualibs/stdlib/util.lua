@@ -252,9 +252,7 @@ function S.util.install ( src, dest, perm )
         cmd:extend(P.S.util.cmd.install.flags.preargs)
         if perm then cmd:extend(T.List(P.S.util.cmd.install.flags.perm):map():format(perm)) end
 	cmd:append(src)
-	cmd:append(dest)
-
-	T.pretty.dump(cmd)
+        cmd:append(dest)
 	
 	C.addGenerator({src}, cmd, {dest}, {
 		description = "Installing "..src.." to "..dest
