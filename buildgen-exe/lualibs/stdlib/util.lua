@@ -249,7 +249,7 @@ function S.util.install ( src, dest, perm )
 
 	cmd = T.List()
 	cmd:append(P.S.util.cmd.install.name)
-	cmd:extend(P.S.util.cmd.install.flags.preargs)
+        cmd:extend(P.S.util.cmd.install.flags.preargs)
         if perm then cmd:extend(T.List(P.S.util.cmd.install.flags.perm):map():format(perm)) end
 	cmd:append(src)
 	cmd:append(dest)
