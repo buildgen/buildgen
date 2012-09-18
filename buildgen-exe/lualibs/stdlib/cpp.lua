@@ -140,8 +140,8 @@ compilers:set("g++", {
 	}
 })
 compilers:set("gcc", compilers["g++"])
-compilers:set("clang", {
-	exe = "clang", -- Name of the executable
+compilers:set("clang++", {
+	exe = "clang++", -- Name of the executable
 	flags = {
 		compile  = {"-c"},
 		output   = {"-o", "%s"}, -- the option to set the output file name.
@@ -162,6 +162,7 @@ compilers:set("clang", {
 		}
 	}
 })
+compilers:set("clang", compilers["clang++"])
 
 --- Check to see if a compiler is available.
 --
