@@ -45,9 +45,15 @@ function D.resolvePath ( path , default )
 
 	if not D[path] then
 		D[path] = default
-	elseif not T.path.isabs(D[path]) then
-		D[path] = C.path(">"..D[path])
+	else
+		D[path] = T.path.expanduser(D[path])
+
+		if not T.path.isabs(D[path]) then
+			D[path] = ">"..D[path]
+		end
 	end
+
+	D[path] = C.path(D[path])
 end
 
 if not S.prefix then
