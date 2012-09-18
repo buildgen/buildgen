@@ -140,12 +140,14 @@ if not P.S.util.cmd.install then
 	local installs = T.List{
 		{	name = "install", -- Name of the executable
 			flags = {
+				perm = {"-m", "%d"},
 				preargs = {"-D"},
 				verbose = "-v",
 			}
 		},
 		{	name = S.lualibsRoot.."util/cp.lua", -- Name of the executable
 			flags = {
+				perm = {},
 				preargs = {},
 				verbose = "-v",
 			}
@@ -233,19 +235,27 @@ end
 --
 -- @tparam string src The file to install.
 -- @tparam string dest Where to install it.
-function S.util.install ( src, dest )
+-- @tparam number perm File permissions.  This is a number representing the
+--   octal unix permissions.  The number will be given in decimal but the digits
+--   are what matters **do not** try to convert it to octal. (Ex: 755 **not**
+--   1363 for rwx-rx-rx)
+function S.util.install ( src, dest, perm )
 	T.utils.assert_string(1, src)
 	T.utils.assert_string(2, dest)
+	if perm then T.utils.assert_arg(3, perm, "number") end
 
 	src  = C.path(src)
 	dest = C.path(dest)
 
 	cmd = T.List()
 	cmd:append(P.S.util.cmd.install.name)
-	cmd:append(P.S.util.cmd.cp.flags.preargs)
+	cmd:extend(P.S.util.cmd.install.flags.preargs)
+        if perm then cmd:extend(T.List(P.S.util.cmd.install.flags.perm):map():format(perm)) end
 	cmd:append(src)
 	cmd:append(dest)
 
+	T.pretty.dump(cmd)
+	
 	C.addGenerator({src}, cmd, {dest}, {
 		description = "Installing "..src.." to "..dest
 	})

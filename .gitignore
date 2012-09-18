@@ -6,6 +6,12 @@ build/
 
 # QtCreator
 CMakeLists.txt.user
+*.config
+*.creator
+*.creator.user
+*.files
+*.includes
+*.kdev4
 
 # Code::Blocks
 BuildGen.cbp
