@@ -8,15 +8,15 @@ before_install:
  - sudo luarocks install luafilesystem
  - sudo luarocks install penlight
  - src="$(pwd)"
- - mkdir "$src/gtest/" && cd "$src/gtest/" && cmake /usr/src/gtest/ && make && sudo cp libgtest.a libgtest_main.a /usr/lib/
+ - mkdir -p "$src/gtest/" && cd "$src/gtest/" && cmake /usr/src/gtest/ && make && sudo cp libgtest.a libgtest_main.a /usr/lib/
 script:
  - SRC="$(pwd)"
  - OLDPATH=$PATH
- - mkdir "$src/cmake/" && cd "$src/cmake/" && cmake "-DCMAKE_INSTALL_PREFIX:PATH=$src/cmakeins/" .. && make install
+ - mkdir -p "$src/cmake/" && cd "$src/cmake/" && cmake "-DCMAKE_INSTALL_PREFIX:PATH=$src/cmakeins/" .. && make install
  - PATH="$src/cmakeins/bin/:$OLDPATH"
- - mkdir "$src/bg0/"    && cd "$src/bg0/"  && sudo gen -Ddebug -Dtest -Dcpp.compiler=$CXX "-Dprefix=$src/bgins0/" .. && make install
+ - mkdir -p "$src/bg0/"    && cd "$src/bg0/"  && sudo gen -Ddebug -Dtest -Dcpp.compiler=$CXX "-Dprefix=$src/bgins0/" .. && make install
  - PATH="$src/bgins0/bin/:$OLDPATH"
- - mkdir "$src/bg1/"    && cd "$src/bg1/"  && sudo gen -Ddebug -Dtest -Dcpp.compiler=$CXX "-Dprefix=$src/bgins1/" .. && make test
+ - mkdir -p "$src/bg1/"    && cd "$src/bg1/"  && sudo gen -Ddebug -Dtest -Dcpp.compiler=$CXX "-Dprefix=$src/bgins1/" .. && make test
 
  - cd "$src/"
  - bg1/buildgen-exe/test
