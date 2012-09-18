@@ -31,20 +31,17 @@
 
 Makefile::Makefile (ITargetManager *manager):
 	cwd(getcwd(NULL, 0)),
-	cwdlen(strlen(cwd)+1), // The one is for the trailing slash
 	manager(manager),
 	targets(manager->allTargets())
 {
-	cwd = (char*)realloc(cwd, (cwdlen+1)*sizeof(char));
-	cwd[cwdlen++] = '/';
-	cwd[cwdlen]   = '\0';
+	if ( cwd[cwd.length()-1] != '/' ) cwd.append("/");
 }
 
 std::string Makefile::relitiveName(std::string path)
 {
-	if ( path.find(cwd) != std::string::npos ) // Found it
+	if ( path.substr(0, cwd.length()) == cwd ) // Found it
 	{
-		std::string s(path.substr(cwdlen-1));
+		std::string s(path.substr(cwd.length()));
 
 		if ( s[0] == '\0' )
 			s = '.';
@@ -190,7 +187,7 @@ std::string Makefile::writeClean (void)
 	{
 		const Target *t = *i;
 
-		if ( !strncmp(cwd, t->path, cwdlen-1) && t != makefile ) // strcmp is so
+		if ( std::string(t->path).substr(0, cwd.length()) == cwd && t != makefile ) // strcmp is so
 		{ // that we only delete files in the build directory.
 			out += " ";
 			out += escape(relitiveName(t->path));
@@ -229,5 +226,4 @@ std::string Makefile::writeHelp ( void )
 
 Makefile::~Makefile()
 {
-	free(cwd);
 }

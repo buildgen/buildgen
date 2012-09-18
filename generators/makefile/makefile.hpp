@@ -33,8 +33,7 @@
 
 class Makefile
 {
-	char *cwd;
-	unsigned int cwdlen;
+	std::string cwd;
 
 	ITargetManager *manager;
 
