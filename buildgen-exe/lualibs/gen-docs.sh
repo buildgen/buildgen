@@ -1,4 +1,4 @@
-#! /bin/sh --
+#! /bin/bash --
 
 # Copyright 2011-2012 Kevin Cox
 
@@ -24,6 +24,8 @@
 #                                                                              #
 ################################################################################
 
+ourgen="$(dirname "$BASH_SOURCE")/gen"
+
 ldoc=''
 
 if (which 'ldoc.lua'); then
@@ -32,4 +34,4 @@ elif (which 'ldoc'); then
 	ldoc='ldoc'
 fi
 
-$ldoc "$(gen --buildgenlibs-root)" $@
+$ldoc "$("$ourgen" --buildgenlibs-root)" $@
