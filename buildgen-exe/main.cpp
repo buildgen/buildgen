@@ -26,6 +26,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <locale.h>
+#include <dirent.h>
 #include <sysexits.h> // BSD recomended exit stati
 
 #include <lua.hpp>
@@ -58,6 +59,8 @@ int main ( int argc, char **argv )
 		cmd[i] = mstrdup(argv[i]);  // Or else getopt changes them.
 	cmd[0] = findOurPath(argv[0]); // We will process this after files is init'ed.
 
+	DIR *owd  = opendir("."); // Remember the current directory.
+
 	opt::get_options(&argc, &argv);
 
 	TargetManager targetmanager;
@@ -73,6 +76,9 @@ int main ( int argc, char **argv )
 	char *rootFileName = files.resolver.normalizeFilename(files.rootfilename);
 	BuildGenLuaEnv lua(&files, rootFileName);
 	free(rootFileName);
+
+	fchdir(dirfd(owd)); // Change back to the last directory.
+	closedir(owd);
 
 	Target *regen = targetmanager.newTarget("regen");
 	regen->magic = 1;
