@@ -242,7 +242,7 @@ function S.util.install ( src, dest )
 
 	cmd = T.List()
 	cmd:append(P.S.util.cmd.install.name)
-	cmd:append(P.S.util.cmd.cp.flags.preargs)
+	cmd:extend(P.S.util.cmd.install.flags.preargs)
 	cmd:append(src)
 	cmd:append(dest)
 
