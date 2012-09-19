@@ -160,7 +160,7 @@ function L.import ( name )
 
 	if name:sub(-4) == ".lua" then
 		global = false
-		lname = name:sub(name:rfind("/"), -3)
+		lname = name:sub(name:rfind("/") or 1, -3)
 	else
 		global = true
 		lname = name
