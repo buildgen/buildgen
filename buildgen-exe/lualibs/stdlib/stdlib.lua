@@ -190,9 +190,10 @@ function S.findFile ( file, dirs )
 	----- Actually look for it.
 	for dir in dirs:iter() do
 		for root, _, files in T.dir.walk(dir) do
-			for f in files:iter() do
-				f = T.path.join(root, f)
-				for tf in file:iter() do
+			for tf in file:iter() do
+				for f in files:iter() do
+					f = T.path.join(root, f)
+				
 					if f:endswith(tf) then
 						if foundFiles[tf] then
 							foundFiles[tf]:append(f)
