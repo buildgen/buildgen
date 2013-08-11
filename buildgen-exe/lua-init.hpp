@@ -25,7 +25,7 @@
 #ifndef LUA_HPP
 #define LUA_HPP
 
-#include <lua.hpp>
+#include <lua5.1/lua.hpp>
 
 #include "files.hpp"
 

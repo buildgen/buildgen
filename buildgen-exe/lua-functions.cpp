@@ -29,7 +29,7 @@
 #include <queue>
 #include <sysexits.h>
 
-#include <lua.hpp>
+#include <lua5.1/lua.hpp>
 #include <locale>
 #include <math.h>
 

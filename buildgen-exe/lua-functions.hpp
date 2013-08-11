@@ -25,7 +25,7 @@
 #ifndef LUA_FUNCTIONS_HPP
 #define LUA_FUNCTIONS_HPP
 
-#include <lua.hpp>
+#include <lua5.1/lua.hpp>
 #include "files.hpp"
 #include "pathresolver.hpp"
 

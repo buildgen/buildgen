@@ -114,7 +114,7 @@ end
 S.c.swapState(S.c.newState())
 
 local compilers = T.OrderedMap()
-compilers:set("gcc",	{
+compilers:set("gcc", {
 	exe = "gcc", -- Name of the executable
 	flags = {
 		compile  = "-c",
